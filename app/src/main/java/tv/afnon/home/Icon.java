@@ -8,7 +8,8 @@ import android.view.View;
 
 /** Stroke icons on a 24px grid in the current colour, so they follow focus (README: Iconography). */
 final class Icon extends View {
-    static final int WIFI = 0, GEAR = 1, COMPASS = 2, BELL = 3, BACK = 4, STAR = 5, MIHRAB = 6, RADIO = 7, PLAY = 8, STOP = 9, MOON = 10;
+    static final int WIFI = 0, GEAR = 1, COMPASS = 2, BELL = 3, BACK = 4, STAR = 5, MIHRAB = 6, RADIO = 7, PLAY = 8, STOP = 9, MOON = 10,
+        NIGHT = 11, SUN = 12;
 
     private int kind;
     private final float strokeOn24;
@@ -119,6 +120,26 @@ final class Icon extends View {
             path.op(cut, android.graphics.Path.Op.DIFFERENCE);
             p.setStyle(Paint.Style.FILL);
             c.drawPath(path, p);
+        } else if (kind == NIGHT) {
+            // Night mode is off: a full moon with three craters and a small four-point star, unlike MOON's
+            // filled crescent (screen off). Circle at 13.5,13.5 r7.2; star M4.8 2 L5.6 4.4 L8 5.2 … Z.
+            c.drawCircle(13.5f * k, 13.5f * k, 7.2f * k, p);
+            p.setStyle(Paint.Style.FILL);
+            c.drawCircle(11.2f * k, 11.8f * k, 1.4f * k, p);
+            c.drawCircle(15.6f * k, 16.2f * k, 1f * k, p);
+            c.drawCircle(16.3f * k, 11f * k, 0.7f * k, p);
+            float[] pts = {4.8f, 2, 5.6f, 4.4f, 8, 5.2f, 5.6f, 6, 4.8f, 8.4f, 4, 6, 1.6f, 5.2f, 4, 4.4f};
+            path.reset();
+            path.moveTo(pts[0] * k, pts[1] * k);
+            for (int i = 2; i < pts.length; i += 2) path.lineTo(pts[i] * k, pts[i + 1] * k);
+            path.close();
+            c.drawPath(path, p);
+        } else if (kind == SUN) {
+            // Night mode is on: a sun (circle r4.2 and eight rays) turns it back to day.
+            c.drawCircle(12 * k, 12 * k, 4.2f * k, p);
+            float[][] rays = {{12, 2.5f, 12, 5}, {12, 19, 12, 21.5f}, {2.5f, 12, 5, 12}, {19, 12, 21.5f, 12},
+                    {5.3f, 5.3f, 7, 7}, {17, 17, 18.7f, 18.7f}, {5.3f, 18.7f, 7, 17}, {17, 7, 18.7f, 5.3f}};
+            for (float[] s : rays) c.drawLine(s[0] * k, s[1] * k, s[2] * k, s[3] * k, p);
         } else if (kind == BACK) {
             // M15 5l-7 7 7 7: points to the start side, so it mirrors in Arabic.
             boolean flip = getLayoutDirection() == LAYOUT_DIRECTION_RTL;

@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.widget.ImageView;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -148,6 +150,17 @@ final class Apps {
         } catch (PackageManager.NameNotFoundException e) {
             return null;
         }
+    }
+
+    /**
+     * Shows an app's icon. In night mode it is multiplied by color.app-icon-tint: one colour filter on the
+     * drawable (ImageView mutates it first, so the icon elsewhere is untouched), dimmer and a little warm, so a
+     * bright logo doesn't glare. No extra view or layer. By day there is no filter.
+     */
+    static void showIcon(ImageView v, Drawable d) {
+        if (d == null) return;
+        v.setImageDrawable(d);
+        if (Tokens.night) v.setColorFilter(Tokens.APP_ICON_TINT, PorterDuff.Mode.MULTIPLY);
     }
 
     /** Opens the app's TV entry, or its phone-style one; back at its main screen, not wherever it was left. */

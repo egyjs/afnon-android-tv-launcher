@@ -4,6 +4,49 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- Night mode: a dimmer, warmer palette for watching at night on every screen (Home, Prayer day, Settings, All
+  apps, the call, the reminder banner, the screensaver and screen-off), from the LG version's night colours.
+  Near-black and a little warm; text, gold and lines at about half brightness; the reminder card and the current
+  prayer dark instead of plaster; focus a dim amber fill with light text and a clear ring. A round button beside
+  Home's Settings gear switches it at once (a full moon with a star while off, a sun while on; focus stays on
+  it), and so does Settings → Display → Night mode. Off by default.
+  - The colours are tokens: `afnon-mihrab/tokens.night.json` overrides `tokens.json` by the same paths, and
+    `npm run tokens` generates both palettes into `Tokens.java` (colour fields that `Tokens.use(night)` switches)
+    and `colors.xml` (`night_*`). Nothing is overlaid, filtered or layered; screens are built in the palette.
+  - New tokens `color.current.*` (the current prayer, a chosen segment) and `color.card.*` (the reminder card),
+    and the focused-text colour is now `focus.text` everywhere. By day every colour is unchanged.
+- Night mode dims other apps' icons too, on Home's favourites and in All apps: a little warm and about 60% as
+  bright, so a red YouTube logo doesn't glare. Each icon takes one colour filter that multiplies it by the new
+  token `color.app-icon-tint` (no extra view or layer); by day there is no filter.
+- Home's radio card has a Station button («المحطة», with the radio-waves icon) between Play and Screen off, as in
+  the LG version. It opens the same list as Settings → Radio → Station, over Home: the Quran radio stations or
+  the reciters, then one of them. Playing radio moves to the pick at once and the card shows it; Back steps back
+  through the list, and focus returns to Station. ◀▶ move along the three buttons (mirrored in Arabic).
+- Two Quran radio stations from the Saudi Broadcasting Authority, its own audio streams as Saudi Radio+ plays
+  them (`live.kwikmotion.com`, HLS, AAC): إذاعة القرآن الكريم · السعودية and إذاعة نداء الإسلام, with the
+  Quran radios in both Station lists (Settings and the radio card).
+- Settings → What's new («ما الجديد», the last section): the latest releases, newest first, each a few short
+  lines in Arabic (or English) under its version, read-only and built only while it is open. OK or toward the
+  end goes into it, ▲▼ scroll it, Back or toward the start returns to the sections. It starts with 0.5 and this
+  release; the lines are `Text.news()`, and each release adds its own on top.
+
+### Changed
+- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
+  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
+  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
+  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
+  need its `TypefaceSpan`).
+- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
+  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
+  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
+  changing never moves. The view also no longer asks for a new layout every second.
+
+### Fixed
+- Lists over the screen (Settings' lists and the radio card's Station) no longer cut off the last item: its focus
+  ring and the bottom of its tile were clipped, plainly with only two groups. The list is now as tall as its
+  whole tiles, rings included, and moves a whole item at a time when it scrolls.
+
 ## [0.5] - 2026-10-22
 
 ### Added

@@ -391,10 +391,21 @@ final class Prefs {
         return "system".equals(s) ? DateFormat.is24HourFormat(c) : "24".equals(s);
     }
 
+    /** Night mode: the dimmer, warmer palette of afnon-mihrab/tokens.night.json on every screen. Off by default. */
+    static boolean night(Context c) {
+        return of(c).getBoolean("night", false);
+    }
+
+    /** Saves night mode and switches {@link Tokens} to it; screens built from then on take the new colours. */
+    static void setNight(Context c, boolean on) {
+        of(c).edit().putBoolean("night", on).apply();
+        Tokens.use(on);
+    }
+
     /** Everything a built screen depends on; a screen whose key changed while it was away rebuilds. */
     static String key(Context c) {
         SharedPreferences p = of(c);
         return p.getString("locale", "") + "|" + p.getString("digits", "") + "|" + clock24(c) + "|" + cityIndex(c)
-            + "|" + method(c) + "|" + madhab(c) + "|" + hijriOffset(c) + "|" + p.getInt("facing", -1);
+            + "|" + method(c) + "|" + madhab(c) + "|" + hijriOffset(c) + "|" + p.getInt("facing", -1) + "|" + night(c);
     }
 }
