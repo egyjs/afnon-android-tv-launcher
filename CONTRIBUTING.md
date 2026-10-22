@@ -43,7 +43,8 @@ Kotlin, no Compose. It has to stay smooth on a TV with under 2 GB of RAM, so:
   accessibility service.
 - **No new network access.** The radio stream is the only connection. No analytics, no ads, no
   feeds, no "recommended" rows.
-- **Design tokens.** Colours, sizes and timings live in `afnon-mihrab/tokens.json`. `Tokens.java`,
+- **Design tokens.** Colours, sizes and timings live in `afnon-mihrab/tokens.json`, and night mode's colours
+  in `tokens.night.json` (a colour added to one may need a night value in the other). `Tokens.java`,
   `colors.xml` and the preview site's CSS are generated from it: edit the JSON, then run `npm run tokens`
   in `site/` (Node 24). Never edit the generated files; CI checks they match. Text comes from `Text.java`,
   in both languages.

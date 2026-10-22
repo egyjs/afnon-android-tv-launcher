@@ -62,8 +62,16 @@ abstract class Screen extends Activity {
     /** Once a second while the screen is in front. */
     abstract void onTick();
 
+    /** The window theme in night mode; 0 keeps the manifest's (the call screen is see-through). */
+    int nightTheme() {
+        return R.style.Theme_Afnon_Night;
+    }
+
     @Override
     protected void onCreate(Bundle state) {
+        // Night mode: the night ground under the window too, before the window is made.
+        Tokens.use(Prefs.night(this));
+        if (Tokens.night && nightTheme() != 0) setTheme(nightTheme());
         super.onCreate(state);
         Ui.init(this);
         loadSettings(getIntent());
@@ -119,6 +127,7 @@ abstract class Screen extends Activity {
         }
         t = loadText(this);
         rtl = t.ar;
+        Tokens.use(Prefs.night(this));
         builtSettings = Prefs.key(this);
         return changed;
     }

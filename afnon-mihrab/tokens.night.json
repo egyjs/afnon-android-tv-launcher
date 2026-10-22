@@ -1,0 +1,53 @@
+{
+  "$description": "Afnon · night mode (Settings → Display, or the moon button on Home): the colours of tokens.json that change at night, by the same paths; anything not here, and every reference to a colour that is here, follows tokens.json. Near-black and a little warm; text, gold and lines at about half brightness; the plaster surfaces dark; focus a dim amber fill with light text and a clear ring instead of the bright gold, so it still stands out. From the LG version's night palette (afnon.css, html.night). Run `npm run tokens` in site/ after editing.",
+  "color": {
+    "lapis-950": { "$type": "color", "$value": "#090806" },
+    "lapis-900": { "$type": "color", "$value": "#0B0A08" },
+    "lapis-800": { "$type": "color", "$value": "#17140F" },
+    "lapis-700": { "$type": "color", "$value": "#221D16" },
+    "gold-400": { "$type": "color", "$value": "#84703F" },
+    "gold-200": { "$type": "color", "$value": "#93835C" },
+    "plaster-100": { "$type": "color", "$value": "#8F877A" },
+    "mist-400": { "$type": "color", "$value": "#6A655C" },
+    "disabled-text": { "$type": "color", "$value": "#57524A" },
+    "lapis-800-60": { "$type": "color", "$value": "rgba(23,20,15,0.6)" },
+    "gold-400-60": { "$type": "color", "$value": "rgba(132,112,63,0.6)" },
+    "line-soft": { "$type": "color", "$value": "rgba(143,135,122,0.22)" },
+    "line-dash": { "$type": "color", "$value": "rgba(143,135,122,0.27)" },
+    "arch-inner": { "$type": "color", "$value": "rgba(132,112,63,0.45)" },
+    "bell-off-border": { "$type": "color", "$value": "rgba(106,101,92,0.4)" },
+    "banner-track": { "$type": "color", "$value": "rgba(132,112,63,0.25)" },
+    "seg-track-focused": { "$type": "color", "$value": "rgba(11,10,8,0.3)" },
+    "qibla-ring": { "$type": "color", "$value": "rgba(143,135,122,0.1)" },
+    "qibla-tick": { "$type": "color", "$value": "rgba(143,135,122,0.45)" },
+    "scrim": { "$type": "color", "$value": "rgba(7,6,5,0.94)" },
+    "scrim-menu": { "$type": "color", "$value": "rgba(11,10,8,0.94)" },
+    "scrim-panel": { "$type": "color", "$value": "rgba(5,4,3,0.72)" },
+    "pattern-line": { "$type": "color", "$value": "rgba(132,112,63,0.06)" },
+    "on-plaster": {
+      "label": { "$type": "color", "$value": "#84703F" },
+      "secondary": { "$type": "color", "$value": "#6A655C" },
+      "border": { "$type": "color", "$value": "rgba(132,112,63,0.5)" },
+      "button-border": { "$type": "color", "$value": "rgba(143,135,122,0.35)" }
+    },
+    "card": {
+      "fill": { "$type": "color", "$value": "#221D16" },
+      "text": { "$type": "color", "$value": "#A99C80" }
+    },
+    "current": {
+      "fill": { "$type": "color", "$value": "#2A241B" },
+      "text": { "$type": "color", "$value": "#B0A27F" }
+    },
+    "screensaver": {
+      "text": { "$type": "color", "$value": "#6A655C" },
+      "text-dim": { "$type": "color", "$value": "#4F4B44" },
+      "next": { "$type": "color", "$value": "#75684A" },
+      "arch-line": { "$type": "color", "$value": "rgba(132,112,63,0.28)" }
+    }
+  },
+  "focus": {
+    "fill": { "$type": "color", "$value": "#3A3022" },
+    "text": { "$type": "color", "$value": "#CDB68A" },
+    "ring-color": { "$type": "color", "$value": "#A8987A" }
+  }
+}

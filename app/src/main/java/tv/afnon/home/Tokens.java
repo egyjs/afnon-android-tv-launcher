@@ -2,74 +2,85 @@ package tv.afnon.home;
 
 // Generated from afnon-mihrab/tokens.json by site/scripts/tokens.mjs. Do not edit: run `npm run tokens` in site/.
 
-/** Design tokens in px at 1920×1080. Multiply lengths by {@link Ui#px}. */
+/**
+ * Design tokens in px at 1920×1080. Multiply lengths by {@link Ui#px}. Colours are the day palette until
+ * {@link #use} switches them to night mode's (afnon-mihrab/tokens.night.json).
+ */
 final class Tokens {
     private Tokens() {}
 
     /** color.lapis-950: Settings sidebar, below the ground */
-    static final int LAPIS_950 = 0xFF0A1730;
+    static int LAPIS_950 = 0xFF0A1730;
     /** color.lapis-900: Ground / page background */
-    static final int LAPIS_900 = 0xFF0C1B33;
+    static int LAPIS_900 = 0xFF0C1B33;
     /** color.lapis-800: Surface: arch fill, tiles, cells, panels */
-    static final int LAPIS_800 = 0xFF12264A;
+    static int LAPIS_800 = 0xFF12264A;
     /** color.lapis-700: Raised: badges, stepper buttons, toggle off track */
-    static final int LAPIS_700 = 0xFF1A3360;
+    static int LAPIS_700 = 0xFF1A3360;
     /** color.gold-400: Accent, sacred text, focus fill, next prayer · 8.9:1 on ground */
-    static final int GOLD_400 = 0xFFD8B46A;
+    static int GOLD_400 = 0xFFD8B46A;
     /** color.gold-200: Approaching-prayer glow, pressed state */
-    static final int GOLD_200 = 0xFFF0D79C;
+    static int GOLD_200 = 0xFFF0D79C;
     /** color.plaster-100: Primary text, focus ring, current prayer · 13.9:1 on ground */
-    static final int PLASTER_100 = 0xFFEFE7D6;
+    static int PLASTER_100 = 0xFFEFE7D6;
     /** color.mist-400: Secondary text, past prayers · 7.7:1 on ground */
-    static final int MIST_400 = 0xFF9FB0CC;
+    static int MIST_400 = 0xFF9FB0CC;
     /** color.disabled-text */
-    static final int DISABLED_TEXT = 0xFF6F7F9C;
+    static int DISABLED_TEXT = 0xFF6F7F9C;
     /** color.lapis-800-60: Past prayer cells (lapis-800 at 60%) */
-    static final int LAPIS_800_60 = 0x9912264A;
+    static int LAPIS_800_60 = 0x9912264A;
     /** color.gold-400-60: Arch foot button border at rest */
-    static final int GOLD_400_60 = 0x99D8B46A;
+    static int GOLD_400_60 = 0x99D8B46A;
     /** color.line-soft: Chip borders, Qibla outer ring */
-    static final int LINE_SOFT = 0x40EFE7D6;
+    static int LINE_SOFT = 0x40EFE7D6;
     /** color.line-dash: Dashed "All apps" border */
-    static final int LINE_DASH = 0x4DEFE7D6;
+    static int LINE_DASH = 0x4DEFE7D6;
     /** color.arch-inner: Inner arch line */
-    static final int ARCH_INNER = 0x73D8B46A;
+    static int ARCH_INNER = 0x73D8B46A;
     /** color.bell-off-border: Prayer Day: reminder bell when off (mist-400 at 40%) */
-    static final int BELL_OFF_BORDER = 0x669FB0CC;
+    static int BELL_OFF_BORDER = 0x669FB0CC;
     /** color.banner-track: Reminder banner: time-left track (gold-400 at 25%) */
-    static final int BANNER_TRACK = 0x40D8B46A;
+    static int BANNER_TRACK = 0x40D8B46A;
     /** color.seg-track-focused: Settings: segmented control track on a focused gold row (lapis-900 at 15%) */
-    static final int SEG_TRACK_FOCUSED = 0x260C1B33;
+    static int SEG_TRACK_FOCUSED = 0x260C1B33;
     /** color.qibla-ring: Qibla inner ring (plaster-100 at 10%) */
-    static final int QIBLA_RING = 0x1AEFE7D6;
+    static int QIBLA_RING = 0x1AEFE7D6;
     /** color.qibla-tick: Qibla cardinal ticks (plaster-100 at 50%) */
-    static final int QIBLA_TICK = 0x80EFE7D6;
+    static int QIBLA_TICK = 0x80EFE7D6;
     /** color.scrim: Prayer-time-now overlay (no blur) */
-    static final int SCRIM = 0xF0081224;
+    static int SCRIM = 0xF0081224;
     /** color.scrim-menu: Behind menus, pickers and choosers (lapis-900 at 92%) */
-    static final int SCRIM_MENU = 0xEB0C1B33;
+    static int SCRIM_MENU = 0xEB0C1B33;
     /** color.scrim-panel: Behind side panels (Inputs) */
-    static final int SCRIM_PANEL = 0xB8060D1A;
+    static int SCRIM_PANEL = 0xB8060D1A;
     /** color.pattern-line: Star lattice lines (gold-400 at 7%) */
-    static final int PATTERN_LINE = 0x12D8B46A;
+    static int PATTERN_LINE = 0x12D8B46A;
     /** color.on-plaster.label: Approaching card: caps label on plaster */
-    static final int ON_PLASTER_LABEL = 0xFF5A4A22;
+    static int ON_PLASTER_LABEL = 0xFF5A4A22;
     /** color.on-plaster.secondary: Approaching card: secondary text on plaster */
-    static final int ON_PLASTER_SECONDARY = 0xFF3D4A63;
+    static int ON_PLASTER_SECONDARY = 0xFF3D4A63;
     /** color.on-plaster.border: Approaching card border (lapis-900 at 60%) */
-    static final int ON_PLASTER_BORDER = 0x990C1B33;
+    static int ON_PLASTER_BORDER = 0x990C1B33;
     /** color.on-plaster.button-border: Approaching card: outlined button border (lapis-900 at 35%) */
-    static final int ON_PLASTER_BUTTON_BORDER = 0x590C1B33;
+    static int ON_PLASTER_BUTTON_BORDER = 0x590C1B33;
+    /** color.card.fill: Approaching card (Home's reminder) ground */
+    static int CARD_FILL = 0xFFEFE7D6;
+    /** color.card.text: Approaching card: title and outlined button label */
+    static int CARD_TEXT = 0xFF0C1B33;
+    /** color.current.fill: The current prayer (Home's cell, Prayer day's row) and a chosen segment */
+    static int CURRENT_FILL = 0xFFEFE7D6;
+    /** color.current.text: Text and icons on current.fill */
+    static int CURRENT_TEXT = 0xFF0C1B33;
     /** color.screensaver.ground: Screensaver and Audio Only ground */
-    static final int SCREENSAVER_GROUND = 0xFF000000;
+    static int SCREENSAVER_GROUND = 0xFF000000;
     /** color.screensaver.text */
-    static final int SCREENSAVER_TEXT = 0xFFA69F90;
+    static int SCREENSAVER_TEXT = 0xFFA69F90;
     /** color.screensaver.text-dim */
-    static final int SCREENSAVER_TEXT_DIM = 0xFF7D7769;
+    static int SCREENSAVER_TEXT_DIM = 0xFF7D7769;
     /** color.screensaver.next */
-    static final int SCREENSAVER_NEXT = 0xFFB8A578;
+    static int SCREENSAVER_NEXT = 0xFFB8A578;
     /** color.screensaver.arch-line */
-    static final int SCREENSAVER_ARCH_LINE = 0x59D8B46A;
+    static int SCREENSAVER_ARCH_LINE = 0x59D8B46A;
     /** font.size.display-xl: Countdown */
     static final float FONT_SIZE_DISPLAY_XL = 150f;
     /** font.size.display-xl-hours: Countdown when it has hours */
@@ -186,12 +197,12 @@ final class Tokens {
     static final float RADIUS_PANEL = 24f;
     /** radius.pill */
     static final float RADIUS_PILL = 999f;
-    /** focus.fill */
-    static final int FOCUS_FILL = 0xFFD8B46A;
-    /** focus.text */
-    static final int FOCUS_TEXT = 0xFF0C1B33;
-    /** focus.ring-color */
-    static final int FOCUS_RING_COLOR = 0xFFEFE7D6;
+    /** focus.fill: A focused tile, row or button */
+    static int FOCUS_FILL = 0xFFD8B46A;
+    /** focus.text: Text and icons on focus.fill */
+    static int FOCUS_TEXT = 0xFF0C1B33;
+    /** focus.ring-color: The ring round a focused tile */
+    static int FOCUS_RING_COLOR = 0xFFEFE7D6;
     /** focus.ring-width */
     static final float FOCUS_RING_WIDTH = 4f;
     /** focus.ring-offset */
@@ -203,37 +214,37 @@ final class Tokens {
     /** focus.scale-settings-row: Settings rows, which are wide */
     static final float FOCUS_SCALE_SETTINGS_ROW = 1.02f;
     /** focus.on-light.fill */
-    static final int FOCUS_ON_LIGHT_FILL = 0xFF0C1B33;
+    static int FOCUS_ON_LIGHT_FILL = 0xFF0C1B33;
     /** focus.on-light.text */
-    static final int FOCUS_ON_LIGHT_TEXT = 0xFFEFE7D6;
+    static int FOCUS_ON_LIGHT_TEXT = 0xFFEFE7D6;
     /** focus.on-light.ring-color */
-    static final int FOCUS_ON_LIGHT_RING_COLOR = 0xFFD8B46A;
+    static int FOCUS_ON_LIGHT_RING_COLOR = 0xFFD8B46A;
     /** focus.on-light.ring-offset */
     static final float FOCUS_ON_LIGHT_RING_OFFSET = 4f;
     /** focus.pressed.fill */
-    static final int FOCUS_PRESSED_FILL = 0xFFF0D79C;
+    static int FOCUS_PRESSED_FILL = 0xFFF0D79C;
     /** focus.pressed.scale */
     static final float FOCUS_PRESSED_SCALE = 1.02f;
     /** focus.pressed.ring-offset */
     static final float FOCUS_PRESSED_RING_OFFSET = 4f;
     /** border.arch-rest.color */
-    static final int BORDER_ARCH_REST_COLOR = 0xFFD8B46A;
+    static int BORDER_ARCH_REST_COLOR = 0xFFD8B46A;
     /** border.arch-rest.width */
     static final float BORDER_ARCH_REST_WIDTH = 3f;
     /** border.arch-focused.color */
-    static final int BORDER_ARCH_FOCUSED_COLOR = 0xFFEFE7D6;
+    static int BORDER_ARCH_FOCUSED_COLOR = 0xFFEFE7D6;
     /** border.arch-focused.width */
     static final float BORDER_ARCH_FOCUSED_WIDTH = 5f;
     /** border.arch-approaching.color */
-    static final int BORDER_ARCH_APPROACHING_COLOR = 0xFFF0D79C;
+    static int BORDER_ARCH_APPROACHING_COLOR = 0xFFF0D79C;
     /** border.arch-approaching.width */
     static final float BORDER_ARCH_APPROACHING_WIDTH = 6f;
     /** border.next-prayer.color */
-    static final int BORDER_NEXT_PRAYER_COLOR = 0xFFD8B46A;
+    static int BORDER_NEXT_PRAYER_COLOR = 0xFFD8B46A;
     /** border.next-prayer.width */
     static final float BORDER_NEXT_PRAYER_WIDTH = 3f;
     /** border.chip.color */
-    static final int BORDER_CHIP_COLOR = 0x40EFE7D6;
+    static int BORDER_CHIP_COLOR = 0x40EFE7D6;
     /** border.chip.width */
     static final float BORDER_CHIP_WIDTH = 2f;
     /** motion.focus */
@@ -256,4 +267,63 @@ final class Tokens {
     static final long MOTION_CALL_SILENT_DISMISS_MS = 60000;
     /** timing.approach: Before a prayer, the arch switches to its approaching outline */
     static final int APPROACH_MIN = 15;
+
+    /** Whether the colours above are night mode's. */
+    static boolean night;
+
+    /**
+     * The day or the night palette for every colour above. Views take their colours when they are built, so a
+     * screen in front rebuilds after a switch; the others build in the new palette when they next open.
+     */
+    static void use(boolean night) {
+        if (Tokens.night == night) return;
+        Tokens.night = night;
+        LAPIS_950 = night ? 0xFF090806 : 0xFF0A1730;
+        LAPIS_900 = night ? 0xFF0B0A08 : 0xFF0C1B33;
+        LAPIS_800 = night ? 0xFF17140F : 0xFF12264A;
+        LAPIS_700 = night ? 0xFF221D16 : 0xFF1A3360;
+        GOLD_400 = night ? 0xFF84703F : 0xFFD8B46A;
+        GOLD_200 = night ? 0xFF93835C : 0xFFF0D79C;
+        PLASTER_100 = night ? 0xFF8F877A : 0xFFEFE7D6;
+        MIST_400 = night ? 0xFF6A655C : 0xFF9FB0CC;
+        DISABLED_TEXT = night ? 0xFF57524A : 0xFF6F7F9C;
+        LAPIS_800_60 = night ? 0x9917140F : 0x9912264A;
+        GOLD_400_60 = night ? 0x9984703F : 0x99D8B46A;
+        LINE_SOFT = night ? 0x388F877A : 0x40EFE7D6;
+        LINE_DASH = night ? 0x458F877A : 0x4DEFE7D6;
+        ARCH_INNER = night ? 0x7384703F : 0x73D8B46A;
+        BELL_OFF_BORDER = night ? 0x666A655C : 0x669FB0CC;
+        BANNER_TRACK = night ? 0x4084703F : 0x40D8B46A;
+        SEG_TRACK_FOCUSED = night ? 0x4D0B0A08 : 0x260C1B33;
+        QIBLA_RING = night ? 0x1A8F877A : 0x1AEFE7D6;
+        QIBLA_TICK = night ? 0x738F877A : 0x80EFE7D6;
+        SCRIM = night ? 0xF0070605 : 0xF0081224;
+        SCRIM_MENU = night ? 0xF00B0A08 : 0xEB0C1B33;
+        SCRIM_PANEL = night ? 0xB8050403 : 0xB8060D1A;
+        PATTERN_LINE = night ? 0x0F84703F : 0x12D8B46A;
+        ON_PLASTER_LABEL = night ? 0xFF84703F : 0xFF5A4A22;
+        ON_PLASTER_SECONDARY = night ? 0xFF6A655C : 0xFF3D4A63;
+        ON_PLASTER_BORDER = night ? 0x8084703F : 0x990C1B33;
+        ON_PLASTER_BUTTON_BORDER = night ? 0x598F877A : 0x590C1B33;
+        CARD_FILL = night ? 0xFF221D16 : 0xFFEFE7D6;
+        CARD_TEXT = night ? 0xFFA99C80 : 0xFF0C1B33;
+        CURRENT_FILL = night ? 0xFF2A241B : 0xFFEFE7D6;
+        CURRENT_TEXT = night ? 0xFFB0A27F : 0xFF0C1B33;
+        SCREENSAVER_TEXT = night ? 0xFF6A655C : 0xFFA69F90;
+        SCREENSAVER_TEXT_DIM = night ? 0xFF4F4B44 : 0xFF7D7769;
+        SCREENSAVER_NEXT = night ? 0xFF75684A : 0xFFB8A578;
+        SCREENSAVER_ARCH_LINE = night ? 0x4784703F : 0x59D8B46A;
+        FOCUS_FILL = night ? 0xFF3A3022 : 0xFFD8B46A;
+        FOCUS_TEXT = night ? 0xFFCDB68A : 0xFF0C1B33;
+        FOCUS_RING_COLOR = night ? 0xFFA8987A : 0xFFEFE7D6;
+        FOCUS_ON_LIGHT_FILL = night ? 0xFF0B0A08 : 0xFF0C1B33;
+        FOCUS_ON_LIGHT_TEXT = night ? 0xFF8F877A : 0xFFEFE7D6;
+        FOCUS_ON_LIGHT_RING_COLOR = night ? 0xFF84703F : 0xFFD8B46A;
+        FOCUS_PRESSED_FILL = night ? 0xFF93835C : 0xFFF0D79C;
+        BORDER_ARCH_REST_COLOR = night ? 0xFF84703F : 0xFFD8B46A;
+        BORDER_ARCH_FOCUSED_COLOR = night ? 0xFF8F877A : 0xFFEFE7D6;
+        BORDER_ARCH_APPROACHING_COLOR = night ? 0xFF93835C : 0xFFF0D79C;
+        BORDER_NEXT_PRAYER_COLOR = night ? 0xFF84703F : 0xFFD8B46A;
+        BORDER_CHIP_COLOR = night ? 0x388F877A : 0x40EFE7D6;
+    }
 }

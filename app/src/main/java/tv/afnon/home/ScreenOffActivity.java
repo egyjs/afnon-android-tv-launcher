@@ -60,6 +60,7 @@ public class ScreenOffActivity extends Activity implements Radio.Listener {
         super.onCreate(state);
         Ui.init(this);
         Text t = Screen.loadText(this);
+        Tokens.use(Prefs.night(this));
         Typeface ui = getResources().getFont(R.font.alexandria_regular);
 
         FrameLayout root = new FrameLayout(this);

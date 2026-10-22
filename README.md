@@ -80,6 +80,8 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
   Input and All apps buttons, to Afnon. The stock home's background service can then be disabled.
 - **Arabic and English.** RTL and LTR layouts. Language follows the TV or is set in Afnon. Digits
   are Arabic-Indic or Latin.
+- **Night mode.** Calmer, dimmer, warmer colours on every screen, from the moon button beside Home's Settings
+  gear or Settings → Display.
 - **Light on the TV.** Plain Java and Views, with no AndroidX, Kotlin or Compose. No blur, no
   video, no shadows. It runs smoothly on a 1.8 GB TV.
 
@@ -158,7 +160,7 @@ in Developer options, revoke the USB debugging authorisations, reboot, and check
 | Change favourites | All apps → hold **OK** on an app → *Put in favourites instead of…* |
 | Change city, method, adhan voice, radio options | The remote's **Settings** button, or the gear on Home |
 | Point a remote button at another app | Edit the table at the top of `RemoteKeys.java`, then `bash tools/install.sh` |
-| Change colours or the star pattern | `Tokens.java` (the design tokens) and `Ui.starLattice` |
+| Change colours or the star pattern | `afnon-mihrab/tokens.json` (and `tokens.night.json` for night mode), then `npm run tokens` in `site/`; `Ui.starLattice` |
 | Disable a stock app | `bash tools/disable.sh <package>` (reversible; logged to `state/disabled.log`) |
 | Re-enable an app | `bash tools/enable.sh <package>`, or on the TV: Settings → Apps → See all apps → Show system apps → the app → Enable |
 | Go back to stock | `bash tools/restore.sh`, then reboot. Re-enables everything in the log, restores home, screensaver and sleep timer, and uninstalls Afnon. |

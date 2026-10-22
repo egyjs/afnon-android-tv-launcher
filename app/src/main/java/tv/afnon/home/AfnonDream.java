@@ -28,8 +28,6 @@ import java.util.Random;
  */
 public class AfnonDream extends DreamService {
 
-    private static final int INK = Tokens.SCREENSAVER_TEXT, DIM = Tokens.SCREENSAVER_TEXT_DIM, NEXT = Tokens.SCREENSAVER_NEXT;
-    private static final int LINE = Tokens.SCREENSAVER_ARCH_LINE;
     private static final float W = 440, H = 640;
     private static final long DRIFT_MS = 60_000, FADE_MS = 800;
 
@@ -68,6 +66,9 @@ public class AfnonDream extends DreamService {
         setScreenBright(false);
         Ui.init(this);
         t = Screen.loadText(this);
+        // Night mode dims the screensaver's text and arch too (tokens.night.json, screensaver.*).
+        Tokens.use(Prefs.night(this));
+        int ink = Tokens.SCREENSAVER_TEXT, dim = Tokens.SCREENSAVER_TEXT_DIM, gold = Tokens.SCREENSAVER_NEXT;
 
         Typeface ui = getResources().getFont(R.font.alexandria_regular);
         Typeface display = getResources().getFont(t.ar ? R.font.amiri_regular : R.font.marcellus_regular);
@@ -81,14 +82,14 @@ public class AfnonDream extends DreamService {
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setGravity(Gravity.CENTER_HORIZONTAL);
-        clock = text(display, 128, INK);
+        clock = text(display, 128, ink);
         clock.setTextDirection(t.ar ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
-        date = text(ui, 24, DIM);
+        date = text(ui, 24, dim);
         View rule = new View(this);
-        rule.setBackgroundColor(LINE);
-        next = text(ui, 28, NEXT);
+        rule.setBackgroundColor(Tokens.SCREENSAVER_ARCH_LINE);
+        next = text(ui, 28, gold);
         next.setTextDirection(t.ar ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
-        left = text(ui, 24, DIM);
+        left = text(ui, 24, dim);
         col.addView(clock, wrap(0));
         col.addView(date, wrap(10));
         LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(Ui.ipx(80), Math.max(1, Ui.ipx(1)));
@@ -100,9 +101,9 @@ public class AfnonDream extends DreamService {
         radioRow = new LinearLayout(this);
         radioRow.setGravity(Gravity.CENTER_VERTICAL);
         radioBars = new RadioBars(this, 3);
-        radioBars.setColor(NEXT);
+        radioBars.setColor(gold);
         radioRow.addView(radioBars, new LinearLayout.LayoutParams(Ui.ipx(22), Ui.ipx(20)));
-        radioText = text(ui, 22, DIM);
+        radioText = text(ui, 22, dim);
         LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(-2, -2);
         tlp.setMarginStart(Ui.ipx(12));
         radioRow.addView(radioText, tlp);
@@ -250,7 +251,7 @@ public class AfnonDream extends DreamService {
         Outline(Context c) {
             super(c);
             p.setStyle(Paint.Style.STROKE);
-            p.setColor(LINE);
+            p.setColor(Tokens.SCREENSAVER_ARCH_LINE);
         }
 
         @Override

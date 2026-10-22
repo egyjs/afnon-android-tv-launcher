@@ -42,7 +42,6 @@ public class SettingsActivity extends Screen {
 
     private static final int PRAYER = 0, REMINDERS = 1, RADIO = 2, DISPLAY = 3, NETWORK = 4, DEVICE = 5, SECTIONS = 6;
     private static final int VALUE = 0, SEG = 1, STEP = 2, TOGGLE = 3;
-    private static final int SIDEBAR = Tokens.LAPIS_950;
     private static final float ROWS_TOP = 112, ROW_H = 88, ROW_GAP = 10;
     private static final float NAV_TOP = 152, NAV_H = 76, NAV_GAP = 10;
 
@@ -126,7 +125,7 @@ public class SettingsActivity extends Screen {
         readClockFormat();
 
         View side = new View(this);
-        side.setBackgroundColor(SIDEBAR);
+        side.setBackgroundColor(Tokens.LAPIS_950);
         place(side, 0, 0, Tokens.LAYOUT_SETTINGS_SIDEBAR_WIDTH, 1080);
 
         LinearLayout head = new LinearLayout(this);
@@ -217,7 +216,7 @@ public class SettingsActivity extends Screen {
         boolean focused = nav[i] != null && nav[i].isFocused();
         boolean open = i == section;
         if (nav[i] != null) nav[i].setRest(open ? Tokens.LAPIS_800 : 0, Tokens.GOLD_400, open ? 2 : 0);
-        navLabel[i].setTextColor(focused ? Tokens.LAPIS_900 : (open ? Tokens.PLASTER_100 : Tokens.MIST_400));
+        navLabel[i].setTextColor(focused ? Tokens.FOCUS_TEXT : (open ? Tokens.PLASTER_100 : Tokens.MIST_400));
     }
 
     private void showSection() {
@@ -389,6 +388,13 @@ public class SettingsActivity extends Screen {
                     String[] segs() { return digits(t.clocks()); }
                     int selected() { return Math.max(0, Arrays.asList(values).indexOf(Prefs.clock(c))); }
                     void select(int i) { prefs().edit().putString("clock", values[i]).apply(); readClockFormat(); }
+                },
+                new Row(TOGGLE) {
+                    String label() { return t.nightRow(); }
+                    String help() { return t.nightHelp(); }
+                    boolean on() { return Prefs.night(c); }
+                    // Every colour changes: rebuild this screen where it is, in the new palette.
+                    void set(boolean on) { Prefs.setNight(c, on); relaunch(); }
                 });
             case NETWORK: return Arrays.asList(
                 new Row(VALUE) {
@@ -444,7 +450,7 @@ public class SettingsActivity extends Screen {
         return out;
     }
 
-    /** Language or digits changed: every string on the screen changes, so rebuild it where it was. */
+    /** Language, digits or night mode changed: every string or colour on the screen changes, so rebuild it where it was. */
     private void relaunch() {
         loadSettings(null);
         build();
@@ -488,7 +494,7 @@ public class SettingsActivity extends Screen {
 
     private void render(Row r, boolean focused) {
         if (day == null) return;
-        int ink = focused ? Tokens.LAPIS_900 : Tokens.PLASTER_100;
+        int ink = focused ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100;
         r.label.setText(r.label());
         r.label.setTextColor(ink);
         String help = r.help();
@@ -499,9 +505,9 @@ public class SettingsActivity extends Screen {
         r.control.removeAllViews();
         boolean edit = r == editing;
         if (edit) {
-            // Editing: a lapis ring around the control on the gold row.
+            // Editing: a ring in the focused row's ink (lapis on the gold row) around the control.
             GradientDrawable ring = round(0, 34);
-            ring.setStroke(Ui.ipx(3), Tokens.LAPIS_900);
+            ring.setStroke(Ui.ipx(3), Tokens.FOCUS_TEXT);
             r.control.setBackground(ring);
             int pad = Ui.ipx(6);
             r.control.setPadding(pad, pad, pad, pad);
@@ -529,12 +535,12 @@ public class SettingsActivity extends Screen {
                 String[] segs = r.segs();
                 for (int i = 0; i < segs.length; i++) {
                     boolean chosen = i == (edit ? draft : r.selected());
-                    TextView s = text(ui400, 22, chosen ? (focused ? Tokens.PLASTER_100 : Tokens.LAPIS_900) : (focused ? Tokens.LAPIS_900 : Tokens.MIST_400));
+                    TextView s = text(ui400, 22, chosen ? (focused ? Tokens.PLASTER_100 : Tokens.CURRENT_TEXT) : (focused ? Tokens.FOCUS_TEXT : Tokens.MIST_400));
                     s.setText(segs[i]);
                     s.setGravity(Gravity.CENTER);
                     s.setPadding(Ui.ipx(24), 0, Ui.ipx(24), 0);
                     if (chosen) {
-                        GradientDrawable bg = round(focused ? Tokens.LAPIS_900 : Tokens.PLASTER_100, 26);
+                        GradientDrawable bg = round(focused ? Tokens.LAPIS_900 : Tokens.CURRENT_FILL, 26);
                         if (focused) bg.setStroke(Ui.ipx(3), Tokens.PLASTER_100);
                         s.setBackground(bg);
                     }
@@ -838,7 +844,7 @@ public class SettingsActivity extends Screen {
             v.setPadding(Ui.ipx(24), 0, Ui.ipx(24), 0);
             item.addView(v, new FrameLayout.LayoutParams(-1, -1));
             item.setLook(f -> {
-                v.setTextColor(f ? Tokens.LAPIS_900 : (chosen ? Tokens.GOLD_400 : Tokens.PLASTER_100));
+                v.setTextColor(f ? Tokens.FOCUS_TEXT : (chosen ? Tokens.GOLD_400 : Tokens.PLASTER_100));
                 if (f && onFocus != null) onFocus.accept(index);
             });
             item.setOnClickListener(x -> {

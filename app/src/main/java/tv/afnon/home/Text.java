@@ -265,6 +265,11 @@ final class Text {
     String clockRow() { return ar ? "الساعة" : "Clock"; }
     String clockHelp() { return ar ? "«التلفاز» يتبع إعداد الوقت في التلفاز" : "“TV” follows the TV's time setting"; }
     String[] clocks() { return ar ? new String[] {"التلفاز", "12 س", "24 س"} : new String[] {"TV", "12 h", "24 h"}; }
+    // Night mode: Settings → Display, and the moon button beside Home's Settings.
+    String nightRow() { return ar ? "الوضع الليلي" : "Night mode"; }
+    String nightHelp() { return ar ? "ألوان أهدأ وأخفت للمشاهدة ليلًا" : "Calmer, dimmer colours for watching at night"; }
+    String nightOn() { return ar ? "تشغيل الوضع الليلي" : "Night mode on"; }
+    String nightOff() { return ar ? "إيقاف الوضع الليلي" : "Night mode off"; }
     String networkRow() { return ar ? "إعدادات الشبكة في التلفاز" : "TV network settings"; }
     String networkHelp() { return ar ? "واي فاي وإيثرنت" : "Wi-Fi and Ethernet"; }
     String deviceRow() { return ar ? "إعدادات التلفاز" : "TV settings"; }

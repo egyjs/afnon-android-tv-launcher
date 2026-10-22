@@ -7,6 +7,12 @@
         <item name="android:defaultFocusHighlightEnabled">false</item>
     </style>
 
+    <!-- Night mode (Prefs.night): the same on the night ground. Screen sets it before the window is made. -->
+    <style name="Theme.Afnon.Night">
+        <item name="android:windowBackground">@color/night_lapis_900</item>
+        <item name="android:colorBackground">@color/night_lapis_900</item>
+    </style>
+
     <!-- The call to prayer: drawn over whatever was on, which shows faintly through its dimmed ground. -->
     <style name="Theme.Afnon.Call">
         <item name="android:windowIsTranslucent">true</item>

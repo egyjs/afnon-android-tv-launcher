@@ -2,6 +2,9 @@
 //   app/src/main/java/tv/afnon/home/Tokens.java   (Java constants, names as the app uses them)
 //   app/src/main/res/values/colors.xml            (window background etc.)
 //   site/src/styles/tokens.css                    (CSS custom properties for the preview site)
+// Night mode: afnon-mihrab/tokens.night.json overrides colours by the same paths (references follow), the usual
+// Style Dictionary theme. Tokens.java gets both palettes, its colours as fields that Tokens.use(night) switches,
+// and colors.xml the night colours that differ, as night_<name>.
 // `--check` writes nothing and fails if the app's committed outputs differ (for CI).
 import StyleDictionary from 'style-dictionary';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -25,11 +28,16 @@ const durationMs = (v) => {
   return Number(m[1]) * { ms: 1, s: 1000, min: 60000 }[m[2]];
 };
 
+/** Night values by Java name (colours only), filled in from tokens.night.json before the formats run. */
+const night = new Map();
+const nightAndroid = new Map();
+
 function javaLine(t) {
   const v = t.$value;
   switch (t.$type) {
     case 'color':
-      return `static final int ${constName(t)} = ${javaColor(v)};`;
+      // Not final: Tokens.use switches the palette, and every reader must see the field, not an inlined copy.
+      return `static int ${constName(t)} = ${javaColor(v)};`;
     case 'dimension':
       return `static final float ${constName(t)} = ${parseFloat(v)}f;`;
     case 'number':
@@ -59,15 +67,35 @@ StyleDictionary.registerFormat({
       })
       .filter(Boolean)
       .join('\n');
+    const changes = dictionary.allTokens
+      .filter((t) => t.$type === 'color' && night.get(constName(t)) !== t.$value)
+      .map((t) => `        ${constName(t)} = night ? ${javaColor(night.get(constName(t)))} : ${javaColor(t.$value)};`)
+      .join('\n');
     return `package tv.afnon.home;
 
 // ${HEADER}
 
-/** Design tokens in px at 1920×1080. Multiply lengths by {@link Ui#px}. */
+/**
+ * Design tokens in px at 1920×1080. Multiply lengths by {@link Ui#px}. Colours are the day palette until
+ * {@link #use} switches them to night mode's (afnon-mihrab/tokens.night.json).
+ */
 final class Tokens {
     private Tokens() {}
 
 ${body}
+
+    /** Whether the colours above are night mode's. */
+    static boolean night;
+
+    /**
+     * The day or the night palette for every colour above. Views take their colours when they are built, so a
+     * screen in front rebuilds after a switch; the others build in the new palette when they next open.
+     */
+    static void use(boolean night) {
+        if (Tokens.night == night) return;
+        Tokens.night = night;
+${changes}
+    }
 }
 `;
   },
@@ -76,16 +104,48 @@ ${body}
 StyleDictionary.registerFormat({
   name: 'afnon/android-colors',
   format: ({ dictionary }) => {
-    const rows = dictionary.allTokens
-      .filter((t) => t.path[0] === 'color')
-      .map((t) => `    <color name="${path(t).join('_').replace(/-/g, '_')}">${t.$value}</color>`)
+    const name = (t) => path(t).join('_').replace(/-/g, '_');
+    const colors = dictionary.allTokens.filter((t) => t.path[0] === 'color');
+    const rows = colors.map((t) => `    <color name="${name(t)}">${t.$value}</color>`).join('\n');
+    const nightRows = colors
+      .filter((t) => nightAndroid.get(name(t)) !== t.$value)
+      .map((t) => `    <color name="night_${name(t)}">${nightAndroid.get(name(t))}</color>`)
       .join('\n');
-    return `<?xml version="1.0" encoding="utf-8"?>\n<!-- ${HEADER} -->\n<resources>\n${rows}\n</resources>\n`;
+    return `<?xml version="1.0" encoding="utf-8"?>\n<!-- ${HEADER} -->\n<resources>\n${rows}\n`
+      + `    <!-- Night mode (tokens.night.json): the colours that differ. -->\n${nightRows}\n</resources>\n`;
   },
 });
 
+const DAY = resolve(root, 'afnon-mihrab/tokens.json');
+const NIGHT = resolve(root, 'afnon-mihrab/tokens.night.json');
+
+// Every night token must override a day one: a misspelt path would otherwise add a colour nothing reads.
+const leaves = (o, at = []) => Object.entries(o).flatMap(([k, v]) =>
+  k.startsWith('$') || typeof v !== 'object' ? [] : '$value' in v ? [[...at, k].join('.')] : leaves(v, [...at, k]));
+const dayPaths = new Set(leaves(JSON.parse(readFileSync(DAY, 'utf8'))));
+const unknown = leaves(JSON.parse(readFileSync(NIGHT, 'utf8'))).filter((p) => !dayPaths.has(p));
+if (unknown.length) {
+  console.error('tokens.night.json has paths that tokens.json lacks:\n  ' + unknown.join('\n  '));
+  process.exit(1);
+}
+
+// The night theme: tokens.json underneath, tokens.night.json on top; references resolve against the merge.
+const sdNight = new StyleDictionary({
+  include: [DAY],
+  source: [NIGHT],
+  log: { verbosity: 'silent', warnings: 'error' },
+  platforms: {
+    java: { transforms: ['attribute/cti', 'name/constant', 'color/hex8android'] },
+    android: { transforms: ['attribute/cti', 'name/snake', 'color/hex8android'] },
+  },
+});
+for (const t of (await sdNight.getPlatformTokens('java')).allTokens) if (t.$type === 'color') night.set(constName(t), t.$value);
+for (const t of (await sdNight.getPlatformTokens('android')).allTokens) {
+  if (t.path[0] === 'color') nightAndroid.set(path(t).join('_').replace(/-/g, '_'), t.$value);
+}
+
 const sd = new StyleDictionary({
-  source: [resolve(root, 'afnon-mihrab/tokens.json')],
+  source: [DAY],
   log: { verbosity: 'silent', warnings: 'error' },
   platforms: {
     css: {
