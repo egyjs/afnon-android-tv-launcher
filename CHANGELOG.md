@@ -4,6 +4,9 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Fixed
+- In Settings, pressing OK on segmented controls and steppers confirms and fixes the current selection instead of cyclically flipping it. Added visual `✓ Saved` feedback in the hints bar when preferences change, and smooth Left-navigation to the sidebar menu.
+
 ## [0.3] - 2026-10-22
 
 ### Added

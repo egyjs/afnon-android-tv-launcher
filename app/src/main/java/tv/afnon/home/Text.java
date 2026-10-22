@@ -246,6 +246,7 @@ final class Text {
     String hintChange() { return ar ? "◀▶  تغيير القيمة" : "◀▶  Change value"; }
     String hintChoose() { return ar ? "OK  اختيار" : "OK  Choose"; }
     String hintBackMenu() { return ar ? "رجوع  القائمة" : "Back  Menu"; }
+    String hintSaved() { return ar ? "✓  تم الحفظ" : "✓  Saved"; }
     String qibla() { return ar ? "القبلة" : "QIBLA"; }
     String north() { return ar ? "الشمال ▲" : "▲ North"; }
     String qiblaHint() { return ar ? "وجّه الشمال على البوصلة نحو الشمال الحقيقي" : "Line up the compass north with true north"; }

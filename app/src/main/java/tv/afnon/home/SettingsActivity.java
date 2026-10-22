@@ -513,10 +513,34 @@ public class SettingsActivity extends Screen {
         return d;
     }
 
-    // ---------------------------------------------------------------- focus and keys
+    private boolean savedFeedback;
+    private final Runnable clearSaved = () -> {
+        savedFeedback = false;
+        if (!onNav && rowIndex >= 0 && rowIndex < rows.size()) updateHints();
+    };
+
+    private void showSaved() {
+        savedFeedback = true;
+        updateHints();
+        root.removeCallbacks(clearSaved);
+        root.postDelayed(clearSaved, 1500);
+    }
+
+    private void updateHints() {
+        if (onNav || rowIndex < 0 || rowIndex >= rows.size()) return;
+        Row r = rows.get(rowIndex);
+        List<String> h = new ArrayList<>();
+        if (savedFeedback) h.add(t.hintSaved());
+        h.add(t.hintMove());
+        h.add(r.kind == VALUE ? t.hintChoose() : t.hintChange());
+        h.add(t.hintBackMenu());
+        setHints(hints, h);
+    }
 
     private void focusNav() {
         onNav = true;
+        savedFeedback = false;
+        root.removeCallbacks(clearSaved);
         nav[section].requestFocus();
         List<String> h = new ArrayList<>();
         h.add(t.hintMove());
@@ -530,11 +554,7 @@ public class SettingsActivity extends Screen {
         rowIndex = i;
         Row r = rows.get(i);
         r.tile.requestFocus();
-        List<String> h = new ArrayList<>();
-        h.add(t.hintMove());
-        h.add(r.kind == VALUE ? t.hintChoose() : t.hintChange());
-        h.add(t.hintBackMenu());
-        setHints(hints, h);
+        updateHints();
         styleNav(section);
     }
 
@@ -543,6 +563,12 @@ public class SettingsActivity extends Screen {
         section = i;
         showSection();
         focusNav();
+    }
+
+    @Override
+    protected void onDestroy() {
+        root.removeCallbacks(clearSaved);
+        super.onDestroy();
     }
 
     @Override
@@ -595,17 +621,30 @@ public class SettingsActivity extends Screen {
         switch (r.kind) {
             case SEG: {
                 int n = r.segs().length;
-                int to = ok ? (r.selected() + 1) % n : Math.max(0, Math.min(n - 1, r.selected() + d));
-                if (to == r.selected()) return true;
+                if (ok) {
+                    showSaved();
+                    return true;
+                }
+                int to = Math.max(0, Math.min(n - 1, r.selected() + d));
+                if (to == r.selected()) {
+                    if (!toEnd) focusNav();
+                    return true;
+                }
                 r.select(to);
+                showSaved();
                 break;
             }
             case STEP:
-                if (ok) return true;
+                if (ok) {
+                    showSaved();
+                    return true;
+                }
                 r.step(d);
+                showSaved();
                 break;
             case TOGGLE:
                 r.set(!r.on());
+                showSaved();
                 break;
             default:
                 if (ok) r.open();
@@ -713,6 +752,7 @@ public class SettingsActivity extends Screen {
             item.setOnClickListener(x -> {
                 pick.accept(index);
                 closeChooser();
+                showSaved();
             });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, Ui.ipx(68 + 2 * FocusTile.REACH));
             if (i > 0) lp.topMargin = Ui.ipx(6 - 2 * FocusTile.REACH);

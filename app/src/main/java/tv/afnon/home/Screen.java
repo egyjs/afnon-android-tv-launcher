@@ -286,8 +286,10 @@ abstract class Screen extends Activity {
     void setHints(LinearLayout hints, List<String> h) {
         hints.removeAllViews();
         for (int i = 0; i < h.size(); i++) {
-            TextView v = text(ui400, 22, Tokens.MIST_400);
-            v.setText(h.get(i));
+            String text = h.get(i);
+            int ink = text.startsWith("✓") ? Tokens.GOLD_400 : Tokens.MIST_400;
+            TextView v = text(ui400, 22, ink);
+            v.setText(text);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
             if (i > 0) lp.setMarginStart(Ui.ipx(40));
             hints.addView(v, lp);
