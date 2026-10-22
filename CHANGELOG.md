@@ -4,6 +4,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Fixed
+- Opening Settings (and Prayer day or All apps) no longer flashes a plain blue screen first. That was Android's
+  starting window in the theme's ground colour, shown for the quarter second the screen takes to draw, and blue
+  even in night mode. Afnon's screens now have none (`windowDisablePreview`), and open and close with no
+  transition: the screen in front stays until the next one is ready.
+
 ## [0.4] - 2026-10-22
 
 ### Added

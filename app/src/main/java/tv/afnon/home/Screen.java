@@ -309,6 +309,27 @@ abstract class Screen extends Activity {
         return ssid;
     }
 
+    /**
+     * Afnon's own screens open with no transition: the one in front stays until the new one has drawn. (Its
+     * replacement, overrideActivityTransition, is Android 14+; these TVs run 11 and 12.)
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public void startActivity(Intent i, Bundle options) {
+        super.startActivity(i, options);
+        if (i.getComponent() != null && getPackageName().equals(i.getComponent().getPackageName())) {
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    /** …and close with none. */
+    @SuppressWarnings("deprecation")
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
+    }
+
     void startSafely(Intent i) {
         try {
             startActivity(i);
