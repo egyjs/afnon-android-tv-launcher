@@ -69,7 +69,7 @@ from Tanzil's.
 ## Phase 3: UI polish from UrTV's home screen
 
 8. **Focus tiles**: bounce to 1.1x (overshoot) with a light sheen, and the app name fades in under the tile. No shadow
-   lift (rule). A (our gold focus) or B (UrTV's white ring, the tile keeps its colour): A is recommended (open question 2).
+   lift (rule). **Decided: A**, our gold focus (the focus colour on every other screen). B, UrTV's white ring, is dropped.
    Source: UrTV launcher `MainActivity.java:432-520`. Mocks: `tiles-a`, `tiles-b`.
 9. **Colour glow** behind the favourites, sampled from the focused app's icon. Two glow layers crossfade by opacity
    (no colour animation). **Decided: keep.** Needs a GPU check on the TV. Source: `sampleColor`, `MainActivity.java:945-973`. Mock:
@@ -96,9 +96,10 @@ from Tanzil's.
     - Shown in Amiri with surah:ayah, pause marks kept, and drifting with the screensaver.
     - Every TV shows the same verse on a given day (day number from the local date).
     - On/off in Settings → Display ("Verse of the day on the screensaver").
-    - The list is ours, not UrTV's: refs only, chosen for comfort, remembrance, du'a and hope. UrTV's list
-      (`assets/shared/verses.json`, refs in `.github/tools/fetch_verses.py`) is a starting point; leave out verses
-      that are a warning on their own (e.g. 20:124, 3:85). A du'a that names the Fire (3:16, 25:65) is fine.
+    - **Decided: UrTV's method, as is.** Copy UrTV's `REFS` list (`.github/tools/fetch_verses.py`, refs only)
+      into `quran.mjs` as a `daily` list, fetched from Tanzil like every other verse. As UrTV's `build.py:32-51`
+      does, drop the basmala that the API puts before ayah 1 (except Al-Fatiha). Unlike UrTV, keep the pause
+      marks, because Amiri has them. Pick by day number into the list.
     - Source: UrTV `fetch_verses.py`, `build.py:32-51`, `template.html:1058-1073`. Mock: `verse-screensaver`.
 14. **Hadith** on alternate days, later and optional. Each must be checked against the six books and Al-Albani's
     grades (UrTV `verify_hadith.py`, `build.py:53-206`).
@@ -129,13 +130,12 @@ favourites.
 1. Commit Phase 0 and the Quran pipeline: yes.
 2. Iqama: by country, Saudi by default, no Settings row (item 4).
 3. Verse of the day: screensaver only; the crown verse stays on every screen.
-4. Glow: keep.
-5. Verse list: our own, refs only (item 13).
-6. Radio Settings row: "Screensaver while listening".
+4. Tiles: A.
+5. Glow: keep.
+6. Verse list: UrTV's refs and method (item 13).
+7. Radio Settings row: "Screensaver while listening".
+8. The 7 remaining safe-list apps were turned off on the TV on 2026-10-22, logged in `state/disabled.log`.
 
 ## Open questions
 
-1. The 7 safe-list apps still enabled on the TV: turn them off? (`com.tcl.factory.view`,
-   `com.tcl.useragreement`, `com.tcl.initsetup`, `com.google.android.partnersetup`,
-   `com.google.android.onetimeinitializer`, `com.google.android.play.games`, `com.google.android.apps.tv.dreamx`.)
-2. Tiles: A (recommended: keeps Afnon's gold focus, the same on every screen) or B?
+None. Next: Phase 1.
