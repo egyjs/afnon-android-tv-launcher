@@ -20,6 +20,10 @@ import java.util.Date;
  * again; Back or Dismiss closes, and so does leaving the screen. It closes by itself 1, 5 or 10 minutes after it
  * opens, or when the adhan ends (Settings → Reminders → Close the call screen; 10 minutes by default). It runs in
  * its own task, so closing returns to the app that was playing.
+ *
+ * <p>Opened with the TV in standby (Settings → Reminders → Turn the TV on for the adhan), it turns the screen on
+ * (turnScreenOn in the manifest), and when it closes by itself, or with Back or Dismiss, it asks for standby again
+ * ({@link Wake#backToStandby}). Left for another app or Home, the TV stays on.
  */
 public class NowActivity extends Screen {
 
@@ -36,13 +40,16 @@ public class NowActivity extends Screen {
     private int restoreVolume = -1;
     private boolean restoreMute;
     private boolean started;
+    /** Afnon turned the TV on for this call; closed, rather than left for something else, it goes back to standby. */
+    private boolean woke, closed;
 
-    private final Runnable autoClose = this::finish;
+    private final Runnable autoClose = this::close;
 
     @Override
     void build() {
         prayer = getIntent().getIntExtra("prayer", PrayerDay.DHUHR);
         time = new Date(getIntent().getLongExtra("time", System.currentTimeMillis()));
+        woke = getIntent().getBooleanExtra("woke", false);
         readClockFormat();
         newRoot();
         root.setBackgroundColor(Tokens.SCRIM);
@@ -88,7 +95,7 @@ public class NowActivity extends Screen {
         });
         dismissButton = pill(0, 2);
         ((TextView) dismissButton.getChildAt(0)).setText(t.dismiss());
-        dismissButton.setOnClickListener(v -> finish());
+        dismissButton.setOnClickListener(v -> close());
         float r = FocusTile.REACH;
         LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(Ui.ipx(420 + 2 * r), Ui.ipx(76 + 2 * r));
         plp.topMargin = Ui.ipx(36 - r);
@@ -126,6 +133,12 @@ public class NowActivity extends Screen {
         else if (player == null) tick.postDelayed(autoClose, Tokens.MOTION_CALL_SILENT_DISMISS_MS);
     }
 
+    /** Closed by itself, Back or Dismiss: unlike leaving it for another app, that may put the TV back to standby. */
+    private void close() {
+        closed = true;
+        finish();
+    }
+
     /** A 420×76 pill: gold when focused; at rest the given fill, or a soft outline. */
     private FocusTile pill(int restFill, float border) {
         FocusTile b = new FocusTile(this, 38);
@@ -158,7 +171,7 @@ public class NowActivity extends Screen {
         player = Adhans.play(this, Prefs.voice(this, prayer == PrayerDay.FAJR));
         if (player != null) player.setOnCompletionListener(mp -> {
             stopAdhan();
-            if (Prefs.callCloseMinutes(this) == 0) finish();
+            if (Prefs.callCloseMinutes(this) == 0) close();
         });
         updatePlayLabel();
     }
@@ -204,7 +217,7 @@ public class NowActivity extends Screen {
     public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
         if (k == KeyEvent.KEYCODE_BACK) {
-            if (e.getAction() == KeyEvent.ACTION_UP) finish();
+            if (e.getAction() == KeyEvent.ACTION_UP) close();
             return true;
         }
         if (k == KeyEvent.KEYCODE_DPAD_UP || k == KeyEvent.KEYCODE_DPAD_DOWN) {
@@ -226,6 +239,8 @@ public class NowActivity extends Screen {
     protected void onDestroy() {
         tick.removeCallbacks(autoClose);
         stopAdhan();
+        // After the adhan has stopped and the volume is back, so standby starts quiet.
+        if (woke && closed) Wake.backToStandby();
         super.onDestroy();
     }
 }

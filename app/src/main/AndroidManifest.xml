@@ -19,6 +19,13 @@
          never requested at runtime. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
+    <!-- Turn the TV on for the adhan (Wake): one exact alarm at the next picked prayer, armed again after a
+         reboot. SCHEDULE_EXACT_ALARM is granted at install on Android 12; from 13, USE_EXACT_ALARM, the alarm-clock
+         permission, takes its place. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Android 11+ package visibility, so the app tiles can resolve the apps they launch. -->
     <queries>
@@ -96,13 +103,17 @@
             android:screenOrientation="landscape" />
 
         <!-- The call to prayer, opened by the remote buttons service. Its own task, so closing it returns to
-             whatever app was playing rather than to Home. -->
+             whatever app was playing rather than to Home. Opened in standby (Wake) or under TCL Audio Only, it
+             turns the screen on instead of waiting stopped behind it. -->
         <activity
             android:name=".NowActivity"
             android:exported="false"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:taskAffinity="tv.afnon.home.call"
+            android:turnScreenOn="true"
+            android:showWhenLocked="true"
+            tools:targetApi="27"
             android:theme="@style/Theme.Afnon.Call"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden|uiMode|locale|layoutDirection"
             android:screenOrientation="landscape" />
@@ -143,5 +154,19 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/remote_keys" />
         </service>
+
+        <!-- Wake's alarm, and re-arming it after a reboot, an update or a clock change. The system sends these, so
+             the receiver needs no export. -->
+        <receiver
+            android:name=".WakeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -73,13 +74,8 @@ final class PrayerWatch {
 
         int call = Reminders.dueCall(service, day, now);
         if (call >= 0) {
-            String key = call + ":" + day.times[call].getTime();
             // While Afnon's screensaver runs it wakes itself for the call; open the screen once it has gone.
-            if (!key.equals(called) && !AfnonDream.running) {
-                called = key;
-                Prefs.of(service).edit().putString("called", key).apply();
-                openCall(call, day.times[call]);
-            }
+            if (!AfnonDream.running) callOnce(call, day.times[call], false);
             return;
         }
         // No call for a prayer whose adhan is off: just say that its time has begun (also with the screen off).
@@ -104,12 +100,26 @@ final class PrayerWatch {
         }
     }
 
-    void openCall(int prayer, Date time) {
+    /**
+     * The call for this prayer time, unless it has been shown already: from this check, or from {@link Wake}'s
+     * alarm with the TV in standby (woke), which shares the "called" key so the two never both open it.
+     */
+    void callOnce(int prayer, Date time, boolean woke) {
+        String key = prayer + ":" + time.getTime();
+        if (key.equals(called)) return;
+        called = key;
+        Prefs.of(service).edit().putString("called", key).apply();
+        openCall(prayer, time, woke);
+    }
+
+    /** woke: Afnon turned the TV on for it, so the call screen puts it back to standby when it closes. */
+    void openCall(int prayer, Date time, boolean woke) {
         hideBanner();
         wakeScreen();
         Intent i = new Intent(service, NowActivity.class)
             .putExtra("prayer", prayer)
             .putExtra("time", time.getTime())
+            .putExtra("woke", woke)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             service.startActivity(i);
@@ -130,6 +140,15 @@ final class PrayerWatch {
         } catch (RuntimeException ignored) {
             // No wake lock; the call opens when the screen next comes on.
         }
+    }
+
+    /**
+     * Back to standby after a call Afnon woke the TV for: Android's lock-screen action, which also turns the screen
+     * off (Android 9+). False where there is none; the TV then stays on.
+     */
+    boolean sleep() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+            && service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN);
     }
 
     // ---------------------------------------------------------------- banner
@@ -239,14 +258,17 @@ final class PrayerWatch {
     /**
      * For checking on the TV without waiting for a prayer: the banner (with the spoken reminder, if on), the call
      * screen, or the spoken «حان الآن موعد صلاة …» for the next prayer, after a delay to switch to another app
-     * first. From Home: `am start -n tv.afnon.home/.MainActivity --es test banner|call|announce`.
+     * first; or standby as after a call that woke the TV. From Home:
+     * `am start -n tv.afnon.home/.MainActivity --es test banner|call|announce|standby`.
      */
     void test(String kind, long delayMs) {
         handler.postDelayed(() -> {
             Date now = new Date();
             PrayerDay day = new PrayerDay(service, now);
             if ("call".equals(kind)) {
-                openCall(day.nextIndex, day.nextTime);
+                openCall(day.nextIndex, day.nextTime, false);
+            } else if ("standby".equals(kind)) {
+                Wake.backToStandby();
             } else if ("announce".equals(kind)) {
                 Announce.now(service, day.nextIndex, day.friday);
             } else {

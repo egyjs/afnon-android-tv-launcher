@@ -34,7 +34,7 @@ real TV over ADB, never just in the build.
 export TV=<ip>:5555                 # the tools refuse to run without it
 bash tools/install.sh               # fetch adhans (first time), assembleDebug, install, set HOME, grants, a11y service
 bash tools/shot.sh home             # screenshot -> state/shots/home.png (look at it)
-adb -s $TV shell am start -n tv.afnon.home/.MainActivity --es test friday   # ramadan|now|reminder|call|banner|announce|radio
+adb -s $TV shell am start -n tv.afnon.home/.MainActivity --es test friday   # ramadan|now|reminder|call|banner|announce|radio|standby, wake --ei seconds N
 ```
 
 `tools/env.sh` finds adb itself (PATH, then `local.properties` sdk.dir, ANDROID_HOME, default SDK folders);
@@ -52,6 +52,10 @@ a button sends and who handled it.
 - `PrayerDay`, `Prefs` (cities and methods), `Reminders`, `Adhans`, `Radio`/`RadioBars`, `Apps` (launching).
 - `RemoteKeys` is the accessibility service. It is always on, so it also hosts `PrayerWatch` (reminders, banner,
   the call). Turning it off stops the call to prayer.
+- `Wake` (Settings → Reminders → Turn the TV on for the adhan; none picked by default): the 15 s timer stops in
+  standby, so it arms one AlarmManager alarm (`setAlarmClock`) for the next picked prayer, and none while nothing
+  is picked. It opens the call through `PrayerWatch.callOnce` (same "called" key) and the service's
+  `GLOBAL_ACTION_LOCK_SCREEN` puts the TV back to standby when the call closes.
 
 ### Remote buttons and the volume-hold bug (fixed 2026-10-21)
 

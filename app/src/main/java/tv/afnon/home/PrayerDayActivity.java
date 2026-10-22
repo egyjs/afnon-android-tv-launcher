@@ -142,6 +142,7 @@ public class PrayerDayActivity extends Screen {
         b.setOnClickListener(v -> {
             String key = "bell_" + i;
             prefs().edit().putBoolean(key, !bellOn(i)).apply();
+            Wake.schedule(this);
             paintRow(i);
         });
         b.setOnFocusChangeListener((v, has) -> {

@@ -232,6 +232,7 @@ final class Prefs {
         City city = CITIES[index];
         of(c).edit().putString("city", city.id).putString("method", city.method.name())
             .putString("madhab", city.madhab == Madhab.HANAFI ? "hanafi" : "shafi").apply();
+        Wake.schedule(c);
     }
 
     /**
@@ -276,6 +277,7 @@ final class Prefs {
 
     static void setMethod(Context c, CalculationMethod m) {
         of(c).edit().putString("method", m.name()).apply();
+        Wake.schedule(c);
     }
 
     static Madhab madhab(Context c) {
@@ -284,6 +286,7 @@ final class Prefs {
 
     static void setMadhab(Context c, Madhab m) {
         of(c).edit().putString("madhab", m == Madhab.HANAFI ? "hanafi" : "shafi").apply();
+        Wake.schedule(c);
     }
 
     /** Days added to the computed Hijri date, for when the local moon sighting differs: −2 to +2. */
@@ -343,6 +346,25 @@ final class Prefs {
 
     static void setAdhan(Context c, boolean on) {
         of(c).edit().putBoolean("adhan", on).apply();
+        Wake.schedule(c);
+    }
+
+    /**
+     * The prayers whose adhan turns the TV on from standby (Settings → Reminders → Turn the TV on for the adhan),
+     * one bit per PrayerDay index; none, so off, by default. Every change re-arms {@link Wake}'s alarm.
+     */
+    static boolean wake(Context c, int prayer) {
+        return (of(c).getInt("wake", 0) & (1 << prayer)) != 0;
+    }
+
+    static boolean wakeAny(Context c) {
+        return of(c).getInt("wake", 0) != 0;
+    }
+
+    static void setWake(Context c, int prayer, boolean on) {
+        int bits = of(c).getInt("wake", 0);
+        of(c).edit().putInt("wake", on ? bits | (1 << prayer) : bits & ~(1 << prayer)).apply();
+        Wake.schedule(c);
     }
 
     /** Each prayer's own adhan bell (Prayer day); on by default except Sunrise, which has no adhan. */

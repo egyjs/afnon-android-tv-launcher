@@ -16,6 +16,17 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   records them with a Microsoft neural Arabic voice through edge-tts into `app/src/main/assets/announce/`; without them both stay silent. `--es test announce`
   tries it; `--es test banner` and `--es test reminder` now say the reminder too.
 
+- Settings → Reminders → Turn the TV on for the adhan: the prayers picked in its list (Fajr, Dhuhr/Jumu'ah, Asr,
+  Maghrib, Isha; none, so off, by default) wake the TV from standby for their call. One alarm is armed at a time,
+  for the next picked prayer (`setAlarmClock`), and armed again after it rings, on boot, and when the picks, the
+  adhan, a bell, the city, the method or the Asr school change; with nothing picked nothing is armed. The call
+  opens as usual and only once, and the adhan switch and each prayer's bell still decide. If Afnon turned the TV
+  on, closing the call screen (by itself, Back or Dismiss) asks Android for standby again through the remote
+  buttons service; leaving it for another app keeps the TV on. Needs the exact-alarm permission
+  (`SCHEDULE_EXACT_ALARM`, granted at install on Android 12; `USE_EXACT_ALARM` from 13). `--es test wake --ei
+  seconds 120` picks the coming prayer and rings its alarm that many seconds later; `--es test standby` tries
+  the way back. Not yet checked on the TV.
+
 ### Changed
 - The reminder can come 5, 10, 15, 20 or 30 minutes before each prayer (or not at all). Settings → Reminders →
   Remind me before prayer is now a list, like the adhan voices; 15 is still the default.

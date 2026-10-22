@@ -328,6 +328,21 @@ public class SettingsActivity extends Screen {
                     }
                     void select(int i) { Prefs.setCallCloseMinutes(c, minutes[i]); }
                 },
+                new Row(VALUE) {
+                    // Off (no prayer picked) by default; a list of switches, one per prayer.
+                    String label() { return t.wakeRow(); }
+                    String help() { return Prefs.wakeAny(c) && !Wake.allowed(c) ? t.wakeBlocked() : t.wakeHelp(); }
+                    String value() { return wakeValue(); }
+                    void open() {
+                        boolean[] on = new boolean[Wake.PRAYERS.length];
+                        for (int i = 0; i < on.length; i++) on[i] = Prefs.wake(c, Wake.PRAYERS[i]);
+                        openChooser(label(), t.wakePrayers(), -1, i -> {
+                            on[i] = !on[i];
+                            Prefs.setWake(c, Wake.PRAYERS[i], on[i]);
+                            showSaved();
+                        }, null, on);
+                    }
+                },
                 voiceRow(false),
                 voiceRow(true));
             case RADIO: return Arrays.asList(
@@ -420,6 +435,16 @@ public class SettingsActivity extends Screen {
                     i -> preview(Adhans.VOICES[i][0]));
             }
         };
+    }
+
+    /** Turn the TV on: Off, the picked prayers' names, or All prayers. */
+    private String wakeValue() {
+        String[] names = t.prayerNames();
+        List<String> on = new ArrayList<>();
+        for (int p : Wake.PRAYERS) if (Prefs.wake(this, p)) on.add(names[p]);
+        if (on.isEmpty()) return t.wakeOff();
+        if (on.size() == Wake.PRAYERS.length) return t.wakeAll();
+        return String.join(t.ar ? "، " : ", ", on);
     }
 
     private void preview(String id) {
@@ -799,6 +824,15 @@ public class SettingsActivity extends Screen {
 
     /** onFocus, if given, hears each item as focus reaches it (the adhan list plays that voice). */
     private void openChooser(String title, String[] items, int selected, IntConsumer pick, IntConsumer onFocus) {
+        openChooser(title, items, selected, pick, onFocus, null);
+    }
+
+    /**
+     * checks, if given, makes it a list of switches showing those values (Turn the TV on: the prayers): OK hands
+     * the focused item to pick, which flips and saves it, and the list stays open; Back closes it.
+     */
+    private void openChooser(String title, String[] items, int selected, IntConsumer pick, IntConsumer onFocus,
+                             boolean[] checks) {
         chooser = new FrameLayout(this);
         chooser.setBackgroundColor(Tokens.SCRIM_MENU);
         chooser.setClickable(true);
@@ -837,13 +871,24 @@ public class SettingsActivity extends Screen {
             v.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
             v.setPadding(Ui.ipx(24), 0, Ui.ipx(24), 0);
             item.addView(v, new FrameLayout.LayoutParams(-1, -1));
+            Switch box = null;
+            if (checks != null) {
+                box = new Switch(this, checks[i], false);
+                FrameLayout.LayoutParams blp = new FrameLayout.LayoutParams(Ui.ipx(88), Ui.ipx(48),
+                    Gravity.CENTER_VERTICAL | Gravity.END);
+                blp.setMarginEnd(Ui.ipx(24));
+                item.addView(box, blp);
+            }
+            Switch sw = box;
             item.setLook(f -> {
                 v.setTextColor(f ? Tokens.LAPIS_900 : (chosen ? Tokens.GOLD_400 : Tokens.PLASTER_100));
+                if (sw != null) sw.set(checks[index], f);
                 if (f && onFocus != null) onFocus.accept(index);
             });
             item.setOnClickListener(x -> {
                 pick.accept(index);
-                closeChooser();
+                if (sw != null) sw.set(checks[index], item.isFocused());
+                else closeChooser();
             });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, Ui.ipx(68 + 2 * FocusTile.REACH));
             if (i > 0) lp.topMargin = Ui.ipx(6 - 2 * FocusTile.REACH);
@@ -865,8 +910,8 @@ public class SettingsActivity extends Screen {
         if (start != null) root.post(start::requestFocus);
         List<String> h = new ArrayList<>();
         h.add(t.hintMove());
-        h.add(t.hintChoose());
-        h.add(t.hintBackCancel());
+        h.add(checks != null ? t.hintSwitch() : t.hintChoose());
+        h.add(checks != null ? t.hintClose() : t.hintBackCancel());
         setHints(hints, h);
     }
 
@@ -916,12 +961,20 @@ public class SettingsActivity extends Screen {
     /** On: gold track, lapis knob at the end. Off: lapis-700 track, mist knob at the start. On a gold row the on track turns lapis so it still shows. */
     private static final class Switch extends View {
         private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final boolean on, focused;
+        private boolean on, focused;
 
         Switch(Context c, boolean on, boolean focused) {
             super(c);
             this.on = on;
             this.focused = focused;
+        }
+
+        /** A switch in a list (Turn the TV on) follows its item's value and focus without being rebuilt. */
+        void set(boolean on, boolean focused) {
+            if (on == this.on && focused == this.focused) return;
+            this.on = on;
+            this.focused = focused;
+            invalidate();
         }
 
         @Override

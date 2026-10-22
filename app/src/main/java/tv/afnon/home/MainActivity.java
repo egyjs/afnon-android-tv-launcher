@@ -102,8 +102,9 @@ public class MainActivity extends Screen {
 
     /**
      * Checking reminders on the TV without waiting for a prayer: `--es test reminder` shows Home's card now, with
-     * the spoken reminder if it is on; `banner`, `call` and `announce` come from the remote buttons service 8 s
-     * later, time enough to open another app.
+     * the spoken reminder if it is on; `banner`, `call`, `announce` and `standby` come from the remote buttons
+     * service 8 s later, time enough to open another app. `wake` (with `--ei seconds N`, 120 by default) turns the
+     * TV on for the coming prayer N seconds from now, after it has been put in standby (Wake.test).
      * `--es station <id>` (ids in Radio.STATIONS) picks a radio station as Settings does, before any test runs.
      */
     private void runTest(Intent i) {
@@ -121,6 +122,7 @@ public class MainActivity extends Screen {
         });
         else if ("friday".equals(kind) || "ramadan".equals(kind) || "now".equals(kind)) shiftTo(kind);
         else if ("radio".equals(kind)) Radio.toggle(this);
+        else if ("wake".equals(kind)) Wake.test(this, i.getIntExtra("seconds", 120), i.getStringExtra("via"));
         else if (RemoteKeys.watch != null) RemoteKeys.watch.test(kind, 8000);
     }
 

@@ -147,6 +147,19 @@ final class Text {
     String[] callCloseChoices() {
         return ar ? new String[] {"بعد الأذان", "1 د", "5 د", "10 د"} : new String[] {"After adhan", "1 min", "5 min", "10 min"};
     }
+    String wakeRow() { return ar ? "تشغيل التلفاز للأذان" : "Turn the TV on for the adhan"; }
+    String wakeHelp() { return ar ? "يعمل التلفاز وحده من وضع الاستعداد ليؤذّن" : "Wakes the TV from standby to play the adhan"; }
+    /** When Android has taken away Afnon's exact alarms (Android 12+), so nothing can wake the TV. */
+    String wakeBlocked() {
+        return ar ? "لا يعمل: النظام يمنع أفنون من ضبط المنبّهات" : "Not working: Android blocks Afnon's alarms";
+    }
+    String wakeOff() { return ar ? "إيقاف" : "Off"; }
+    String wakeAll() { return ar ? "كل الصلوات" : "All prayers"; }
+    /** The row's list, in the order of Wake.PRAYERS. */
+    String[] wakePrayers() {
+        return ar ? new String[] {"الفجر", "الظهر / الجمعة", "العصر", "المغرب", "العشاء"}
+                  : new String[] {"Fajr", "Dhuhr / Jumu'ah", "Asr", "Maghrib", "Isha"};
+    }
     String voiceRow() { return ar ? "صوت الأذان" : "Adhan voice"; }
     String voiceHelp() { return ar ? "لكل الصلوات عدا الفجر · يُسمع عند التنقل في القائمة" : "Every prayer but Fajr · plays as you move through the list"; }
     String fajrVoiceRow() { return ar ? "أذان الفجر" : "Fajr adhan"; }

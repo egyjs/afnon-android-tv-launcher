@@ -62,7 +62,8 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 - **Qibla and room direction.** The Qibla bearing from your city, and a one-time "which way does
   the TV face" setting, so the screen can say *"Qibla is behind you"*.
 - **The adhan.** 14 voices to choose from, plus a separate Fajr adhan. If the TV is muted or at
-  zero, the volume comes up for the adhan and goes back afterwards.
+  zero, the volume comes up for the adhan and goes back afterwards. For the prayers you pick (none by
+  default), it can turn the TV on from standby and put it back after.
 - **Reminders.** A card on Home, or a banner over other apps, 5 to 30 minutes before each prayer. It can
   also say «اقترب موعد صلاة …», and when a prayer's adhan is off, «حان الآن موعد صلاة …» as its time begins
   (both lower whatever is playing for a moment instead of pausing it; see `tools/fetch-announce.sh` below).
@@ -102,6 +103,7 @@ nothing from other sites except the station's stream when you press Play, and ke
 | `RECORD_AUDIO` | Required by Android's Visualizer, to read Afnon's **own** player for the level bars. It does not use the microphone. |
 | `WRITE_SECURE_SETTINGS` | Turns the TV's sleep timer off while the radio plays, and puts it back after. On TCL, also writes the remote button mappings (see TCL notes) |
 | `ACCESS_FINE_LOCATION` | Android 9+ hides the Wi-Fi name without it; Home shows the name. Afnon never reads the TV's location |
+| `SCHEDULE_EXACT_ALARM` (Android 12), `USE_EXACT_ALARM` (13+), `RECEIVE_BOOT_COMPLETED` | Turn the TV on for the adhan (off by default): one alarm at the next picked prayer, armed again after a reboot |
 | Accessibility service | Remote button mapping (see `RemoteKeys.java`) |
 
 ## Install
@@ -172,6 +174,9 @@ adb shell am start -n tv.afnon.home/.MainActivity --es test call      # the call
 adb shell am start -n tv.afnon.home/.MainActivity --es test banner    # the banner and its voice, 8 s later (open another app)
 adb shell am start -n tv.afnon.home/.MainActivity --es test announce  # «حان الآن موعد صلاة …», 8 s later
 adb shell am start -n tv.afnon.home/.MainActivity --es test radio     # radio on / off
+adb shell am start -n tv.afnon.home/.MainActivity --es test wake --ei seconds 120  # turn the TV on for the coming prayer
+                                                                      # 120 s from now; put it in standby meanwhile
+adb shell am start -n tv.afnon.home/.MainActivity --es test standby   # back to standby, as after a call that woke it
 adb shell am start -n tv.afnon.home/.MainActivity --es station nablus # pick a station (ids in Radio.STATIONS)
 bash tools/shot.sh home                                               # screenshot to state/shots/
 ```
@@ -220,6 +225,7 @@ app/src/main/java/tv/afnon/home/
   Radio, RadioBars    Quran Radio player and its level bars
   ScreenOffActivity   Screen off while listening (TCL Audio Only, or a black fallback)
   Announce            The spoken reminder and «حان الآن موعد صلاة …»
+  Wake, WakeReceiver  Turning the TV on from standby for the adhan (one alarm, for the next picked prayer)
   PrayerDay, Prefs, Reminders, Adhans, Text, Tokens, Ui …
 tools/                install, restore, disable/enable, fetch-adhans, fetch-announce, screenshot
 docs/screenshots/     the images above, all from the real TV
