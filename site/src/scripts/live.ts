@@ -4,6 +4,7 @@ import { DEFAULT_PREFS, type Prefs } from '../lib/data';
 import { makeCtx, type Ctx, type Model } from '../lib/ctx';
 import { shiftFor } from '../lib/prayer';
 import type { Lang } from '../lib/text';
+import { patchModel } from '../mocks/mocks';
 
 const KEY = 'afnon-prefs';
 
@@ -40,9 +41,11 @@ export function live(model: (c: Ctx) => Model, onTick?: (c: Ctx) => void) {
   const mode = stage.dataset.mode || undefined;
   let prefs = loadPrefs();
   let shift = mode ? shiftFor(mode, prefs) : 0;
+  // Dev-only UI mocks (/mocks/): flags on the stage, and the mock's changes to the screen model.
+  const mock = import.meta.env.DEV ? (stage.dataset.mock ?? '').split(' ').filter(Boolean) : [];
   const render = () => {
-    const c = makeCtx(lang, prefs, new Date(Date.now() + shift), mode);
-    bind(stage, model(c));
+    const c = makeCtx(lang, prefs, new Date(Date.now() + shift), mode, mock);
+    bind(stage, import.meta.env.DEV && mock.length ? patchModel(stage.dataset.screen!, c, model(c)) : model(c));
     onTick?.(c);
   };
   render();

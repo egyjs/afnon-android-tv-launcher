@@ -1,11 +1,12 @@
 ---
 // The 1920×1080 TV stage with the star lattice ground (Ui.starLattice), scaled into a 16:9 frame by the inline script below
 // (inline so the TV still fits when a cached page outlives its script bundle after a deploy).
-interface Props { mode?: string; screen: string; ground?: 'lattice' | 'black' }
-const { mode, screen, ground = 'lattice' } = Astro.props;
+// `mock`: dev-only UI mock flags (src/mocks), as data-mock on the stage.
+interface Props { mode?: string; screen: string; ground?: 'lattice' | 'black'; mock?: string }
+const { mode, screen, ground = 'lattice', mock } = Astro.props;
 ---
 <div class="tv-frame">
-  <div class="tv" data-mode={mode} data-screen={screen} data-ground={ground}>
+  <div class="tv" data-mode={mode} data-screen={screen} data-ground={ground} data-mock={mock}>
     {ground === 'lattice' && (
       <svg class="lattice" aria-hidden="true" width="1920" height="1080">
         <defs>

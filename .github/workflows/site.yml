@@ -33,6 +33,9 @@ jobs:
       - name: Generated token files match tokens.json
         run: npm run tokens:check
         working-directory: site
+      - name: Quranic text matches afnon-mihrab/quran.json (never typed by hand)
+        run: npm run quran:check
+        working-directory: site
 
   build:
     needs: tokens

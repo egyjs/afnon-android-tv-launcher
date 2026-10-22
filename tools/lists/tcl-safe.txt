@@ -1,0 +1,37 @@
+# TCL Google TV / Android TV: safe to disable. Telemetry, ads, promos, demos and helpers nobody opens.
+# Measured by UrTV on three TCL sets (Android 11, 12, 14): about 85-215 MB more free RAM, no feature lost.
+# Apply: bash tools/disable.sh tools/lists/tcl-safe.txt     Undo: bash tools/restore.sh (or tools/enable.sh <pkg>)
+# Packages missing on a given TV are skipped. From UrTV (github.com/tshi-dev/UrTV, MIT).
+
+# TCL telemetry, accounts and ads
+com.tcl.bi                             # telemetry (over a thousand events a day)
+com.tcl.logkit                         # log collection
+com.tcl.usercenter                     # TCL account / phone binding
+com.tcl.partnercustomizer              # partner app rows and promos
+com.tcl.overseasappshow                # preinstalled-app showcase
+com.tcl.messagebox                     # promo pop-ups
+com.tcl.esticker                       # on-screen promo stickers
+com.tcl.exhibit                        # shop demo
+com.tcl.factory.view                   # factory menu
+com.tcl.hotelmenu                      # hotel mode
+com.tcl.useragreement                  # agreement viewer
+com.tcl.guard                          # "TV guard" cleaner
+com.tcl.notereminder
+com.tcl.repairguide
+com.tcl.ocean.instructions             # e-manual
+com.tcl.initsetup                      # first-run setup (already done)
+com.tcl.copydatatotv
+com.tcl.xian.StartandroidService       # boot helper, ~70 MB, no visible purpose
+
+# Google extras
+com.google.android.tvrecommendations   # sponsored / recommendation rows
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+com.google.android.play.games
+android.autoinstalls.config.google.gtvpai   # silently installs promoted apps
+com.google.android.apps.tv.dreamx      # Google ambient screensaver (replaced by Afnon's screensaver)
+com.google.android.backdrop            # Google backdrop screensaver (older sets)
+
+# Seen on our TCL 55P7K
+tv.samba.ssm.ui                        # Samba TV content recognition (tracks what is on screen)

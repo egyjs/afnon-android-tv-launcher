@@ -3,6 +3,7 @@
 import '../styles/base.css';
 import { APK, PAGES, REPO, href, type Page } from '../lib/site';
 import type { Lang } from '../lib/text';
+import quran from '../../../afnon-mihrab/quran.json';
 
 interface Props { lang: Lang; page: Page; image?: string }
 const { lang, page, image = lang === 'ar' ? 'home-ar.png' : 'home-en.png' } = Astro.props;
@@ -104,7 +105,7 @@ const jsonLd = {
   </main>
 
   <footer class="foot">
-    <p class="sacred" lang="ar" dir="rtl">إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا</p>
+    <p class="sacred" lang="ar" dir="rtl">{quran.verses.crown.lines.join(' ')}</p>
     <p>{L.foot}</p>
     <p><a href={APK}>{L.download}</a> · <a href={REPO}>{L.source}</a></p>
   </footer>

@@ -1,0 +1,28 @@
+# TCL Google TV / Android TV: optional. Each line removes something SOMEONE might use.
+# Ask the household about every group, comment out what they keep, then apply.
+# Apply: bash tools/disable.sh tools/lists/tcl-optional.txt     Undo: bash tools/enable.sh <pkg>
+# From UrTV (github.com/tshi-dev/UrTV, MIT).
+
+# TCL content tabs and channels (the "TCL" tab and TCL Channel app)
+com.tcl.channelplus
+com.tcl.waterfall.overseas
+com.tcl.dashboard
+com.tcl.t_solo
+
+# TCL extras
+com.tcl.gamebar                        # game bar overlay
+com.tcl.interactive
+com.tcl.MultiScreenInteraction_TV      # T-Cast (AirPlay and Chromecast stay on)
+com.tcl.UpdatePeripheral               # accessory firmware updates
+
+# Google apps
+com.google.android.videos              # Google TV / Play Movies
+com.google.android.youtube.tvmusic     # YouTube Music
+com.android.dreams.basic               # basic screensaver (keep if Afnon's screensaver is not used)
+
+# Region leftovers seen on imported sets (only present on some)
+uk.co.freeview.bbc_sounds
+com.hungama.movies.tv
+tv.airtel.xstream.tvapp
+com.internet.tvbrowser
+com.tcl.smartalexa                     # Alexa (TCL ships it off outside Alexa's regions)

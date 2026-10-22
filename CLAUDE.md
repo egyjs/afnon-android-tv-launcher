@@ -23,7 +23,10 @@ real TV over ADB, never just in the build.
 - Colours/sizes/timings from `afnon-mihrab/tokens.json` (generated into `Tokens.java`, `colors.xml` and the site's
   `tokens.css` by `cd site && npm run tokens`; never edit those by hand); every string in Arabic and English in
   `Text.java`. Arabic (RTL) is the
-  default; check RTL and LTR. No letter-spacing on Arabic. Quranic text uses Amiri and must be exact (surah:ayah).
+  default; check RTL and LTR. No letter-spacing on Arabic. Quranic text uses Amiri and must be exact (surah:ayah), and is **never typed by
+  hand**, not even in docs, comments or mocks: it is fetched from Tanzil into `afnon-mihrab/quran.json`
+  (`cd site && npm run quran:fetch`) and every copy is generated from it (`Quran.java`, `<!--quran …-->` markers in
+  README and design files; the site imports the JSON). CI runs `npm run quran:check`. Refer to verses by surah:ayah.
 - D-pad focus is explicit per screen, with Left/Right swapped in RTL.
 - Never commit `state/`, `local.properties`, APKs or the adhan MP3s (no licence; `tools/fetch-adhans.sh` downloads
   them). No personal data in screenshots or logs (Wi-Fi names, IPs, serials).
@@ -37,8 +40,13 @@ bash tools/shot.sh home             # screenshot -> state/shots/home.png (look a
 adb -s $TV shell am start -n tv.afnon.home/.MainActivity --es test friday   # ramadan|now|reminder|call|banner|radio
 ```
 
+Home on TCL Google TV only sticks with `launcherx` and `setupwraith` disabled; `tools/set-home.sh` does that behind
+an on-TV safety switch (`tools/deadman.sh`). Never disable them any other way. `tools/lists/keep.txt` must never be
+disabled (`disable.sh` refuses it).
+
 `tools/env.sh` finds adb itself (PATH, then `local.properties` sdk.dir, ANDROID_HOME, default SDK folders);
-`ADB_BIN` overrides. Other tools: `disable.sh`/`enable.sh` (stock apps, logged to `state/disabled.log`),
+`ADB_BIN` overrides. Other tools: `disable.sh`/`enable.sh` (stock apps or a `tools/lists/` file, logged to `state/disabled.log`),
+`keep.sh`, `tweaks.sh apply|restore`,
 `restore.sh` (back to stock and uninstall, then reboot).
 
 Keys injected with `adb shell input keyevent` do not reach the accessibility service: test remote buttons with the

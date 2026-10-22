@@ -2,6 +2,7 @@
 // The mihrab on the start side (Screen.buildArch + ArchView): crown verse, reference, rule, then the info
 // column at infoTop: label, prayer name, countdown and two sub lines. Values are bound by key (data-k).
 import type { Ctx } from '../lib/ctx';
+import quran from '../../../afnon-mihrab/quran.json';
 import { archModel } from '../screens/home';
 
 type ArchModel = ReturnType<typeof archModel>;
@@ -14,7 +15,8 @@ const m = model ?? archModel(ctx);
   <path class="outer" d="M0 900 L0 330 C0 170 140 70 300 0 C460 70 600 170 600 330 L600 900 Z" />
   <path class="inner" d="M18 900 L18 334 C18 184 150 92 300 22 C450 92 582 184 582 334 L582 900" />
 </svg>
-<div class="verse"><p class="sacred" lang="ar" dir="rtl">إِنَّ الصَّلَاةَ كَانَتْ<br />عَلَى الْمُؤْمِنِينَ<br />كِتَابًا مَّوْقُوتًا</p></div>
+<!-- Quranic text only from afnon-mihrab/quran.json (site/scripts/quran.mjs), never typed by hand. -->
+<div class="verse"><p class="sacred" lang="ar" dir="rtl" set:html={quran.verses.crown.lines.join('<br />')} /></div>
 <p class="ref">{ctx.t.s('ref')}</p>
 <div class="rule" aria-hidden="true"></div>
 <div class="info" style={`top:${infoTop}px`}>

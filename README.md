@@ -14,7 +14,7 @@ Arabic first (RTL) and English · Offline prayer times for 136 cities · 14 adha
 
 </div>
 
-> إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا · النساء ١٠٣
+> <!--quran crown space-->إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا<!--/quran--> · النساء ١٠٣
 >
 > *Indeed, prayer has been decreed upon the believers at fixed times.* (An-Nisa 4:103)
 
@@ -112,14 +112,17 @@ Download [`afnon.apk`](https://github.com/egyjs/afnon-android-tv-launcher/releas
 export TV=192.168.1.50:5555
 adb connect $TV
 adb -s $TV install -r afnon.apk
-adb -s $TV shell cmd package set-home-activity tv.afnon.home/.MainActivity
 adb -s $TV shell settings put secure screensaver_components tv.afnon.home/.AfnonDream
 adb -s $TV shell pm grant tv.afnon.home android.permission.RECORD_AUDIO
 adb -s $TV shell pm grant tv.afnon.home android.permission.WRITE_SECURE_SETTINGS
 adb -s $TV shell pm grant tv.afnon.home android.permission.ACCESS_FINE_LOCATION
 ```
 
-Then turn on **Afnon remote buttons** in the TV's Settings → Accessibility. The APK includes the adhan recordings.
+Then make Afnon the home screen from a clone of this repo (no build needed): `TV=$TV bash tools/set-home.sh`.
+On TCL Google TV the firmware ignores Android's home setting and opens Google TV by name, so the script has to
+disable Google TV's home and setup app. It arms a safety switch on the TV first: if Afnon isn't confirmed as Home
+within 5 minutes, the TV puts its own home back. Last, turn on **Afnon remote buttons** in the TV's Settings →
+Accessibility. The APK includes the adhan recordings.
 
 ### From source
 
@@ -151,7 +154,10 @@ in Developer options, revoke the USB debugging authorisations, reboot, and check
 | Change city, method, adhan voice, radio options | The remote's **Settings** button, or the gear on Home |
 | Point a remote button at another app | Edit the table at the top of `RemoteKeys.java`, then `bash tools/install.sh` |
 | Change colours or the star pattern | `Tokens.java` (the design tokens) and `Ui.starLattice` |
-| Disable a stock app | `bash tools/disable.sh <package>` (reversible; logged to `state/disabled.log`) |
+| Disable a stock app | `bash tools/disable.sh <package>` (reversible; logged to `state/disabled.log`). Refuses anything in `tools/lists/keep.txt`: AirPlay, Chromecast, voice, inputs, updates, Play Store |
+| Free memory on a TCL set | `bash tools/disable.sh tools/lists/tcl-safe.txt` (telemetry, promos, demos); `tools/lists/tcl-optional.txt` lists what someone might use, so read it first |
+| Make the TV feel faster | `bash tools/tweaks.sh apply` (shorter animations, Play Store kept out of the background); `restore` undoes it |
+| Turn protected features back on | `bash tools/keep.sh` re-enables anything from `keep.txt` that is off |
 | Re-enable an app | `bash tools/enable.sh <package>`, or on the TV: Settings → Apps → See all apps → Show system apps → the app → Enable |
 | Go back to stock | `bash tools/restore.sh`, then reboot. Re-enables everything in the log, restores home, screensaver and sleep timer, and uninstalls Afnon. |
 
@@ -211,7 +217,8 @@ app/src/main/java/tv/afnon/home/
   Radio, RadioBars    Quran Radio player and its level bars
   ScreenOffActivity   Screen off while listening (TCL Audio Only, or a black fallback)
   PrayerDay, Prefs, Reminders, Adhans, Text, Tokens, Ui …
-tools/                install, restore, disable/enable, fetch-adhans, screenshot
+tools/                install, set-home (with its on-TV safety switch), restore, disable/enable, keep, tweaks,
+                      fetch-adhans, screenshot; lists/ says what may be turned off and what never
 docs/screenshots/     the images above, all from the real TV
 ```
 
@@ -258,6 +265,8 @@ docs/screenshots/     the images above, all from the real TV
 - Fonts: [Amiri](https://github.com/aliftype/amiri), [Alexandria](https://fonts.google.com/specimen/Alexandria)
   and [Marcellus](https://fonts.google.com/specimen/Marcellus), all under the SIL Open Font Licence.
   See [THIRD_PARTY.md](THIRD_PARTY.md).
+- The safe home switch, the TCL removal and keep lists and the speed tweaks come from
+  [UrTV](https://github.com/tshi-dev/UrTV) (MIT) by tshi-dev, measured there on several TCL sets.
 - Started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv). Built with
   [Claude Code](https://claude.com/claude-code) on the real TV, screenshot by screenshot.
 

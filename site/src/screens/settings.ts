@@ -6,6 +6,7 @@ import { CITIES, METHODS, REGIONS, STATIONS, cityOf, methodOf, stationOf, type P
 import { ASR, clock, hijri, methodParams } from '../lib/prayer';
 import type { Text } from '../lib/text';
 import { loadFacing } from './prayer-day';
+import { mockRows } from '../mocks/mocks';
 
 export const PRAYER = 0, REMINDERS = 1, RADIO = 2, DISPLAY = 3, NETWORK = 4, DEVICE = 5, SECTIONS = 6;
 export type Kind = 'value' | 'seg' | 'step' | 'toggle';
@@ -59,6 +60,11 @@ const DARK = [0, 15, -1];
 const CLOCKS = ['system', '12', '24'] as const;
 
 export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
+  const rows = realRowsFor(c, section, radioOn);
+  return import.meta.env.DEV && c.mock.length ? mockRows(c, section, rows) : rows; // dev-only UI mocks
+}
+
+function realRowsFor(c: Ctx, section: number, radioOn: boolean): Row[] {
   const { t } = c;
   const p = c.prefs as SPrefs;
   const facing = loadFacing();

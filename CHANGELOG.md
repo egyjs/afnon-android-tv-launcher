@@ -4,6 +4,23 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- `tools/set-home.sh` makes Afnon Home safely. On TCL Google TV, which ignores Android's home setting, it disables
+  Google TV's home and setup app behind a safety switch on the TV that brings them back if Afnon isn't confirmed
+  within 5 minutes. `install.sh` runs it, and it works after installing the release APK too.
+- `tools/lists/`: what is safe to disable on TCL sets, what might be used (ask first), and what must never be off.
+  `disable.sh` takes a list and refuses anything on the keep list; `tools/keep.sh` turns those back on.
+- `tools/tweaks.sh apply|restore`: shorter animations, the Play Store kept out of the background, cached apps frozen.
+- All three come from [UrTV](https://github.com/tshi-dev/UrTV) (MIT).
+
+### Changed
+- Quranic text is never typed by hand any more. The arch's verse (An-Nisa 4:103) is fetched from Tanzil into
+  `afnon-mihrab/quran.json` by `site/scripts/quran.mjs`, and the app (`Quran.java`), the site, the README and the
+  design files are generated from it; CI checks they match. The typed copy had two marks in a different order
+  from Tanzil's text (it looked the same).
+- `restore.sh` always re-enables Google TV's home, its setup app and its helpers, stops a running safety switch,
+  and gives the home its notification access back.
+
 ## [0.4] - 2026-10-22
 
 ### Added

@@ -9,7 +9,10 @@
     "build": "npm run gen && astro build",
     "preview": "astro preview",
     "tokens": "node scripts/tokens.mjs",
-    "tokens:check": "node scripts/tokens.mjs --check"
+    "tokens:check": "node scripts/tokens.mjs --check",
+    "quran": "node scripts/quran.mjs",
+    "quran:fetch": "node scripts/quran.mjs --fetch",
+    "quran:check": "node scripts/quran.mjs --check"
   },
   "devDependencies": {
     "style-dictionary": "^5.7.0"

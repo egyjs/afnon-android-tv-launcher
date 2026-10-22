@@ -2,6 +2,7 @@
 import { CalculationMethod, Coordinates, Madhab, PrayerTimes, Qibla } from 'adhan';
 import type { Text } from './text';
 import { cityOf, methodOf, type Prefs } from './data';
+import { mockShift } from '../mocks/mocks';
 
 export const FAJR = 0, SUNRISE = 1, DHUHR = 2, ASR = 3, MAGHRIB = 4, ISHA = 5;
 const RAMADAN = 8; // 0-based, as IslamicCalendar.RAMADAN
@@ -114,6 +115,8 @@ export function shiftFor(mode: string, prefs: Prefs, real = new Date()): number 
     const day = prayerDay(real, prefs);
     const lead = mode === 'reminder' ? prefs.remind * 60000 - 1000 : -2000;
     return day.nextTime.getTime() - lead - real.getTime();
+  } else if (import.meta.env.DEV) {
+    return mockShift(mode, prefs, real); // dev-only UI mocks (src/mocks)
   } else return 0;
   return c.getTime() - real.getTime();
 }

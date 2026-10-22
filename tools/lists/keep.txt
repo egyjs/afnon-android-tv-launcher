@@ -1,0 +1,45 @@
+# NEVER disable. tools/disable.sh refuses any package listed here; tools/keep.sh turns them back on.
+# Features people use, or the TV breaks without them. From UrTV (github.com/tshi-dev/UrTV, MIT), learned on real
+# TCL Google TV / Android TV sets.
+
+# Casting and mirroring (keep on)
+com.tcl.airplay2                       # AirPlay from iPhone/iPad/Mac
+com.google.android.apps.mediashell     # Chromecast built-in / Google Cast
+com.tcl.miracast                       # screen mirroring from Android phones
+com.tcl.magiconnectfree                # TCL phone-to-TV connect
+
+# Voice and remote
+com.google.android.katniss             # Google Assistant / voice search from the remote
+com.google.android.tv.assistant        # Google Assistant on TV
+com.tcl.micmanager                     # the remote's microphone
+com.google.android.tv.remote.service   # Google TV remote (phone app)
+com.tcl.autopair                       # remote pairing
+com.tcl.inputmethod.international      # on-screen keyboard
+com.google.android.inputmethod.latin   # Gboard
+
+# TV core: inputs, tuner, quick panel, settings, updates
+com.tcl.tv                             # Live TV / tuner
+com.tcl.tvinput                        # HDMI and other inputs
+com.tcl.suspension                     # quick panel and source picker
+com.tcl.settings
+com.android.tv.settings
+com.tcl.systemserver
+com.tcl.versionUpdateApp               # firmware (OTA) updates
+com.tcl.providers.config               # firmware configuration provider
+com.tcl.android.webview
+com.google.android.webview
+com.android.systemui
+com.google.android.gms
+com.google.android.gsf
+com.android.vending                    # Play Store: restrict it (optimize/tweaks.sh), never disable
+com.android.location.fused
+
+# Home screens: only tools/set-home.sh may disable these, behind the safety switch
+com.google.android.apps.tv.launcherx   # Google TV home
+com.google.android.tvlauncher          # Android TV home (older sets)
+com.google.android.tungsten.setupwraith
+com.tcl.keycustomfunctionservice       # provides a fallback home on some sets
+
+# Accessibility and sound
+com.tcl.hearaid
+com.google.android.marvin.talkback

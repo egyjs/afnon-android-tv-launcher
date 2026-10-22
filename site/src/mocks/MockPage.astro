@@ -1,0 +1,165 @@
+---
+// Dev-only: mocks of the UI planned from UrTV (docs/plans/urtv-port.md). /mocks/ lists them; /mocks/<slug>/ shows
+// one on the real screen with what changes and where it comes from. No pages in a production build.
+import '../styles/base.css';
+import './mocks.css';
+import Tv from '../components/Tv.astro';
+import Home from '../screens/Home.astro';
+import PrayerDay from '../screens/PrayerDay.astro';
+import Settings from '../screens/Settings.astro';
+import Screensaver from '../screens/Screensaver.astro';
+import { makeCtx } from '../lib/ctx';
+import { DEFAULT_PREFS } from '../lib/data';
+import { shiftFor } from '../lib/prayer';
+import { MOCKS, verseOf, type Mock } from './mocks';
+import type { Lang } from '../lib/text';
+
+export function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  const slugs: (string | undefined)[] = [undefined, ...MOCKS.map((m) => m.slug)];
+  return (['ar', 'en'] as Lang[]).flatMap((lang) =>
+    slugs.map((slug) => ({ params: { path: [lang === 'en' ? 'en' : '', slug].filter(Boolean).join('/') || undefined }, props: { lang, slug } })));
+}
+
+interface Props { lang: Lang; slug?: string }
+const { lang, slug } = Astro.props;
+const ar = lang === 'ar';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/') + 'mocks/';
+const link = (s: string | undefined, l: Lang = lang) => base + (l === 'en' ? 'en/' : '') + (s ? s + '/' : '');
+const mock: Mock | undefined = MOCKS.find((m) => m.slug === slug);
+const i = mock ? MOCKS.indexOf(mock) : -1;
+const prev = i > 0 ? MOCKS[i - 1] : undefined, next = i >= 0 && i < MOCKS.length - 1 ? MOCKS[i + 1] : undefined;
+const flags = mock?.flags.split(' ') ?? [];
+const real = new Date();
+const ctx = mock ? makeCtx(lang, DEFAULT_PREFS, new Date(real.getTime() + (mock.mode ? shiftFor(mock.mode, DEFAULT_PREFS, real) : 0)), mock.mode, flags) : null;
+const verse = ctx ? verseOf(ctx) : null;
+const SCREENS = { home: Home, 'prayer-day': PrayerDay, settings: Settings, screensaver: Screensaver } as Record<string, any>;
+const Screen = mock ? SCREENS[mock.screen] : null;
+const L = ar
+  ? { title: 'محاكاة واجهات أفنون من UrTV', all: 'كل المحاكاة', what: 'ما يتغير', try: 'جرّب', from: 'من UrTV', rules: 'قواعد أفنون', plan: 'بند الخطة',
+      intro: 'كل ما يغيّر الشكل في الخطة، على شاشات المعاينة الحقيقية. للمراجعة فقط: لا شيء من هذا في التطبيق بعد، ولا يُنشر على الموقع.',
+      noUi: 'بلا واجهة (لا محاكاة): مواقيت العشاء في رمضان لأم القرى، وأدوات التلفاز (البند ٠ و١٥–١٩).', hour: 'الساعة', keys: 'الأسهم للتنقل · Enter موافق · Esc رجوع' }
+  : { title: 'Afnon UI mocks from UrTV', all: 'All mocks', what: 'What changes', try: 'Try', from: 'From UrTV', rules: 'Afnon’s rules', plan: 'Plan item',
+      intro: 'Everything in the plan that changes how Afnon looks, on the preview’s real screens. For review only: none of this is in the app yet, and it is never published.',
+      noUi: 'No UI (no mock): the Ramadan Isha fix for Umm al-Qura, and the TV tools (items 0 and 15–19).', hour: 'Hour', keys: 'Arrows move · Enter is OK · Esc is Back' };
+const SCREEN_NAMES: Record<string, [string, string]> = {
+  home: ['الرئيسية', 'Home'], 'prayer-day': ['مواقيت اليوم', 'Today'], settings: ['الإعدادات', 'Settings'], screensaver: ['شاشة التوقف', 'Screensaver'],
+};
+---
+<!doctype html>
+<html lang={lang} dir={ar ? 'rtl' : 'ltr'}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>{mock ? mock.title[lang] + ' · ' : ''}{L.title}</title>
+</head>
+<body>
+  <header class="top">
+    <a href={link(undefined)} class="brand">{L.title}</a>
+    <a href={link(slug, ar ? 'en' : 'ar')}>{ar ? 'English' : 'العربية'}</a>
+  </header>
+  <main>
+    {!mock && (
+      <>
+        <p class="intro">{L.intro}</p>
+        <ol class="cards">
+          {MOCKS.map((m) => (
+            <li><a href={link(m.slug)}>
+              <span class="tag">{L.plan} {m.plan} · {SCREEN_NAMES[m.screen][ar ? 0 : 1]}</span>
+              <strong>{m.title[lang]}</strong>
+              <span class="what">{m.what[lang]}</span>
+            </a></li>
+          ))}
+        </ol>
+        <p class="intro">{L.noUi}</p>
+      </>
+    )}
+    {mock && ctx && (
+      <>
+        <h1>{mock.title[lang]}</h1>
+        <section id="tv">
+          <Tv screen={mock.screen} mode={mock.mode} ground={mock.screen === 'screensaver' ? 'black' : 'lattice'} mock={mock.flags}>
+            <Screen ctx={ctx} />
+            {flags.includes('shaban') && mock.screen === 'prayer-day' && <div class="mock-ramadan" data-k="mockRamadan"></div>}
+            {flags.includes('verse') && verse && (
+              <div class={mock.screen === 'screensaver' ? 'mock-verse-saver' : 'mock-verse-day'} data-len={verse.text.length <= 45 ? 's' : verse.text.length <= 80 ? 'm' : 'l'}>
+                <p class="sacred" lang="ar" dir="rtl" data-k="mockVerse">{verse.text}</p>
+                <small data-k="mockVerseRef">{verse.ref}</small>
+              </div>
+            )}
+          </Tv>
+          <p class="keys">{L.keys}</p>
+          {flags.includes('night') && (
+            <label class="hour">{L.hour} <input type="range" min="18" max="32" step="0.25" value="23.5" data-hour /> <output data-hour-out>23:30</output> <output data-dim-out></output></label>
+          )}
+        </section>
+        <dl class="notes">
+          <dt>{L.what}</dt><dd>{mock.what[lang]}</dd>
+          {mock.try[lang] && <><dt>{L.try}</dt><dd>{mock.try[lang]}</dd></>}
+          <dt>{L.rules}</dt><dd>{mock.rules[lang]}</dd>
+          <dt>{L.from}</dt><dd dir="ltr"><code>{mock.from}</code></dd>
+          <dt>{L.plan}</dt><dd>{mock.plan} · <code>docs/plans/urtv-port.md</code></dd>
+        </dl>
+        <nav class="pager">
+          {prev ? <a href={link(prev.slug)}>{ar ? '→ ' : '← '}{prev.title[lang]}</a> : <span />}
+          <a href={link(undefined)}>{L.all}</a>
+          {next ? <a href={link(next.slug)}>{next.title[lang]}{ar ? ' ←' : ' →'}</a> : <span />}
+        </nav>
+      </>
+    )}
+  </main>
+</body>
+</html>
+
+<script>
+  import '../scripts/tv.ts';
+  import './overlay.ts';
+
+  // Night dimming (UrTV template.html:1118-1129): 0 by day, ramps 21→23, 0.46 until 5, back to 0 by 7.
+  const range = document.querySelector<HTMLInputElement>('[data-hour]');
+  const stage = document.querySelector<HTMLElement>('.tv');
+  if (range && stage) {
+    const MAX = 0.46;
+    const dimAt = (h: number) => {
+      h = h % 24;
+      if (h >= 21 && h < 23) return ((h - 21) / 2) * MAX;
+      if (h >= 23 || h < 5) return MAX;
+      if (h >= 5 && h < 7) return ((7 - h) / 2) * MAX;
+      return 0;
+    };
+    const show = () => {
+      const h = +range.value, hh = Math.floor(h % 24), mm = Math.round((h % 1) * 60);
+      const dim = dimAt(h);
+      stage.style.setProperty('--mock-dim', String(dim));
+      document.querySelector('[data-hour-out]')!.textContent = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+      document.querySelector('[data-dim-out]')!.textContent = `· ${Math.round(dim * 100)}%`;
+    };
+    range.addEventListener('input', show);
+    show();
+  }
+</script>
+
+<style>
+  body { --gutter: clamp(16px, 4vw, 48px); }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px var(--gutter); }
+  .brand { font-family: var(--display); font-weight: var(--display-weight); font-size: 24px; color: var(--color-plaster-100); text-decoration: none; }
+  main { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter) 64px; }
+  h1 { font-size: clamp(24px, 3.4vw, 38px); color: var(--color-gold-400); margin: 8px 0 20px; }
+  .intro { color: var(--color-mist-400); font-size: 18px; max-width: 800px; }
+  .cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .cards a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 18px; border-radius: 14px; background: var(--color-lapis-800); color: var(--color-plaster-100); text-decoration: none; border: 1px solid var(--color-line-soft); }
+  .cards a:hover { border-color: var(--color-gold-400); }
+  .tag { font-size: 13px; color: var(--color-gold-400); }
+  .cards strong { font-size: 19px; }
+  .what { font-size: 14px; color: var(--color-mist-400); }
+  .keys { color: var(--color-mist-400); font-size: 14px; margin: 8px 0 0; }
+  .hour { display: flex; align-items: center; gap: 12px; margin-top: 12px; color: var(--color-plaster-100); }
+  .hour input { width: min(420px, 60vw); accent-color: var(--color-gold-400); }
+  .notes { display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; margin: 28px 0; font-size: 17px; max-width: 900px; }
+  .notes dt { color: var(--color-gold-400); }
+  .notes dd { margin: 0; color: var(--color-plaster-100); }
+  .notes code { font-size: 14px; color: var(--color-mist-400); }
+  @media (max-width: 640px) { .notes { grid-template-columns: 1fr; } .notes dd { margin-bottom: 8px; } }
+  .pager { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 15px; }
+</style>

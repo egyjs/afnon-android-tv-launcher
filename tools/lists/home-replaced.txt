@@ -1,0 +1,4 @@
+# Only useful to the TV's own home screen. tools/set-home.sh disables these by itself, AFTER Afnon is confirmed as
+# Home; tools/restore.sh re-enables them. Not meant to be applied by hand. From UrTV (MIT).
+com.tcl.tv.tclhome_passive             # TCL home helper, ~80 MB
+com.google.android.leanbacklauncher.recommendations   # recommendation rows for the old Android TV home
