@@ -4,7 +4,16 @@
         <item name="android:windowBackground">@color/lapis_900</item>
         <item name="android:colorBackground">@color/lapis_900</item>
         <item name="android:windowAnimationStyle">@null</item>
+        <!-- No starting window: it would show this theme's lapis (day) ground until the screen draws, a blue
+             flash before Settings and in night mode. The screen in front stays until the new one is ready. -->
+        <item name="android:windowDisablePreview">true</item>
         <item name="android:defaultFocusHighlightEnabled">false</item>
+    </style>
+
+    <!-- Night mode (Prefs.night): the same on the night ground. Screen sets it before the window is made. -->
+    <style name="Theme.Afnon.Night">
+        <item name="android:windowBackground">@color/night_lapis_900</item>
+        <item name="android:colorBackground">@color/night_lapis_900</item>
     </style>
 
     <!-- The call to prayer: drawn over whatever was on, which shows faintly through its dimmed ground. -->

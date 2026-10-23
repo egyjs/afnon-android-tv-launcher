@@ -1,7 +1,6 @@
 package tv.afnon.home;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -61,7 +60,7 @@ public class AllAppsActivity extends Screen {
         backButton.setRest(Tokens.LAPIS_800, Tokens.LINE_SOFT, 2);
         Icon back = new Icon(this, Icon.BACK, 2f);
         backButton.addView(back, new FrameLayout.LayoutParams(Ui.ipx(32), Ui.ipx(32), Gravity.CENTER));
-        backButton.setLook(f -> back.setColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
+        backButton.setLook(f -> back.setColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100));
         backButton.setContentDescription(t.back());
         backButton.setOnClickListener(v -> finish());
         backButton.setOnFocusChangeListener((v, has) -> { if (has) info(t.back(), t.hintBackHome()); });
@@ -102,9 +101,9 @@ public class AllAppsActivity extends Screen {
         cr.addView(chipTime, lp2);
         chip.addView(cr, new FrameLayout.LayoutParams(-2, -1));
         chip.setLook(f -> {
-            chipLabel.setTextColor(f ? Tokens.LAPIS_900 : Tokens.GOLD_400);
-            chipTime.setTextColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100);
-            mihrab.setColor(f ? Tokens.LAPIS_900 : Tokens.GOLD_400);
+            chipLabel.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.GOLD_400);
+            chipTime.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100);
+            mihrab.setColor(f ? Tokens.FOCUS_TEXT : Tokens.GOLD_400);
         });
         chip.setOnClickListener(v -> startActivity(new Intent(this, PrayerDayActivity.class)));
         chip.setOnFocusChangeListener((v, has) -> { if (has) info(t.today(), t.hintOk(t.today())); });
@@ -166,8 +165,7 @@ public class AllAppsActivity extends Screen {
         FrameLayout mono = new FrameLayout(this);
         ImageView icon = new ImageView(this);
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        Drawable d = Apps.icon(this, pkg);
-        if (d != null) icon.setImageDrawable(d);
+        Apps.showIcon(icon, Apps.icon(this, pkg));
         mono.addView(icon, new FrameLayout.LayoutParams(Ui.ipx(40), Ui.ipx(40), Gravity.CENTER));
         top.addView(mono, new FrameLayout.LayoutParams(Ui.ipx(56), Ui.ipx(56), Gravity.START | Gravity.TOP));
         int favAt = favs.indexOf(pkg);
@@ -189,9 +187,9 @@ public class AllAppsActivity extends Screen {
 
         final Icon starIcon = star;
         b.setLook(f -> {
-            int fg = f ? Tokens.LAPIS_900 : Tokens.PLASTER_100;
+            int fg = f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100;
             label.setTextColor(fg);
-            if (starIcon != null) starIcon.setColor(f ? Tokens.LAPIS_900 : Tokens.GOLD_400);
+            if (starIcon != null) starIcon.setColor(f ? Tokens.FOCUS_TEXT : Tokens.GOLD_400);
             GradientDrawable g = new GradientDrawable();
             g.setCornerRadius(Ui.px(14));
             g.setColor(f ? Tokens.LAPIS_900 : Tokens.LAPIS_700);
@@ -364,7 +362,7 @@ public class AllAppsActivity extends Screen {
             l.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
             l.setPadding(Ui.ipx(32), 0, Ui.ipx(32), 0);
             item.addView(l, new FrameLayout.LayoutParams(-1, -1));
-            item.setLook(f -> l.setTextColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
+            item.setLook(f -> l.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100));
             float r = FocusTile.REACH;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, Ui.ipx(72 + 2 * r));
             lp.topMargin = Ui.ipx(i == 0 ? 24 - r : 12 - 2 * r);

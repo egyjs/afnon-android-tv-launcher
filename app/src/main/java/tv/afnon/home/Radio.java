@@ -52,7 +52,8 @@ final class Radio {
 
     /**
      * Each station's own stream, the one its website or official player uses. All https except radiojar, which
-     * redirects to plain http (allowed in network_security.xml). Two are HLS (Qatar, Jordan); the rest MP3 or AAC.
+     * redirects to plain http (allowed in network_security.xml). Qatar, Jordan and the Saudi ones are HLS; the rest
+     * MP3 or AAC.
      * Reciters are mp3quran.net's 24/7 channels (its API: mp3quran.net/api/v3/radios), MP3 at 128 kbps.
      */
     static final Station[] STATIONS = {
@@ -67,6 +68,12 @@ final class Radio {
             "https://live.kwikmotion.com/qmcquranradio2live/quranradio2/playlist.m3u8", false),
         new Station("jordan", QURAN_AR, QURAN_EN, "الأردن", "Jordan",
             "https://jrtv-live.ercdn.net/jrradio/quranradio.m3u8", false),
+        // The Saudi Broadcasting Authority's own audio streams, as Saudi Radio+ (radioplus.sba.sa) plays them:
+        // HLS, AAC at about 192 kbps, no token.
+        new Station("ksa_quran", QURAN_AR, QURAN_EN, "السعودية", "Saudi Arabia",
+            "https://live.kwikmotion.com/sbrksaquranradiolive/ksaquranradio/playlist.m3u8", false),
+        new Station("ksa_nida", "إذاعة نداء الإسلام", "Nida Al-Islam Radio", "السعودية", "Saudi Arabia",
+            "https://live.kwikmotion.com/sbrksanedaradiolive/ksanedaradio/playlist.m3u8", false),
         // Not Sharjah: its audio stream is raw ADTS AAC, which MediaPlayer's AACExtractor scans to the end before
         // playing, so a live one never starts; its official HLS is 1080p video.
         Station.reciter("mishary_alafasi", "مشاري العفاسي", "Mishary Alafasy"),

@@ -122,6 +122,38 @@ final class Text {
         return d(ar ? "الشاشة مطفأة والإذاعة تعمل · اضغط أي زر للعودة" : "Screen off, radio playing · press any key to come back");
     }
     String hintClose() { return ar ? "رجوع  إغلاق" : "Back  Close"; }
+    // Live from Makkah and Madinah (local only): Home's Live pill, its card and the video panel.
+    String live() { return ar ? "مباشر" : "Live"; }
+    String liveTitle() { return ar ? "الحرمان الشريفان" : "Makkah & Madinah"; }
+    /** In the order of Live.MAKKAH, Live.MADINAH. */
+    String[] livePlaces() { return ar ? new String[] {"مكة المكرمة", "المدينة المنورة"} : new String[] {"Makkah", "Madinah"}; }
+    String liveStatus(int s) {
+        switch (s) {
+            case Live.PLAYING: return ar ? "على الهواء" : "On air";
+            case Live.FAILED: return ar ? "تعذّر تشغيل البث" : "Couldn't play the live stream";
+            default: return ar ? "جارٍ الاتصال…" : "Connecting…";
+        }
+    }
+    String liveNote() {
+        return d(ar ? "بث مباشر من قناتي القرآن الكريم والسنة النبوية على منصة الأولى · يتوقف عند مغادرة الرئيسية"
+                    : "Live from the Quran and Sunnah channels on Aloula · stops when you leave Home");
+    }
+    String hintStop() { return ar ? "رجوع  إيقاف" : "Back  Stop"; }
+    String fullScreen() { return ar ? "ملء الشاشة" : "Full screen"; }
+    String fullScreenHint() {
+        return ar ? "رجوع للخروج من ملء الشاشة     ▲  الجودة" : "Back to exit full screen     ▲  Quality";
+    }
+    String quality() { return ar ? "الجودة" : "Quality"; }
+    /** A rendition by its picture height: "480p". */
+    String quality(int height) { return d(height + "p"); }
+    /** What an hour of a rendition costs in data, from its bits per second: "~650 MB/h", "~3.4 GB/h". */
+    String perHour(long bitsPerSecond) {
+        double mb = bitsPerSecond * 3600.0 / 8 / 1_000_000;
+        boolean gb = mb >= 1000;
+        String n = gb ? String.format(java.util.Locale.US, "%.1f", mb / 1000) : String.valueOf(Math.round(mb / 10) * 10);
+        if (eastern) n = n.replace('.', '٫');
+        return d("~" + n + (gb ? (ar ? " جيجا/ساعة" : " GB/h") : (ar ? " ميجا/ساعة" : " MB/h")));
+    }
     String sectionRadio() { return ar ? "الإذاعة" : "Radio"; }
     String radioRowHelp(Radio.Station s) { return stationWhere(s) + (ar ? " · تحتاج إلى الإنترنت" : " · needs the internet"); }
     String afterAdhanRow() { return ar ? "بعد الأذان" : "After the adhan"; }
@@ -147,6 +179,19 @@ final class Text {
     /** In the order of the row's minutes: 0 (after the adhan), 1, 5, 10. */
     String[] callCloseChoices() {
         return ar ? new String[] {"بعد الأذان", "1 د", "5 د", "10 د"} : new String[] {"After adhan", "1 min", "5 min", "10 min"};
+    }
+    String wakeRow() { return ar ? "تشغيل التلفاز للأذان" : "Turn the TV on for the adhan"; }
+    String wakeHelp() { return ar ? "يعمل التلفاز وحده من وضع الاستعداد ليؤذّن" : "Wakes the TV from standby to play the adhan"; }
+    /** When Android has taken away Afnon's exact alarms (Android 12+), so nothing can wake the TV. */
+    String wakeBlocked() {
+        return ar ? "لا يعمل: النظام يمنع أفنون من ضبط المنبّهات" : "Not working: Android blocks Afnon's alarms";
+    }
+    String wakeOff() { return ar ? "إيقاف" : "Off"; }
+    String wakeAll() { return ar ? "كل الصلوات" : "All prayers"; }
+    /** The row's list, in the order of Wake.PRAYERS. */
+    String[] wakePrayers() {
+        return ar ? new String[] {"الفجر", "الظهر / الجمعة", "العصر", "المغرب", "العشاء"}
+                  : new String[] {"Fajr", "Dhuhr / Jumu'ah", "Asr", "Maghrib", "Isha"};
     }
     String voiceRow() { return ar ? "صوت الأذان" : "Adhan voice"; }
     String voiceHelp() { return ar ? "لكل الصلوات عدا الفجر · يُسمع عند التنقل في القائمة" : "Every prayer but Fajr · plays as you move through the list"; }
@@ -210,10 +255,83 @@ final class Text {
 
     // Settings (design/Settings.dc.html)
     String sectionPrayer() { return ar ? "مواقيت الصلاة" : "Prayer times"; }
+    String sectionAdjust() { return ar ? "تعديل المواقيت" : "Adjust the times"; }
+    /** A time's adjustment between its − and + buttons: "+2", "0", "-3" (minutes). */
+    String minutesSigned(int n) {
+        // Left-to-right embedding: in an Arabic line the sign would otherwise land after the number ("2+").
+        return "‪" + d(n > 0 ? "+" + n : String.valueOf(n)) + "‬";
+    }
+    /** Under each time's name: what it is today with the adjustment, and what the buttons do. */
+    String adjustTimeHelp(String time) {
+        return d(ar ? "اليوم " + time + " · بالدقائق، حتى 30 قبله أو بعده"
+                    : "Today " + time + " · in minutes, up to 30 earlier or later");
+    }
     String sectionReminders() { return ar ? "التنبيهات والأذان" : "Reminders & adhan"; }
     String sectionDisplay() { return ar ? "العرض واللغة" : "Display & language"; }
     String sectionNetwork(String ssid) { return ssid == null ? (ar ? "الشبكة" : "Network") : (ar ? "الشبكة · " : "Network · ") + ssid; }
     String sectionDevice() { return ar ? "إعدادات الجهاز" : "Device settings"; }
+    String sectionNews() { return ar ? "ما الجديد" : "What's new"; }
+    /**
+     * Settings → What's new: what this TV's Afnon has on top of 0.4, as groups whose first entry is the heading.
+     * Each line goes through d(), so its numbers follow the digits setting.
+     */
+    String[][] news() {
+        if (ar) return new String[][] {
+            {"مواقيت الصلاة",
+                "تعديل المواقيت: كل وقت حتى 30 دقيقة قبله أو بعده، لمطابقة تقويم مسجدك",
+                "التاريخ الهجري ويومه يتغيّران عند المغرب، ومعهما رمضان وتذكير سورة الكهف",
+                "أم القرى: العشاء بعد المغرب بساعتين في رمضان",
+                "المدن فوق خط العرض 48: الفجر والعشاء بسُبع الليل في ليالي الصيف",
+                "أذانان جديدان: المسجد النبوي، وراغب مصطفى غلوش"},
+            {"الوضع الليلي",
+                "ألوان أهدأ وأخفت للمشاهدة ليلًا: الزر بجانب الإعدادات في الرئيسية، أو الإعدادات ← العرض واللغة",
+                "أيقونات التطبيقات أخفت ودافئة قليلًا في الليل"},
+            {"التنبيهات والأذان",
+                "التنبيه قبل الصلاة بـ 5 أو 10 أو 15 أو 20 أو 30 دقيقة",
+                "تذكير صوتي: «اقترب موعد صلاة …»",
+                "«حان الآن موعد صلاة …» للصلاة التي أذانها متوقف",
+                "تُغلق شاشة الأذان عند انتهائه، أو بعد 1 أو 5 أو 10 دقائق",
+                "تشغيل التلفاز للأذان للصلوات التي تختارها (متوقف في البداية)"},
+            {"الرئيسية",
+                "التاريخ الهجري أولًا، ومرجع الآية «النساء 103» بالأرقام المختارة",
+                "الأرقام الكبيرة بخط الإنجليزية (Marcellus) مع الأرقام اللاتينية",
+                "مباشر من مكة المكرمة والمدينة المنورة، مع ملء الشاشة واختيار الجودة"},
+            {"الإذاعة",
+                "زر «المحطة» في بطاقة الإذاعة",
+                "من السعودية: إذاعة القرآن الكريم وإذاعة نداء الإسلام"},
+            {"إصلاحات",
+                "لا شاشة زرقاء قبل الإعدادات",
+                "القوائم لم تعد تقطع العنصر المحدد"},
+        };
+        return new String[][] {
+            {"Prayer times",
+                "Adjust the times: each up to 30 minutes earlier or later, to match your mosque's timetable",
+                "The Hijri date and its weekday turn at Maghrib, and Ramadan and the Al-Kahf reminder with them",
+                "Umm al-Qura: Isha 2 hours after Maghrib in Ramadan",
+                "Cities above 48°: Fajr and Isha by a seventh of the night on summer nights",
+                "Two new adhans: Al-Masjid an-Nabawi and Ragheb Mustafa Ghalwash"},
+            {"Night mode",
+                "Calmer, dimmer colours for watching at night: the button beside Home's Settings, or Settings → "
+                    + "Display & language",
+                "App icons dimmer and a little warm at night"},
+            {"Reminders & adhan",
+                "Reminders 5, 10, 15, 20 or 30 minutes before each prayer",
+                "Spoken reminder: «اقترب موعد صلاة …»",
+                "«حان الآن موعد صلاة …» when a prayer's adhan is off",
+                "The call screen closes when the adhan ends, or after 1, 5 or 10 minutes",
+                "Turn the TV on for the adhan, for the prayers you pick (off at first)"},
+            {"Home",
+                "The Hijri date first, and the verse reference «النساء 103» in the digits you chose",
+                "The big numbers in the English font (Marcellus) with Latin digits",
+                "Live from Makkah and Madinah, with full screen and a choice of quality"},
+            {"Radio",
+                "A Station button on the radio card",
+                "From Saudi Arabia: Holy Quran Radio and Nida Al-Islam Radio"},
+            {"Fixes",
+                "No blue screen before Settings",
+                "Lists no longer cut off the selected item"},
+        };
+    }
     String preview() { return ar ? "العصر اليوم بهذه الإعدادات" : "Asr today with these settings"; }
     String location() { return ar ? "الموقع" : "Location"; }
     String country() { return ar ? "الدولة" : "Country"; }
@@ -265,6 +383,11 @@ final class Text {
     String clockRow() { return ar ? "الساعة" : "Clock"; }
     String clockHelp() { return ar ? "«التلفاز» يتبع إعداد الوقت في التلفاز" : "“TV” follows the TV's time setting"; }
     String[] clocks() { return ar ? new String[] {"التلفاز", "12 س", "24 س"} : new String[] {"TV", "12 h", "24 h"}; }
+    // Night mode: Settings → Display, and the moon button beside Home's Settings.
+    String nightRow() { return ar ? "الوضع الليلي" : "Night mode"; }
+    String nightHelp() { return ar ? "ألوان أهدأ وأخفت للمشاهدة ليلًا" : "Calmer, dimmer colours for watching at night"; }
+    String nightOn() { return ar ? "تشغيل الوضع الليلي" : "Night mode on"; }
+    String nightOff() { return ar ? "إيقاف الوضع الليلي" : "Night mode off"; }
     String networkRow() { return ar ? "إعدادات الشبكة في التلفاز" : "TV network settings"; }
     String networkHelp() { return ar ? "واي فاي وإيثرنت" : "Wi-Fi and Ethernet"; }
     String deviceRow() { return ar ? "إعدادات التلفاز" : "TV settings"; }

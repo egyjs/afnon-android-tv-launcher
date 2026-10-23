@@ -4,6 +4,96 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- **Settings → Adjust the times** («تعديل المواقيت», its own section), as in meypod/al-azan and the LG launcher:
+  Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha each a stepper of minutes («+2», «0», «-3»), up to 30 earlier or
+  later, with today's adjusted time under the name. Home, Prayer day, the reminders, the adhan and the wake alarm
+  all use the adjusted times.
+- The Hijri date turns at Maghrib, as the Islamic day does: from Maghrib to midnight it shows the next day's date,
+  and its weekday with it (Friday evening reads السبت). The weekday moved from the Gregorian line to the Hijri one
+  (Home, Prayer day, the screensaver). Ramadan follows the Hijri day, so its first night shows the suhoor and the
+  night of Eid doesn't; «سورة الكهف اليوم» shows from Thursday's Maghrib to Friday's. Jumu'ah replaces Dhuhr on
+  Friday until its Maghrib, then the strip says الظهر again.
+- Umm al-Qura (the Saudi cities): Isha is 2 hours after Maghrib in Ramadan instead of 1½, from the first night of
+  Ramadan to the last, as Saudi Arabia's calendar and meypod/al-azan have it.
+- Cities above 48° (London, Paris, Berlin, Amsterdam…): where summer nights never get dark enough for Fajr's and
+  Isha's angles, they are now a seventh of the night from Maghrib and before sunrise, as al-azan has it, instead of
+  both near 1 a.m.
+- Two more adhan voices: «المسجد النبوي» and «راغب مصطفى غلوش», the recordings meypod/al-azan uses
+  (`tools/fetch-adhans.sh` downloads them from meypod/audio_files).
+- Settings → Reminders → Close the call screen: when the adhan ends, or 1, 5 or 10 minutes after it appears (10,
+  as before, by default). Then it's back to what was playing. With no adhan playing (turned off, or stopped with
+  the button), "when the adhan ends" closes it after a minute. The call screen's hint says which.
+- Spoken reminder: «اقترب موعد صلاة …» with the reminder card or banner (Settings → Reminders, on by default).
+- Announce the time: «حان الآن موعد صلاة …» when a prayer's time begins with its adhan off, either for all prayers
+  or by that prayer's bell (on by default). Friday says الجمعة. Both lower whatever is playing for a moment
+  instead of pausing it, and each is said once per prayer, also across a restart of the remote buttons service.
+  The 12 clips are not in the repo: `tools/fetch-announce.sh` (run by `install.sh` the first time) records
+  them with a Microsoft neural Arabic voice through edge-tts into `app/src/main/assets/announce/`; without them
+  both stay silent. Release APKs include them. `--es test announce` tries it; `--es test banner` and
+  `--es test reminder` now say the reminder too.
+- Night mode: a dimmer, warmer palette for watching at night on every screen (Home, Prayer day, Settings, All
+  apps, the call, the reminder banner, the screensaver and screen-off), from the LG version's night colours.
+  Near-black and a little warm; text, gold and lines at about half brightness; the reminder card and the current
+  prayer dark instead of plaster; focus a dim amber fill with light text and a clear ring. A round button beside
+  Home's Settings gear switches it at once (a full moon with a star while off, a sun while on; focus stays on
+  it), and so does Settings → Display → Night mode. Off by default.
+  - The colours are tokens: `afnon-mihrab/tokens.night.json` overrides `tokens.json` by the same paths, and
+    `npm run tokens` generates both palettes into `Tokens.java` (colour fields that `Tokens.use(night)` switches)
+    and `colors.xml` (`night_*`). Nothing is overlaid, filtered or layered; screens are built in the palette.
+  - New tokens `color.current.*` (the current prayer, a chosen segment) and `color.card.*` (the reminder card),
+    and the focused-text colour is now `focus.text` everywhere. By day every colour is unchanged.
+- Night mode dims other apps' icons too, on Home's favourites and in All apps: a little warm and about 60% as
+  bright, so a red YouTube logo doesn't glare. Each icon takes one colour filter that multiplies it by the new
+  token `color.app-icon-tint` (no extra view or layer); by day there is no filter.
+- Settings → Reminders → Turn the TV on for the adhan: the prayers picked in its list (Fajr, Dhuhr/Jumu'ah, Asr,
+  Maghrib, Isha; none, so off, by default) wake the TV from standby for their call. One alarm is armed at a time,
+  for the next picked prayer (`setAlarmClock`), and armed again after it rings, on boot, and when the picks, the
+  adhan, a bell, the city, the method or the Asr school change; with nothing picked nothing is armed. The call
+  opens as usual and only once, and the adhan switch and each prayer's bell still decide. If Afnon turned the TV
+  on, closing the call screen (by itself, Back or Dismiss) asks Android for standby again through the remote
+  buttons service; leaving it for another app keeps the TV on. Needs the exact-alarm permission
+  (`SCHEDULE_EXACT_ALARM`, granted at install on Android 12; `USE_EXACT_ALARM` from 13). `--es test wake --ei
+  seconds 120` picks the coming prayer and rings its alarm that many seconds later; `--es test standby` tries
+  the way back.
+- Home's radio card has a Station button («المحطة», with the radio-waves icon) between Play and Screen off, as in
+  the LG version. It opens the same list as Settings → Radio → Station, over Home: the Quran radio stations or
+  the reciters, then one of them. Playing radio moves to the pick at once and the card shows it; Back steps back
+  through the list, and focus returns to Station. ◀▶ move along the three buttons (mirrored in Arabic).
+- Settings → What's new («ما الجديد», the last section): what this TV's Afnon has on top of 0.4, a few groups
+  of short lines in Arabic (or English), read-only and built only while it is open. OK or toward the end goes
+  into it, ▲▼ scroll it, Back or toward the start returns to the sections.
+- Two Quran radio stations from the Saudi Broadcasting Authority, its own audio streams as Saudi Radio+ plays
+  them (`live.kwikmotion.com`, HLS, AAC): إذاعة القرآن الكريم · السعودية and إذاعة نداء الإسلام, with the
+  Quran radios in both Station lists (Settings and the radio card).
+
+### Changed
+- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
+  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
+  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
+  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
+  need its `TypefaceSpan`).
+- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
+  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
+  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
+  changing never moves. The view also no longer asks for a new layout every second.
+- The Hijri date comes first: on Home it is the line under the clock (with the city) and the Gregorian date is
+  the smaller line below it; on Prayer day the date line starts with it.
+- The verse reference under the arch («النساء 103») follows the digits setting like every other number; it was
+  always Eastern Arabic (١٠٣), even with Western digits chosen. It is the only surah:ayah reference on screen:
+  Friday, Ramadan, the call screen and the screensaver show none.
+- The reminder can come 5, 10, 15, 20 or 30 minutes before each prayer (or not at all). Settings → Reminders →
+  Remind me before prayer is now a list, like the adhan voices; 15 is still the default.
+
+### Fixed
+- Opening Settings (and Prayer day or All apps) no longer flashes a plain blue screen first. That was Android's
+  starting window in the theme's ground colour, shown for the quarter second the screen takes to draw, and blue
+  even in night mode. Afnon's screens now have none (`windowDisablePreview`), and open and close with no
+  transition: the screen in front stays until the next one is ready.
+- Lists over the screen (Settings' lists and the radio card's Station) no longer cut off the last item: its focus
+  ring and the bottom of its tile were clipped, plainly with only two groups. The list is now as tall as its
+  whole tiles, rings included, and moves a whole item at a time when it scrolls.
+
 ## [0.5] - 2026-10-22
 
 ### Added
@@ -25,8 +115,7 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - The Hijri date comes first: on Home it is the line under the clock (with the city) and the Gregorian date is
   the smaller line below it; on Prayer day the date line starts with it.
 - The verse reference under the arch («النساء 103») follows the digits setting like every other number; it was
-  always Eastern Arabic (١٠٣), even with Western digits chosen. It is the only surah:ayah reference on screen:
-  Friday, Ramadan, the call screen and the screensaver show none.
+  always Eastern Arabic (١٠٣), even with Western digits chosen.
 
 ## [0.4] - 2026-10-22
 

@@ -59,6 +59,9 @@ public class RemoteKeys extends AccessibilityService {
         if (watch != null) watch.stop();
         watch = new PrayerWatch(this);
         watch.start();
+        // The alarm that turns the TV on for the adhan, if any prayer is picked: also armed here, in case the
+        // firmware holds back BOOT_COMPLETED.
+        Wake.schedule(this);
     }
 
     @Override

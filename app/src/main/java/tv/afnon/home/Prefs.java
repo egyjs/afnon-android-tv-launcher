@@ -232,6 +232,7 @@ final class Prefs {
         City city = CITIES[index];
         of(c).edit().putString("city", city.id).putString("method", city.method.name())
             .putString("madhab", city.madhab == Madhab.HANAFI ? "hanafi" : "shafi").apply();
+        Wake.schedule(c);
     }
 
     /**
@@ -276,6 +277,7 @@ final class Prefs {
 
     static void setMethod(Context c, CalculationMethod m) {
         of(c).edit().putString("method", m.name()).apply();
+        Wake.schedule(c);
     }
 
     static Madhab madhab(Context c) {
@@ -284,6 +286,7 @@ final class Prefs {
 
     static void setMadhab(Context c, Madhab m) {
         of(c).edit().putString("madhab", m == Madhab.HANAFI ? "hanafi" : "shafi").apply();
+        Wake.schedule(c);
     }
 
     /** Days added to the computed Hijri date, for when the local moon sighting differs: −2 to +2. */
@@ -293,6 +296,19 @@ final class Prefs {
 
     static void setHijriOffset(Context c, int days) {
         of(c).edit().putInt("hijri_offset", Math.max(-2, Math.min(2, days))).apply();
+    }
+
+    /** Minutes added to Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha (Settings → Adjust the times): −30 to +30. */
+    static int[] adjustments(Context c) {
+        SharedPreferences p = of(c);
+        int[] a = new int[6];
+        for (int i = 0; i < 6; i++) a[i] = p.getInt("adjust_" + i, 0);
+        return a;
+    }
+
+    static void setAdjustment(Context c, int prayer, int minutes) {
+        of(c).edit().putInt("adjust_" + prayer, Math.max(-30, Math.min(30, minutes))).apply();
+        Wake.schedule(c);
     }
 
     // ---------------------------------------------------------------- reminders
@@ -343,6 +359,25 @@ final class Prefs {
 
     static void setAdhan(Context c, boolean on) {
         of(c).edit().putBoolean("adhan", on).apply();
+        Wake.schedule(c);
+    }
+
+    /**
+     * The prayers whose adhan turns the TV on from standby (Settings → Reminders → Turn the TV on for the adhan),
+     * one bit per PrayerDay index; none, so off, by default. Every change re-arms {@link Wake}'s alarm.
+     */
+    static boolean wake(Context c, int prayer) {
+        return (of(c).getInt("wake", 0) & (1 << prayer)) != 0;
+    }
+
+    static boolean wakeAny(Context c) {
+        return of(c).getInt("wake", 0) != 0;
+    }
+
+    static void setWake(Context c, int prayer, boolean on) {
+        int bits = of(c).getInt("wake", 0);
+        of(c).edit().putInt("wake", on ? bits | (1 << prayer) : bits & ~(1 << prayer)).apply();
+        Wake.schedule(c);
     }
 
     /** Each prayer's own adhan bell (Prayer day); on by default except Sunrise, which has no adhan. */
@@ -379,6 +414,18 @@ final class Prefs {
         of(c).edit().putInt("radio_dark", minutes).apply();
     }
 
+    /**
+     * The live video's quality (local only), as a picture height: the stream's rendition of that height, or the
+     * nearest below it. 480 until one is picked in full screen.
+     */
+    static int liveQuality(Context c) {
+        return of(c).getInt("live_quality", 480);
+    }
+
+    static void setLiveQuality(Context c, int height) {
+        of(c).edit().putInt("live_quality", height).apply();
+    }
+
     // ---------------------------------------------------------------- display
 
     /** "system" (the TV's own Date & time setting, the default), "12" or "24". */
@@ -391,10 +438,22 @@ final class Prefs {
         return "system".equals(s) ? DateFormat.is24HourFormat(c) : "24".equals(s);
     }
 
+    /** Night mode: the dimmer, warmer palette of afnon-mihrab/tokens.night.json on every screen. Off by default. */
+    static boolean night(Context c) {
+        return of(c).getBoolean("night", false);
+    }
+
+    /** Saves night mode and switches {@link Tokens} to it; screens built from then on take the new colours. */
+    static void setNight(Context c, boolean on) {
+        of(c).edit().putBoolean("night", on).apply();
+        Tokens.use(on);
+    }
+
     /** Everything a built screen depends on; a screen whose key changed while it was away rebuilds. */
     static String key(Context c) {
         SharedPreferences p = of(c);
         return p.getString("locale", "") + "|" + p.getString("digits", "") + "|" + clock24(c) + "|" + cityIndex(c)
-            + "|" + method(c) + "|" + madhab(c) + "|" + hijriOffset(c) + "|" + p.getInt("facing", -1);
+            + "|" + method(c) + "|" + madhab(c) + "|" + java.util.Arrays.toString(adjustments(c)) + "|" + hijriOffset(c)
+            + "|" + p.getInt("facing", -1) + "|" + night(c);
     }
 }
