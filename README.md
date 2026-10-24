@@ -6,7 +6,7 @@
 
 <p dir="rtl"><b>أفنون: شاشة رئيسية لتلفاز أندرويد، تدور حول يوم الصلاة: المواقيت والقبلة والأذان وإذاعة القرآن الكريم.</b></p>
 
-Arabic first (RTL) and English · Offline prayer times for 136 cities · 14 adhan voices · Qibla · 16 Quran radio stations and reciters
+Arabic first (RTL) and English · Offline prayer times for 136 cities · 14 adhan voices · Qibla · 17 Quran radio stations and reciters
 
 **[⬇ Download the APK](https://github.com/egyjs/afnon-android-tv-launcher/releases/latest/download/afnon.apk)** · [Releases](https://github.com/egyjs/afnon-android-tv-launcher/releases) · **[Try it in your browser](https://egyjs.github.io/afnon-android-tv-launcher/)**
 
@@ -88,7 +88,7 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 Afnon has **no accounts, no analytics and no ads**. The radio is the only feature that uses the
 internet, and it connects only to the chosen station's stream, one at a time: `stream.radiojar.com` (Cairo),
 `quran-radio.org` (Nablus), `streaming.zaytonatube.com` (Shabab FM), `live.kwikmotion.com` (Qatar),
-`jrtv-live.ercdn.net` (Jordan) or `backup.qurango.net` (the reciters). The list is in `Radio.STATIONS`. Afnon
+`jrtv-live.ercdn.net` (Jordan), `partwota.cdn.mgmlcdn.com` (Oman) or `backup.qurango.net` (the reciters). The list is in `Radio.STATIONS`. Afnon
 makes no other network requests, and its [network security config](app/src/main/res/xml/network_security.xml)
 allows plain HTTP for the Cairo stream only.
 Your city and settings stay on the TV.

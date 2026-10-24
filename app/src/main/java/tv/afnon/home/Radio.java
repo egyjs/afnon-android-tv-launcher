@@ -67,6 +67,9 @@ final class Radio {
             "https://live.kwikmotion.com/qmcquranradio2live/quranradio2/playlist.m3u8", false),
         new Station("jordan", QURAN_AR, QURAN_EN, "الأردن", "Jordan",
             "https://jrtv-live.ercdn.net/jrradio/quranradio.m3u8", false),
+        // Oman's own station (ayn.om/live/164), the HLS media playlist of its Mangomolo CDN; it plays without a token.
+        new Station("oman", QURAN_AR, QURAN_EN, "سلطنة عُمان · مسقط", "Oman · Muscat",
+            "https://partwota.cdn.mgmlcdn.com/quranrdoorg/quranrdo.stream_aac/chunklist.m3u8", false),
         // Not Sharjah: its audio stream is raw ADTS AAC, which MediaPlayer's AACExtractor scans to the end before
         // playing, so a live one never starts; its official HLS is 1080p video.
         Station.reciter("mishary_alafasi", "مشاري العفاسي", "Mishary Alafasy"),

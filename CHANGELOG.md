@@ -4,6 +4,11 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- Oman's Holy Quran Radio (إذاعة القرآن الكريم، سلطنة عُمان, ayn.om/live/164) in Settings → Radio: its public HLS
+  stream on the Mangomolo CDN, which plays without a token. It adds the host `partwota.cdn.mgmlcdn.com` to the
+  README's Privacy list.
+
 ## [0.5] - 2026-10-22
 
 ### Added
