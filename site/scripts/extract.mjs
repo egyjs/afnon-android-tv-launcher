@@ -91,10 +91,10 @@ console.log(`  ${Object.keys(strings).length} strings; by hand in text.ts: ${ski
 
 const prefs = src('Prefs.java');
 const consts = Object.fromEntries(
-  [...prefs.matchAll(/static final CalculationMethod (\w+) = CalculationMethod\.(\w+);/g)].map((m) => [m[1], m[2]]),
+  [...prefs.matchAll(/static final Method (\w+) = Method\.(\w+);/g)].map((m) => [m[1], m[2]]),
 );
 const cityRe = new RegExp(
-  String.raw`new City\(${STR}, ${STR}, ${STR}, ${STR}, ${STR}, ([-\d.]+), ([-\d.]+), (?:CalculationMethod\.)?(\w+)(?:, (\w+))?\)`, 'g');
+  String.raw`new City\(${STR}, ${STR}, ${STR}, ${STR}, ${STR}, ([-\d.]+), ([-\d.]+), (?:Method\.)?(\w+)(?:, (\w+))?\)`, 'g');
 const cities = [...prefs.matchAll(cityRe)].map((m) => ({
   id: unescape(m[1]), ar: unescape(m[2]), en: unescape(m[3]), countryAr: unescape(m[4]), countryEn: unescape(m[5]),
   lat: Number(m[6]), lng: Number(m[7]), method: consts[m[8]] ?? m[8], hanafi: m[9] === 'HANAFI',
@@ -109,8 +109,8 @@ const lost = [...new Set(cities.map((c) => c.countryEn))].filter((n) => !regions
 if (lost.length) throw new Error(`Prefs.REGIONS is missing ${lost.join(', ')}`);
 write('regions.json', regions);
 
-const methodsBlock = /CalculationMethod\[\] METHODS = \{([^}]*)\}/.exec(prefs)[1];
-write('methods.json', [...methodsBlock.matchAll(/CalculationMethod\.(\w+)/g)].map((m) => m[1]));
+const methodsBlock = /Method\[\] METHODS = \{([^}]*)\}/.exec(prefs)[1];
+write('methods.json', [...methodsBlock.matchAll(/Method\.(\w+)/g)].map((m) => m[1]));
 
 // ---------------------------------------------------------------- Radio.STATIONS
 

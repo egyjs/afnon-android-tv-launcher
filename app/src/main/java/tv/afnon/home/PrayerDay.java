@@ -3,7 +3,6 @@ package tv.afnon.home;
 import android.content.Context;
 import android.icu.util.IslamicCalendar;
 
-import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.CalculationParameters;
 import com.batoulapps.adhan.Coordinates;
 import com.batoulapps.adhan.Madhab;
@@ -37,8 +36,8 @@ final class PrayerDay {
         this(now, Prefs.where(c), Prefs.method(c), Prefs.madhab(c), Prefs.hijriOffset(c));
     }
 
-    PrayerDay(Date now, Coordinates where, CalculationMethod method, Madhab madhab, int hijriOffset) {
-        CalculationParameters params = method.getParameters();
+    PrayerDay(Date now, Coordinates where, Method method, Madhab madhab, int hijriOffset) {
+        CalculationParameters params = method.parameters();
         params.madhab = madhab;
         PrayerTimes today = new PrayerTimes(where, DateComponents.from(now), params);
         times[FAJR] = minute(today.fajr);

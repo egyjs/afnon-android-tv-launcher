@@ -34,7 +34,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.Coordinates;
 import com.batoulapps.adhan.Madhab;
 

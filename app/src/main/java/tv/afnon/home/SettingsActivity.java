@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.Madhab;
 
 import java.util.ArrayList;

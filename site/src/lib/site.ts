@@ -27,12 +27,12 @@ export const PAGES: Page[] = [
     body: {
       ar: [
         'أفنون يستبدل الشاشة الرئيسية لتلفاز أندرويد بشاشة واحدة هادئة. الصلاة القادمة وعدّها التنازلي داخل محراب، ومواقيت اليوم الستة في الأعلى، وتطبيقاتك المفضلة تحتها، والأذان يأتي إلى التلفاز وحده في وقته.',
-        'المواقيت تُحسب على التلفاز نفسه دون إنترنت، لـ 136 مدينة في 43 دولة، مع اختيار طريقة الحساب ومذهب العصر وتعديل التاريخ الهجري.',
+        'المواقيت تُحسب على التلفاز نفسه دون إنترنت، لـ 147 مدينة في 43 دولة، مع اختيار طريقة الحساب ومذهب العصر وتعديل التاريخ الهجري.',
         'هذه معاينة تفاعلية للشاشة: استخدم الأسهم ومفتاح Enter كأنها أزرار جهاز التحكم، أو اضغط بالفأرة. المواقيت محسوبة لمدينتك المختارة الآن.',
       ],
       en: [
         'Afnon replaces the stock launcher on an Android TV with one quiet screen. The next prayer and a live countdown sit inside a mihrab arch, the day’s six times run across the top, your favourite apps sit below, and the call to prayer comes to the TV by itself.',
-        'Times are calculated on the TV, fully offline, for 136 cities in 43 countries, with your choice of calculation method, Asr school and Hijri date offset.',
+        'Times are calculated on the TV, fully offline, for 147 cities in 43 countries, with your choice of calculation method, Asr school and Hijri date offset.',
         'This is a live preview of the screen: use the arrow keys and Enter like the remote, or click. The times are calculated for your chosen city right now.',
       ],
     },

@@ -1,6 +1,5 @@
 package tv.afnon.home;
 
-import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.CalculationParameters;
 import com.batoulapps.adhan.Madhab;
 
@@ -179,29 +178,37 @@ final class Text {
         return ar ? "العصر: الجمهور (شافعي)" : "Asr: standard (Shafi‘i)";
     }
 
-    String methodName(CalculationMethod m) {
-        switch (m) {
-            case UMM_AL_QURA: return ar ? "أم القرى، مكة المكرمة" : "Umm al-Qura, Makkah";
-            case MUSLIM_WORLD_LEAGUE: return ar ? "رابطة العالم الإسلامي" : "Muslim World League";
-            case KARACHI: return ar ? "جامعة العلوم الإسلامية، كراتشي" : "University of Islamic Sciences, Karachi";
-            case DUBAI: return ar ? "دبي" : "Dubai";
-            case KUWAIT: return ar ? "الكويت" : "Kuwait";
-            case QATAR: return ar ? "قطر" : "Qatar";
-            case NORTH_AMERICA: return ar ? "الجمعية الإسلامية لأمريكا الشمالية" : "ISNA, North America";
-            case MOON_SIGHTING_COMMITTEE: return ar ? "لجنة رؤية الهلال" : "Moonsighting Committee";
-            case SINGAPORE: return ar ? "سنغافورة" : "Singapore";
+    String methodName(Method m) {
+        switch (m.id) {
+            case "UMM_AL_QURA": return ar ? "أم القرى، مكة المكرمة" : "Umm al-Qura, Makkah";
+            case "MUSLIM_WORLD_LEAGUE": return ar ? "رابطة العالم الإسلامي" : "Muslim World League";
+            case "KARACHI": return ar ? "جامعة العلوم الإسلامية، كراتشي" : "University of Islamic Sciences, Karachi";
+            case "DUBAI": return ar ? "دبي" : "Dubai";
+            case "KUWAIT": return ar ? "الكويت" : "Kuwait";
+            case "QATAR": return ar ? "قطر" : "Qatar";
+            case "NORTH_AMERICA": return ar ? "الجمعية الإسلامية لأمريكا الشمالية" : "ISNA, North America";
+            case "MOON_SIGHTING_COMMITTEE": return ar ? "لجنة رؤية الهلال" : "Moonsighting Committee";
+            case "SINGAPORE": return ar ? "سنغافورة" : "Singapore";
+            case "OMAN_AWQAF": return ar ? "وزارة الأوقاف والشؤون الدينية، سلطنة عُمان" : "Ministry of Awqaf, Oman";
+            case "GULF": return ar ? "منطقة الخليج (Aladhan)" : "Gulf Region (Aladhan)";
             default: return ar ? "الهيئة المصرية العامة للمساحة" : "Egyptian General Authority of Survey";
         }
     }
 
-    /** "Fajr angle 19.5° · Isha 17.5°", or Isha as minutes after Maghrib where the method fixes it that way. */
-    String methodAngles(CalculationMethod m) {
-        CalculationParameters p = m.getParameters();
+    /**
+     * "Fajr angle 19.5° · Isha 17.5°", or Isha as minutes after Maghrib where the method fixes it that way, and
+     * the minutes a method adds to Dhuhr, Asr and Maghrib where it does.
+     */
+    String methodAngles(Method m) {
+        CalculationParameters p = m.parameters();
         String fajr = (ar ? "زاوية الفجر " : "Fajr angle ") + trim(p.fajrAngle) + "°";
         String isha = p.ishaInterval > 0
             ? (ar ? "العشاء بعد المغرب بـ " + p.ishaInterval + " دقيقة" : "Isha " + p.ishaInterval + " min after Maghrib")
             : (ar ? "العشاء " : "Isha ") + trim(p.ishaAngle) + "°";
-        return d(fajr + " · " + isha);
+        int plus = m.dayAdjustment();
+        String extra = plus == 0 ? ""
+            : ar ? " · +" + plus + " دقائق للظهر والعصر والمغرب" : " · +" + plus + " min on Dhuhr, Asr and Maghrib";
+        return d(fajr + " · " + isha + extra);
     }
 
     private static String trim(double v) {

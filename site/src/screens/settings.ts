@@ -3,7 +3,7 @@
 import voicesJson from '../data/adhans.json';
 import type { Ctx } from '../lib/ctx';
 import { CITIES, METHODS, REGIONS, STATIONS, cityOf, methodOf, stationOf, type Prefs, type Station } from '../lib/data';
-import { ASR, clock, hijri, methodParams } from '../lib/prayer';
+import { ASR, clock, dayAdjustment, hijri, methodParams } from '../lib/prayer';
 import type { Text } from '../lib/text';
 import { loadFacing } from './prayer-day';
 
@@ -39,7 +39,9 @@ function methodAngles(t: Text, m: string) {
   const isha = p.ishaInterval > 0
     ? t.ar ? `العشاء بعد المغرب بـ ${p.ishaInterval} دقيقة` : `Isha ${p.ishaInterval} min after Maghrib`
     : (t.ar ? 'العشاء ' : 'Isha ') + trim(p.ishaAngle) + '°';
-  return t.d(fajr + ' · ' + isha);
+  const plus = dayAdjustment(m);
+  const extra = plus === 0 ? '' : t.ar ? ` · +${plus} دقائق للظهر والعصر والمغرب` : ` · +${plus} min on Dhuhr, Asr and Maghrib`;
+  return t.d(fajr + ' · ' + isha + extra);
 }
 
 export const stationChoice = (t: Text, s: Station) => (s.reciter ? t.station(s) : t.station(s) + t.sep() + t.stationWhere(s));

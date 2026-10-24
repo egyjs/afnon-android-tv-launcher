@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.DateFormat;
 
-import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.Coordinates;
 import com.batoulapps.adhan.Madhab;
 
@@ -25,15 +24,15 @@ final class Prefs {
         final String id, ar, en, countryAr, countryEn;
         final double lat, lng;
         /** The method that city's mosques follow; picked for it when the city changes. */
-        final CalculationMethod method;
+        final Method method;
         /** The Asr school most of its mosques follow, also picked when the city changes. */
         final Madhab madhab;
 
-        City(String id, String ar, String en, String countryAr, String countryEn, double lat, double lng, CalculationMethod method) {
+        City(String id, String ar, String en, String countryAr, String countryEn, double lat, double lng, Method method) {
             this(id, ar, en, countryAr, countryEn, lat, lng, method, Madhab.SHAFI);
         }
 
-        City(String id, String ar, String en, String countryAr, String countryEn, double lat, double lng, CalculationMethod method, Madhab madhab) {
+        City(String id, String ar, String en, String countryAr, String countryEn, double lat, double lng, Method method, Madhab madhab) {
             this.id = id;
             this.ar = ar;
             this.en = en;
@@ -46,11 +45,13 @@ final class Prefs {
         }
     }
 
-    private static final CalculationMethod EG = CalculationMethod.EGYPTIAN;
-    private static final CalculationMethod MWL = CalculationMethod.MUSLIM_WORLD_LEAGUE;
-    private static final CalculationMethod IN = CalculationMethod.KARACHI;
-    private static final CalculationMethod SG = CalculationMethod.SINGAPORE;
-    private static final CalculationMethod NA = CalculationMethod.NORTH_AMERICA;
+    private static final Method EG = Method.EGYPTIAN;
+    private static final Method MWL = Method.MUSLIM_WORLD_LEAGUE;
+    private static final Method IN = Method.KARACHI;
+    private static final Method SG = Method.SINGAPORE;
+    private static final Method NA = Method.NORTH_AMERICA;
+    /** Oman's Ministry of Awqaf: 18° Fajr and Isha, +5 min on Dhuhr, Asr and Maghrib (see {@link Method#OMAN_AWQAF}). */
+    private static final Method OM = Method.OMAN_AWQAF;
     /** Hanafi Asr (about an hour later), the usual school in Pakistan, Bangladesh and most of North India. */
     private static final Madhab HANAFI = Madhab.HANAFI;
     static final City[] CITIES = {
@@ -64,20 +65,20 @@ final class Prefs {
         new City("asyut", "أسيوط", "Asyut", "مصر", "Egypt", 27.1783, 31.1859, EG),
         new City("luxor", "الأقصر", "Luxor", "مصر", "Egypt", 25.6872, 32.6396, EG),
         new City("aswan", "أسوان", "Aswan", "مصر", "Egypt", 24.0889, 32.8998, EG),
-        new City("makkah", "مكة المكرمة", "Makkah", "السعودية", "Saudi Arabia", 21.3891, 39.8579, CalculationMethod.UMM_AL_QURA),
-        new City("madinah", "المدينة المنورة", "Madinah", "السعودية", "Saudi Arabia", 24.5247, 39.5692, CalculationMethod.UMM_AL_QURA),
-        new City("riyadh", "الرياض", "Riyadh", "السعودية", "Saudi Arabia", 24.7136, 46.6753, CalculationMethod.UMM_AL_QURA),
-        new City("jeddah", "جدة", "Jeddah", "السعودية", "Saudi Arabia", 21.5292, 39.1611, CalculationMethod.UMM_AL_QURA),
-        new City("dammam", "الدمام", "Dammam", "السعودية", "Saudi Arabia", 26.4333, 50.1000, CalculationMethod.UMM_AL_QURA),
-        new City("taif", "الطائف", "Taif", "السعودية", "Saudi Arabia", 21.2667, 40.4167, CalculationMethod.UMM_AL_QURA),
-        new City("tabuk", "تبوك", "Tabuk", "السعودية", "Saudi Arabia", 28.3972, 36.5789, CalculationMethod.UMM_AL_QURA),
-        new City("abha", "أبها", "Abha", "السعودية", "Saudi Arabia", 18.2167, 42.5000, CalculationMethod.UMM_AL_QURA),
-        new City("dubai", "دبي", "Dubai", "الإمارات", "UAE", 25.2048, 55.2708, CalculationMethod.DUBAI),
-        new City("abudhabi", "أبو ظبي", "Abu Dhabi", "الإمارات", "UAE", 24.4511, 54.3969, CalculationMethod.DUBAI),
-        new City("sharjah", "الشارقة", "Sharjah", "الإمارات", "UAE", 25.3375, 55.4119, CalculationMethod.DUBAI),
-        new City("alain", "العين", "Al Ain", "الإمارات", "UAE", 24.2075, 55.7447, CalculationMethod.DUBAI),
-        new City("kuwait", "الكويت", "Kuwait City", "الكويت", "Kuwait", 29.3759, 47.9774, CalculationMethod.KUWAIT),
-        new City("doha", "الدوحة", "Doha", "قطر", "Qatar", 25.2854, 51.5310, CalculationMethod.QATAR),
+        new City("makkah", "مكة المكرمة", "Makkah", "السعودية", "Saudi Arabia", 21.3891, 39.8579, Method.UMM_AL_QURA),
+        new City("madinah", "المدينة المنورة", "Madinah", "السعودية", "Saudi Arabia", 24.5247, 39.5692, Method.UMM_AL_QURA),
+        new City("riyadh", "الرياض", "Riyadh", "السعودية", "Saudi Arabia", 24.7136, 46.6753, Method.UMM_AL_QURA),
+        new City("jeddah", "جدة", "Jeddah", "السعودية", "Saudi Arabia", 21.5292, 39.1611, Method.UMM_AL_QURA),
+        new City("dammam", "الدمام", "Dammam", "السعودية", "Saudi Arabia", 26.4333, 50.1000, Method.UMM_AL_QURA),
+        new City("taif", "الطائف", "Taif", "السعودية", "Saudi Arabia", 21.2667, 40.4167, Method.UMM_AL_QURA),
+        new City("tabuk", "تبوك", "Tabuk", "السعودية", "Saudi Arabia", 28.3972, 36.5789, Method.UMM_AL_QURA),
+        new City("abha", "أبها", "Abha", "السعودية", "Saudi Arabia", 18.2167, 42.5000, Method.UMM_AL_QURA),
+        new City("dubai", "دبي", "Dubai", "الإمارات", "UAE", 25.2048, 55.2708, Method.DUBAI),
+        new City("abudhabi", "أبو ظبي", "Abu Dhabi", "الإمارات", "UAE", 24.4511, 54.3969, Method.DUBAI),
+        new City("sharjah", "الشارقة", "Sharjah", "الإمارات", "UAE", 25.3375, 55.4119, Method.DUBAI),
+        new City("alain", "العين", "Al Ain", "الإمارات", "UAE", 24.2075, 55.7447, Method.DUBAI),
+        new City("kuwait", "الكويت", "Kuwait City", "الكويت", "Kuwait", 29.3759, 47.9774, Method.KUWAIT),
+        new City("doha", "الدوحة", "Doha", "قطر", "Qatar", 25.2854, 51.5310, Method.QATAR),
         new City("amman", "عمّان", "Amman", "الأردن", "Jordan", 31.9539, 35.9106, MWL),
         new City("irbid", "إربد", "Irbid", "الأردن", "Jordan", 32.5556, 35.8500, MWL),
         new City("zarqa", "الزرقاء", "Zarqa", "الأردن", "Jordan", 32.0833, 36.1000, MWL),
@@ -119,10 +120,22 @@ final class Prefs {
         new City("sulaymaniyah", "السليمانية", "Sulaymaniyah", "العراق", "Iraq", 35.5500, 45.4333, MWL),
         new City("manama", "المنامة", "Manama", "البحرين", "Bahrain", 26.2167, 50.5833, MWL),
         new City("muharraq", "المحرق", "Muharraq", "البحرين", "Bahrain", 26.2533, 50.6083, MWL),
-        new City("muscat", "مسقط", "Muscat", "عُمان", "Oman", 23.6139, 58.5922, MWL),
-        new City("salalah", "صلالة", "Salalah", "عُمان", "Oman", 17.0197, 54.0897, MWL),
-        new City("sohar", "صحار", "Sohar", "عُمان", "Oman", 24.3420, 56.7299, MWL),
-        new City("nizwa", "نزوى", "Nizwa", "عُمان", "Oman", 22.9333, 57.5333, MWL),
+        // The ministry's Muscat timetable matches a point near Seeb (58.28°E), about 1.3 min west of the old centre.
+        new City("muscat", "مسقط", "Muscat", "عُمان", "Oman", 23.6139, 58.2800, OM),
+        new City("salalah", "صلالة", "Salalah", "عُمان", "Oman", 17.0197, 54.0897, OM),
+        new City("sohar", "صحار", "Sohar", "عُمان", "Oman", 24.3420, 56.7299, OM),
+        new City("nizwa", "نزوى", "Nizwa", "عُمان", "Oman", 22.9333, 57.5333, OM),
+        new City("barka", "بركاء", "Barka", "عُمان", "Oman", 23.6807, 57.8860, OM),
+        new City("rustaq", "الرستاق", "Rustaq", "عُمان", "Oman", 23.3908, 57.4244, OM),
+        new City("sur", "صور", "Sur", "عُمان", "Oman", 22.5667, 59.5289, OM),
+        new City("ibri", "عبري", "Ibri", "عُمان", "Oman", 23.2257, 56.5157, OM),
+        new City("buraimi", "البريمي", "Al Buraimi", "عُمان", "Oman", 24.2500, 55.7933, OM),
+        new City("khasab", "خصب", "Khasab", "عُمان", "Oman", 26.1800, 56.2400, OM),
+        new City("duqm", "الدقم", "Duqm", "عُمان", "Oman", 19.6667, 57.7050, OM),
+        new City("bahla", "بهلاء", "Bahla", "عُمان", "Oman", 22.9667, 57.3000, OM),
+        new City("ibra", "إبراء", "Ibra", "عُمان", "Oman", 22.6900, 58.5300, OM),
+        new City("samail", "سمائل", "Samail", "عُمان", "Oman", 23.3033, 57.9833, OM),
+        new City("adam", "أدم", "Adam", "عُمان", "Oman", 22.3799, 57.5260, OM),
         new City("sanaa", "صنعاء", "Sanaa", "اليمن", "Yemen", 15.3500, 44.2000, MWL),
         new City("aden", "عدن", "Aden", "اليمن", "Yemen", 12.8000, 45.0333, MWL),
         new City("taiz", "تعز", "Taiz", "اليمن", "Yemen", 13.5789, 44.0219, MWL),
@@ -175,8 +188,8 @@ final class Prefs {
         new City("surabaya", "سورابايا", "Surabaya", "إندونيسيا", "Indonesia", -7.2575, 112.7521, SG),
         new City("bandung", "باندونغ", "Bandung", "إندونيسيا", "Indonesia", -6.9175, 107.6191, SG),
         new City("medan", "ميدان", "Medan", "إندونيسيا", "Indonesia", 3.5952, 98.6722, SG),
-        new City("kualalumpur", "كوالالمبور", "Kuala Lumpur", "ماليزيا", "Malaysia", 3.1390, 101.6869, CalculationMethod.MOON_SIGHTING_COMMITTEE),
-        new City("penang", "بينانغ", "Penang", "ماليزيا", "Malaysia", 5.4164, 100.3327, CalculationMethod.MOON_SIGHTING_COMMITTEE),
+        new City("kualalumpur", "كوالالمبور", "Kuala Lumpur", "ماليزيا", "Malaysia", 3.1390, 101.6869, Method.MOON_SIGHTING_COMMITTEE),
+        new City("penang", "بينانغ", "Penang", "ماليزيا", "Malaysia", 5.4164, 100.3327, Method.MOON_SIGHTING_COMMITTEE),
         new City("singapore", "سنغافورة", "Singapore", "سنغافورة", "Singapore", 1.3521, 103.8198, SG),
         new City("brunei", "بندر سري بكاوان", "Bandar Seri Begawan", "بروناي", "Brunei", 4.9031, 114.9398, SG),
         new City("bangkok", "بانكوك", "Bangkok", "تايلاند", "Thailand", 13.7563, 100.5018, SG),
@@ -230,7 +243,7 @@ final class Prefs {
     /** A new city also takes that city's usual method and Asr school; their rows can still override them after. */
     static void setCity(Context c, int index) {
         City city = CITIES[index];
-        of(c).edit().putString("city", city.id).putString("method", city.method.name())
+        of(c).edit().putString("city", city.id).putString("method", city.method.id)
             .putString("madhab", city.madhab == Madhab.HANAFI ? "hanafi" : "shafi").apply();
     }
 
@@ -263,19 +276,19 @@ final class Prefs {
 
     // ---------------------------------------------------------------- calculation
 
-    static final CalculationMethod[] METHODS = {
-        CalculationMethod.EGYPTIAN, CalculationMethod.UMM_AL_QURA, CalculationMethod.MUSLIM_WORLD_LEAGUE,
-        CalculationMethod.KARACHI, CalculationMethod.DUBAI, CalculationMethod.KUWAIT, CalculationMethod.QATAR,
-        CalculationMethod.NORTH_AMERICA, CalculationMethod.MOON_SIGHTING_COMMITTEE, CalculationMethod.SINGAPORE};
+    static final Method[] METHODS = {
+        Method.EGYPTIAN, Method.UMM_AL_QURA, Method.MUSLIM_WORLD_LEAGUE,
+        Method.KARACHI, Method.DUBAI, Method.KUWAIT, Method.QATAR,
+        Method.NORTH_AMERICA, Method.MOON_SIGHTING_COMMITTEE, Method.SINGAPORE, Method.OMAN_AWQAF, Method.GULF};
 
-    static CalculationMethod method(Context c) {
+    static Method method(Context c) {
         String name = of(c).getString("method", null);
-        if (name != null) for (CalculationMethod m : METHODS) if (m.name().equals(name)) return m;
+        if (name != null) for (Method m : METHODS) if (m.id.equals(name)) return m;
         return city(c).method;
     }
 
-    static void setMethod(Context c, CalculationMethod m) {
-        of(c).edit().putString("method", m.name()).apply();
+    static void setMethod(Context c, Method m) {
+        of(c).edit().putString("method", m.id).apply();
     }
 
     static Madhab madhab(Context c) {
