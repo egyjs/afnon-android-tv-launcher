@@ -78,6 +78,9 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
     recitation keeps playing.
 - **Remote buttons.** An accessibility service maps the remote's app buttons, and its Settings,
   Input and All apps buttons, to Afnon. The stock home's background service can then be disabled.
+- **Inputs.** A button beside Settings on Home opens the TV's input menu, as the Source button
+  does, for remotes without one. Where the TV has no menu of its own, Afnon lists the HDMI and AV
+  sources itself.
 - **Arabic and English.** RTL and LTR layouts. Language follows the TV or is set in Afnon. Digits
   are Arabic-Indic or Latin.
 - **Light on the TV.** Plain Java and Views, with no AndroidX, Kotlin or Compose. No blur, no
@@ -228,7 +231,8 @@ detects them by their hotkey service and each piece is skipped elsewhere:
 
 ```
 app/src/main/java/tv/afnon/home/
-  MainActivity        Home: clock, prayer row, favourites, radio pill and card, focus map
+  MainActivity        Home: clock, prayer row, favourites, radio pill and card, Inputs panel, focus map
+  Inputs              The TV's sources for the Inputs panel, and its own inputs screen
   PrayerDayActivity   Today's prayers, Qibla dial, room direction
   AllAppsActivity     Every app; hold OK to arrange favourites
   SettingsActivity    On-TV settings (prayer, reminders, radio, display, network, device)
@@ -269,6 +273,7 @@ docs/screenshots/     the images above, all from the real TV
   للأذان ثم تُستأنف، ويمكن إطفاء الشاشة أثناء الاستماع لتوفير الكهرباء. ومن الإعدادات ← الإذاعة ← المحطة:
   إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
 - **أزرار الريموت**: أزرار التطبيقات والإعدادات والمدخلات تعمل مع أفنون.
+- **مصادر الإدخال**: زر بجانب الإعدادات في الرئيسية يفتح قائمة المصادر في التلفاز كما يفعل زر المصدر، لأجهزة التحكم التي ليس فيها هذا الزر. وإن لم تكن للتلفاز قائمة خاصة، يعرض أفنون منافذ HDMI وAV بنفسه.
 - **العربية أولًا**: من اليمين إلى اليسار، مع الإنجليزية، والأرقام عربية أو لاتينية.
 - **بلا حسابات ولا إعلانات ولا تتبّع**. الإذاعة وحدها تستخدم الإنترنت.
 
