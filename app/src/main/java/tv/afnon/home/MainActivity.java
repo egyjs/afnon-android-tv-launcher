@@ -528,7 +528,7 @@ public class MainActivity extends Screen {
         if (n == ARCH) {
             h.add(t.hintOk(t.today()));
             h.add(t.hintApps());
-        } else if (n == RADIO) {
+        } else if (n == RADIO || n == INPUTS) {
             h.add(t.hintOk(nodeLabel[n]));
         } else if (n >= F0 && n < M0) {
             h.add(t.hintOk(t.open(nodeLabel[n])));
@@ -790,7 +790,10 @@ public class MainActivity extends Screen {
         inputRows.get(0).requestFocus();
     }
 
-    /** One source: a badge (H1, AV…), its name over Connected / Not connected, and a dot that is filled when on. */
+    /**
+     * One source: a badge (H1, AV…), its name over Connected / Not connected, and a dot that is filled when on.
+     * Where the TV doesn't report it, just the badge and the name.
+     */
     private FocusTile inputRow(Inputs.Source s) {
         FocusTile b = new FocusTile(this, Tokens.RADIUS_ROW);
         b.setRest(0, 0, 0).setFocusScale(Tokens.FOCUS_SCALE_ROW);
@@ -811,18 +814,19 @@ public class MainActivity extends Screen {
 
         LinearLayout words = new LinearLayout(this);
         words.setOrientation(LinearLayout.VERTICAL);
-        int rest = s.connected ? Tokens.PLASTER_100 : Tokens.MIST_400;
+        boolean known = s.connected != null, on = !known || s.connected;
+        int rest = on ? Tokens.PLASTER_100 : Tokens.MIST_400;
         TextView name = text(ui500, 30, rest);
         name.setText(s.name);
         name.setSingleLine(true);
         name.setEllipsize(TextUtils.TruncateAt.END);
         TextView status = text(ui400, 20, rest);
-        status.setText(s.connected ? t.inputOn() : t.inputOff());
+        status.setText(on ? t.inputOn() : t.inputOff());
         status.setAlpha(0.8f);
         words.addView(name);
-        words.addView(status);
+        if (known) words.addView(status);
         lineHeight(name, 1.2f);
-        ((LinearLayout.LayoutParams) status.getLayoutParams()).topMargin += Ui.ipx(4);
+        if (known) ((LinearLayout.LayoutParams) status.getLayoutParams()).topMargin += Ui.ipx(4);
         LinearLayout.LayoutParams wlp = new LinearLayout.LayoutParams(0, -2, 1);
         wlp.setMarginStart(Ui.ipx(20));
         wlp.setMarginEnd(Ui.ipx(20));
@@ -832,7 +836,7 @@ public class MainActivity extends Screen {
         GradientDrawable dotBg = new GradientDrawable();
         dotBg.setShape(GradientDrawable.OVAL);
         dot.setBackground(dotBg);
-        row.addView(dot, new LinearLayout.LayoutParams(Ui.ipx(14), Ui.ipx(14)));
+        if (known) row.addView(dot, new LinearLayout.LayoutParams(Ui.ipx(14), Ui.ipx(14)));
 
         b.addView(row, new FrameLayout.LayoutParams(-1, -1));
         b.setLook(f -> {
@@ -841,7 +845,7 @@ public class MainActivity extends Screen {
             status.setTextColor(fg);
             badge.setTextColor(f ? Tokens.GOLD_400 : Tokens.PLASTER_100);
             badgeBg.setStroke(f ? 0 : Ui.ipx(1), Tokens.LINE_SOFT);
-            if (s.connected) {
+            if (on) {
                 dotBg.setColor(f ? Tokens.LAPIS_900 : Tokens.GOLD_400);
                 dotBg.setStroke(0, 0);
             } else {

@@ -7,8 +7,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 ### Added
 - Inputs on Home (#20): a round button between Wi-Fi and Settings opens the Inputs panel (design/Inputs.dc.html)
   for remotes without a Source button. It lists the TV's passthrough sources (HDMI first, then AV and the rest)
-  from the TV Input Framework, with whether something is plugged in, and OK switches to one through the TV's own
-  player. A TV that lists none gets its own inputs screen instead, and a TV with neither gets no button.
+  from the TV Input Framework, and OK switches to one through the TV's own player. Whether something is plugged
+  in shows only where the TV reports it (the 55P7K calls every port connected, so there it shows none). A TV that lists none gets its own inputs screen instead, and a TV with neither gets no button.
   `--es test inputs` opens the panel.
 
 ## [0.6] - 2026-10-25

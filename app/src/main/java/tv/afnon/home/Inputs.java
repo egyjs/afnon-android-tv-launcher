@@ -30,10 +30,11 @@ final class Inputs {
 
     static final class Source {
         final String id, name, badge;
-        final boolean connected;
+        /** Whether something is plugged in; null where the TV doesn't say (it never reports a port as empty). */
+        Boolean connected;
         final Intent open;
 
-        Source(String id, String name, String badge, boolean connected, Intent open) {
+        Source(String id, String name, String badge, Boolean connected, Intent open) {
             this.id = id;
             this.name = name;
             this.badge = badge;
@@ -63,6 +64,11 @@ final class Inputs {
             boolean connected = tim.getInputState(info.getId()) != TvInputManager.INPUT_STATE_DISCONNECTED;
             out.add(new Source(info.getId(), name, badge(info.getType(), String.valueOf(label)), connected, open));
         }
+        // The 55P7K calls every port connected or standby, empty or not; a TV that never says "disconnected"
+        // doesn't know, so the panel shows no state rather than a wrong one.
+        boolean tracks = false;
+        for (Source s : out) tracks |= !s.connected;
+        if (!tracks) for (Source s : out) s.connected = null;
         Collections.sort(out, (a, b) -> {
             boolean ha = a.badge.startsWith("H"), hb = b.badge.startsWith("H");
             return ha != hb ? (ha ? -1 : 1) : a.name.compareToIgnoreCase(b.name);
