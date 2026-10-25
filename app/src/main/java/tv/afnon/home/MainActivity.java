@@ -107,7 +107,8 @@ public class MainActivity extends Screen {
     /**
      * Checking reminders on the TV without waiting for a prayer: `--es test reminder` shows Home's card now, with
      * the spoken reminder if it is on; `banner`, `call` and `announce` come from the remote buttons service 8 s
-     * later, time enough to open another app. `inputs` opens the Inputs panel as its button does.
+     * later, time enough to open another app. `inputs` presses the Inputs button; `inputs-panel` opens Afnon's
+     * panel even where the TV has its own inputs screen.
      * `--es station <id>` (ids in Radio.STATIONS) picks a radio station as Settings does, before any test runs.
      */
     private void runTest(Intent i) {
@@ -126,6 +127,10 @@ public class MainActivity extends Screen {
         else if ("friday".equals(kind) || "ramadan".equals(kind) || "now".equals(kind)) shiftTo(kind);
         else if ("radio".equals(kind)) Radio.toggle(this);
         else if ("inputs".equals(kind)) root.post(() -> { if (nodes[INPUTS] != null) nodes[INPUTS].performClick(); });
+        else if ("inputs-panel".equals(kind)) root.post(() -> {
+            List<Inputs.Source> sources = Inputs.list(this);
+            if (!sources.isEmpty()) showInputsPanel(sources);
+        });
         else if (RemoteKeys.watch != null) RemoteKeys.watch.test(kind, 8000);
     }
 
@@ -353,8 +358,9 @@ public class MainActivity extends Screen {
     }
 
     /**
-     * The round Inputs button left of Settings, for remotes without a Source button. Opens the panel of the TV's
-     * sources, or the TV's own inputs screen where the TV lists none; null (no button) where it has neither.
+     * The round Inputs button left of Settings, for remotes without a Source button. Opens what the Source button
+     * opens, the TV's own inputs screen; where the firmware has none (the stock launcher gone, say), Afnon's panel
+     * of the TV's sources. Null (no button) where it has neither.
      */
     private View inputsButton() {
         if (Inputs.list(this).isEmpty() && Inputs.screen(this) == null) return null;
@@ -366,9 +372,9 @@ public class MainActivity extends Screen {
         b.setContentDescription(t.inputs());
         b.setLook(f -> icon.setColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
         b.setOnClickListener(v -> {
-            List<Inputs.Source> sources = Inputs.list(this);
-            if (!sources.isEmpty()) showInputsPanel(sources);
-            else if (Inputs.screen(this) != null) startSafely(Inputs.screen(this));
+            Intent screen = Inputs.screen(this);
+            if (screen != null) startSafely(screen.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            else showInputsPanel(Inputs.list(this));
         });
         nodeLabel[INPUTS] = t.inputs();
         placeEnd(b, 1920 - (Tokens.COURT_X + Tokens.COURT_W) + 72 + 20, 56, 72, 72);

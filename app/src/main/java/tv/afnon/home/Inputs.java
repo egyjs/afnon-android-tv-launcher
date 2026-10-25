@@ -17,10 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The TV's sources (HDMI, AV…) for Home's Inputs panel (design/Inputs.dc.html), for remotes without a Source
- * button. They come from the TV Input Framework, so they work wherever the firmware lists its inputs there, with or
- * without the stock launcher; switching opens the input's passthrough channel in the TV's own player (com.tcl.tv on
- * TCL). Where the framework lists none, Home opens the TV's own inputs screen instead.
+ * Home's Inputs button, for remotes without a Source button. It opens the TV's own inputs screen, as Source does
+ * ({@link #screen}). Where the firmware has none, Home shows its own panel (design/Inputs.dc.html) of the sources
+ * the TV Input Framework lists ({@link #list}), which works with or without the stock launcher; switching opens the
+ * input's passthrough channel in the TV's own player (com.tcl.tv on TCL).
  */
 final class Inputs {
     private Inputs() {}
