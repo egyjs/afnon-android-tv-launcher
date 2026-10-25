@@ -12,6 +12,11 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   where the TV reports it. A TV with neither gets no button. `--es test inputs` presses the button and
   `--es test inputs-panel` opens Afnon's panel.
 
+### Fixed
+- TCL: the remote's Source button opened the input bar and closed it again at once, so nothing seemed to happen.
+  TCL's window manager opens that bar (com.tcl.suspension) on Source itself, and a second start from Afnon's
+  remapping toggled it shut; Source and TV are left to the firmware there now.
+
 ## [0.6] - 2026-10-25
 
 ### Added

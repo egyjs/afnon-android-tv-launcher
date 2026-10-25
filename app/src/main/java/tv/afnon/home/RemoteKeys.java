@@ -38,6 +38,8 @@ public class RemoteKeys extends AccessibilityService {
     };
     /** TCL remotes send Settings as 83 (KEYCODE_NOTIFICATION), which the stock home turned into its panel. */
     private static final int SETTINGS_KEY = KeyEvent.KEYCODE_NOTIFICATION;
+    /** TCL's quick panel, whose input bar the firmware itself opens on Source. */
+    private static final String TCL_INPUT_BAR = "com.tcl.suspension";
 
     private final Map<Integer, String> appKeys = new HashMap<>();
     /** The running watch, for Home's test hook; null while the service is off. */
@@ -138,8 +140,11 @@ public class RemoteKeys extends AccessibilityService {
         Intent settings = new Intent(this, SettingsActivity.class);
         out.put(SETTINGS_KEY, settings);
         out.put(KeyEvent.KEYCODE_SETTINGS, settings);
+        // TCL's window manager opens its own input bar (com.tcl.suspension) on Source and TV whatever the remapping
+        // says, and the bar toggles: a second start from the remapping closed it again at once. Those two buttons
+        // stay with the firmware there (TclKeys empties them).
         Intent inputs = inputs();
-        if (inputs != null) {
+        if (inputs != null && !(inputs.getComponent() != null && TCL_INPUT_BAR.equals(inputs.getComponent().getPackageName()))) {
             out.put(KeyEvent.KEYCODE_TV, inputs);
             out.put(KeyEvent.KEYCODE_TV_INPUT, inputs);
         }
