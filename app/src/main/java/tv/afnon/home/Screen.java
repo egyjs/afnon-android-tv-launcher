@@ -251,6 +251,7 @@ abstract class Screen extends Activity {
         // The countdown spans the column from a start renderCountdown sets, so it never re-centres each second.
         archCount.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
         archCount.setGravity(Gravity.LEFT);
+        archCount.setSingleLine(true);
         countHead = null;
         ((LinearLayout.LayoutParams) archSub.getLayoutParams()).topMargin = Ui.ipx(subGap);
         ((LinearLayout.LayoutParams) archSub2.getLayoutParams()).topMargin = Ui.ipx(sub2Gap);
@@ -276,6 +277,15 @@ abstract class Screen extends Activity {
         String count = t.d(duration(left, true));
         archCount.setText(count);
         float countSize = Ui.px(h > 0 ? Tokens.FONT_SIZE_DISPLAY_XL_HOURS : Tokens.FONT_SIZE_DISPLAY_XL);
+        // Marcellus digits are proportional: wide counts (10:00:00) can overflow the column. Shrink until it fits.
+        float maxW = Ui.px(ARCH_INFO_W);
+        android.graphics.Paint measure = new android.graphics.Paint(archCount.getPaint());
+        measure.setTextSize(countSize);
+        float minSize = Ui.px(80);
+        while (measure.measureText(count) > maxW && countSize > minSize) {
+            countSize -= Ui.px(5);
+            measure.setTextSize(countSize);
+        }
         if (archCount.getTextSize() != countSize) {
             archCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, countSize);
             lineHeight(archCount, 1f);
