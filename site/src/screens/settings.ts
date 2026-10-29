@@ -40,7 +40,9 @@ function methodAngles(t: Text, m: string) {
     ? t.ar ? `العشاء بعد المغرب بـ ${p.ishaInterval} دقيقة` : `Isha ${p.ishaInterval} min after Maghrib`
     : (t.ar ? 'العشاء ' : 'Isha ') + trim(p.ishaAngle) + '°';
   const plus = dayAdjustment(m);
-  const extra = plus === 0 ? '' : t.ar ? ` · +${plus} دقائق للظهر والعصر والمغرب` : ` · Dhuhr, Asr and Maghrib +${plus} min`;
+  const extra = m === 'MOROCCO_HABOUS'
+    ? t.ar ? ' · الظهر +5 دقائق · أفق كل مدينة' : " · Dhuhr +5 min · each city's horizon"
+    : plus === 0 ? '' : t.ar ? ` · +${plus} دقائق للظهر والعصر والمغرب` : ` · Dhuhr, Asr and Maghrib +${plus} min`;
   return t.d(fajr + ' · ' + isha + extra);
 }
 

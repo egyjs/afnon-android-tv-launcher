@@ -61,6 +61,8 @@ final class Prefs {
     private static final CalculationMethod NA = CalculationMethod.NORTH_AMERICA;
     /** Oman's Ministry of Awqaf: 18° Fajr and Isha, +5 min on Dhuhr, Asr and Maghrib (see {@link Method#OMAN_AWQAF}). */
     private static final Method OM = Method.OMAN_AWQAF;
+    /** Morocco's Ministry of Habous: 19°/17°, Dhuhr +5 min, each city's own horizon (see {@link Habous}). */
+    private static final Method MA = Method.MOROCCO_HABOUS;
     /** Hanafi Asr (about an hour later), the usual school in Pakistan, Bangladesh and most of North India. */
     private static final Madhab HANAFI = Madhab.HANAFI;
     static final City[] CITIES = {
@@ -273,6 +275,54 @@ final class Prefs {
         new City("madrid", "مدريد", "Madrid", "إسبانيا", "Spain", 40.4168, -3.7038, MWL),
         new City("sarajevo", "سراييفو", "Sarajevo", "البوسنة والهرسك", "Bosnia and Herzegovina", 43.8563, 18.4131, MWL),
 
+        // Morocco, capital first, then by size, on the Ministry of Habous's timetable (see Habous). It doesn't publish
+        // the points it computes for, so each is where its October 2026 table matches: the longitude from Dhuhr, the
+        // latitude from Fajr and Isha, all within 7 km of the city centre. Each city's horizon in Habous goes with it.
+        new City("rabat", "الرباط", "Rabat", "المغرب", "Morocco", 34.0218, -6.8509, MA),
+        new City("casablanca", "الدار البيضاء", "Casablanca", "المغرب", "Morocco", 33.5945, -7.6600, MA),
+        new City("fes", "فاس", "Fes", "المغرب", "Morocco", 34.0347, -5.0162, MA),
+        new City("tangier", "طنجة", "Tangier", "المغرب", "Morocco", 35.7695, -5.8145, MA),
+        new City("marrakech", "مراكش", "Marrakech", "المغرب", "Morocco", 31.6258, -8.0242, MA),
+        new City("meknes", "مكناس", "Meknes", "المغرب", "Morocco", 33.8984, -5.5772, MA),
+        new City("oujda", "وجدة", "Oujda", "المغرب", "Morocco", 34.6779, -1.9343, MA),
+        new City("kenitra", "القنيطرة", "Kenitra", "المغرب", "Morocco", 34.2646, -6.6002, MA),
+        new City("agadir", "أكادير", "Agadir", "المغرب", "Morocco", 30.4205, -9.5639, MA),
+        new City("tetouan", "تطوان", "Tetouan", "المغرب", "Morocco", 35.5697, -5.3658, MA),
+        new City("safi", "آسفي", "Safi", "المغرب", "Morocco", 32.2994, -9.2445, MA),
+        new City("mohammedia", "المحمدية", "Mohammedia", "المغرب", "Morocco", 33.6958, -7.3893, MA),
+        new City("khouribga", "خريبكة", "Khouribga", "المغرب", "Morocco", 32.8856, -6.9088, MA),
+        new City("eljadida", "الجديدة", "El Jadida", "المغرب", "Morocco", 33.2433, -8.5088, MA),
+        new City("benimellal", "بني ملال", "Beni Mellal", "المغرب", "Morocco", 32.3342, -6.3583, MA),
+        new City("nador", "الناظور", "Nador", "المغرب", "Morocco", 35.1736, -2.9368, MA),
+        new City("taza", "تازة", "Taza", "المغرب", "Morocco", 34.2302, -4.0101, MA),
+        new City("settat", "سطات", "Settat", "المغرب", "Morocco", 33.0024, -7.6299, MA),
+        new City("berrechid", "برشيد", "Berrechid", "المغرب", "Morocco", 33.2677, -7.5811, MA),
+        new City("khemisset", "الخميسات", "Khemisset", "المغرب", "Morocco", 33.8303, -6.0776, MA),
+        new City("guelmim", "كلميم", "Guelmim", "المغرب", "Morocco", 28.9864, -10.0624, MA),
+        new City("laayoune", "العيون", "Laayoune", "المغرب", "Morocco", 27.1545, -13.2254, MA),
+        new City("berkane", "بركان", "Berkane", "المغرب", "Morocco", 34.9267, -2.3494, MA),
+        new City("taroudant", "تارودانت", "Taroudant", "المغرب", "Morocco", 30.4707, -8.8079, MA),
+        new City("ksarelkebir", "القصر الكبير", "Ksar El Kebir", "المغرب", "Morocco", 34.9991, -5.9098, MA),
+        new City("larache", "العرائش", "Larache", "المغرب", "Morocco", 35.1951, -6.1540, MA),
+        new City("sidislimane", "سيدي سليمان", "Sidi Slimane", "المغرب", "Morocco", 34.2599, -5.9523, MA),
+        new City("khenifra", "خنيفرة", "Khenifra", "المغرب", "Morocco", 32.9358, -5.6847, MA),
+        new City("errachidia", "الرشيدية", "Errachidia", "المغرب", "Morocco", 31.9291, -4.4491, MA),
+        new City("sidikacem", "سيدي قاسم", "Sidi Kacem", "المغرب", "Morocco", 34.2264, -5.7164, MA),
+        new City("tiznit", "تزنيت", "Tiznit", "المغرب", "Morocco", 29.6986, -9.7313, MA),
+        new City("ouarzazate", "ورزازات", "Ouarzazate", "المغرب", "Morocco", 30.9202, -6.9359, MA),
+        new City("dakhla", "الداخلة", "Dakhla", "المغرب", "Morocco", 23.6941, -15.9731, MA),
+        new City("essaouira", "الصويرة", "Essaouira", "المغرب", "Morocco", 31.5118, -9.7771, MA),
+        new City("alhoceima", "الحسيمة", "Al Hoceima", "المغرب", "Morocco", 35.2450, -3.9363, MA),
+        new City("ouazzane", "وزان", "Ouazzane", "المغرب", "Morocco", 34.7979, -5.5819, MA),
+        new City("tantan", "طانطان", "Tan-Tan", "المغرب", "Morocco", 28.4376, -11.1087, MA),
+        new City("sefrou", "صفرو", "Sefrou", "المغرب", "Morocco", 33.8249, -4.8483, MA),
+        new City("tinghir", "تنغير", "Tinghir", "المغرب", "Morocco", 31.5213, -5.5312, MA),
+        new City("midelt", "ميدلت", "Midelt", "المغرب", "Morocco", 32.6803, -4.7449, MA),
+        new City("azrou", "آزرو", "Azrou", "المغرب", "Morocco", 33.3942, -5.2263, MA),
+        new City("chefchaouen", "شفشاون", "Chefchaouen", "المغرب", "Morocco", 35.1688, -5.2683, MA),
+        new City("ifrane", "يفرن", "Ifrane", "المغرب", "Morocco", 33.5276, -5.1074, MA),
+        new City("zagora", "زاكورة", "Zagora", "المغرب", "Morocco", 30.3279, -5.8520, MA),
+
         // Africa
         new City("nairobi", "نيروبي", "Nairobi", "كينيا", "Kenya", -1.2921, 36.8219, MWL),
         new City("lagos", "لاغوس", "Lagos", "نيجيريا", "Nigeria", 6.5244, 3.3792, MWL),
@@ -313,7 +363,7 @@ final class Prefs {
         {"United Kingdom", "France", "Germany", "Netherlands", "Belgium", "Austria", "Switzerland", "Italy", "Spain",
             "Bosnia and Herzegovina"},
         {"United States", "Canada"},
-        {"Kenya", "Nigeria", "South Africa"},
+        {"Morocco", "Kenya", "Nigeria", "South Africa"},
         {"Australia", "New Zealand"},
     };
 
@@ -333,7 +383,8 @@ final class Prefs {
     static final Method[] METHODS = {
         Method.EGYPTIAN, Method.UMM_AL_QURA, Method.MUSLIM_WORLD_LEAGUE,
         Method.KARACHI, Method.DUBAI, Method.KUWAIT, Method.QATAR,
-        Method.NORTH_AMERICA, Method.MOON_SIGHTING_COMMITTEE, Method.SINGAPORE, Method.OMAN_AWQAF};
+        Method.NORTH_AMERICA, Method.MOON_SIGHTING_COMMITTEE, Method.SINGAPORE, Method.OMAN_AWQAF,
+        Method.MOROCCO_HABOUS};
 
     static Method method(Context c) {
         String name = of(c).getString("method", null);

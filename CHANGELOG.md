@@ -4,6 +4,19 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- Morocco: calculation method «وزارة الأوقاف والشؤون الإسلامية، المملكة المغربية» (Ministry of Habous) and 44 cities,
+  capital first then by size (Rabat, Casablanca, Fes, Tangier, Marrakech … Ifrane, Zagora), 236 cities in all. The
+  ministry publishes times, not its method, so the rules were recovered from its tables (habous.gov.ma, October 2026
+  for 44 cities, and Tetouan's whole 2019 year from the Internet Archive): Fajr 19° with seconds dropped, Isha 17°,
+  Dhuhr transit + 5 min, Asr with the sun's declination at Asr itself, sunrise and Maghrib at each city's own
+  horizon (lower in the Atlas than on the coast), the rest rounded. `Habous.java` computes them on adhan-java's
+  solar positions, since its parameters can't round, take seconds or set a horizon. Against the October 2026 table
+  98.8% of the 8184 times are on the minute and the rest a minute off; Tetouan's 2019 year, not fitted to, is 90.8%
+  on the minute and within one throughout. Each city sits at the point the table matches, within 7 km of its centre.
+  Morocco keeps legal time on GMT since 20 September 2026 (decree 2.26.530): TVs whose time-zone data predates it
+  show Africa/Casablanca an hour ahead, so set such a TV to a GMT+0 zone until its firmware updates.
+
 ## [0.7] - 2026-10-28
 
 ### Added
