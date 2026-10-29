@@ -277,12 +277,15 @@ abstract class Screen extends Activity {
         String count = t.d(duration(left, true));
         archCount.setText(count);
         float countSize = Ui.px(h > 0 ? Tokens.FONT_SIZE_DISPLAY_XL_HOURS : Tokens.FONT_SIZE_DISPLAY_XL);
-        // Marcellus digits are proportional: wide counts (10:00:00) can overflow the column. Shrink until it fits.
+        // Marcellus digits are proportional: wide counts (10:00:00) can overflow the column, so it shrinks until it
+        // fits. It measures the count with every digit a 0, the widest, so the size changes only with the count's
+        // shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+        String widest = count.replaceAll("[0-9]", "0").replaceAll("[٠-٩]", "٠");
         float maxW = Ui.px(ARCH_INFO_W);
         android.graphics.Paint measure = new android.graphics.Paint(archCount.getPaint());
         measure.setTextSize(countSize);
         float minSize = Ui.px(80);
-        while (measure.measureText(count) > maxW && countSize > minSize) {
+        while (measure.measureText(widest) > maxW && countSize > minSize) {
             countSize -= Ui.px(5);
             measure.setTextSize(countSize);
         }
