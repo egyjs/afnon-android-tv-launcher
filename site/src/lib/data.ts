@@ -26,7 +26,12 @@ export type Prefs = {
   station: string;
   voice?: string; voiceFajr?: string; // adhan voices (Adhans ids); unset: the app's defaults
   radioResume?: boolean; radioDark?: number; // Settings' radio rows
+  adjust?: number[]; // Settings → Adjust the times: minutes added to Fajr…Isha, −30 to +30 (Prefs.adjustments)
+  night?: boolean; // night mode (Prefs.night): tokens.night.json's palette
 };
+
+/** The six adjustments, zeros when unset. */
+export const adjustOf = (p: Prefs) => [0, 1, 2, 3, 4, 5].map((i) => Math.max(-30, Math.min(30, p.adjust?.[i] ?? 0)));
 
 export const DEFAULT_PREFS: Prefs = {
   city: 'cairo', method: null, hanafi: false, hijriOffset: 0, clock: 'system', digits: 'auto',

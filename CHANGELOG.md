@@ -4,6 +4,85 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- Night mode: a dimmer, warmer palette for watching at night on every screen (Home, Prayer day, Settings, All
+  apps, the call, the reminder banner, the screensaver and screen-off), from the LG version's night colours.
+  Near-black and a little warm; text, gold and lines at about half brightness; the reminder card and the current
+  prayer dark instead of plaster; focus a dim amber fill with light text and a clear ring. A round button beside
+  Home's Settings gear switches it at once (a full moon with a star while off, a sun while on; focus stays on
+  it), and so does Settings → Display → Night mode. Off by default.
+  - The colours are tokens: `afnon-mihrab/tokens.night.json` overrides `tokens.json` by the same paths, and
+    `npm run tokens` generates both palettes into `Tokens.java` (colour fields that `Tokens.use(night)` switches)
+    and `colors.xml` (`night_*`). Nothing is overlaid, filtered or layered; screens are built in the palette.
+  - New tokens `color.current.*` (the current prayer, a chosen segment) and `color.card.*` (the reminder card),
+    and the focused-text colour is now `focus.text` everywhere. By day every colour is unchanged.
+- Night mode dims other apps' icons too, on Home's favourites and in All apps: a little warm and about 60% as
+  bright, so a red YouTube logo doesn't glare. Each icon takes one colour filter that multiplies it by the new
+  token `color.app-icon-tint` (no extra view or layer); by day there is no filter.
+- Home's radio card has a Station button («المحطة», with the radio-waves icon) between Play and Screen off, as in
+  the LG version. It opens the same list as Settings → Radio → Station, over Home: the Quran radio stations or
+  the reciters, then one of them. Playing radio moves to the pick at once and the card shows it; Back steps back
+  through the list, and focus returns to Station. ◀▶ move along the three buttons (mirrored in Arabic).
+- Two Quran radio stations from the Saudi Broadcasting Authority, its own audio streams as Saudi Radio+ plays
+  them (`live.kwikmotion.com`, HLS, AAC): إذاعة القرآن الكريم · السعودية and إذاعة نداء الإسلام, with the
+  Quran radios in both Station lists (Settings and the radio card).
+- Settings → What's new («ما الجديد», the last section): the latest releases, newest first, each a few short
+  lines in Arabic (or English) under its version, read-only and built only while it is open. OK or toward the
+  end goes into it, ▲▼ scroll it, Back or toward the start returns to the sections. It starts with 0.5 and this
+  release; the lines are `Text.news()`, and each release adds its own on top.
+- Settings → Adjust the times («تعديل المواقيت», its own section), as in meypod/al-azan and the LG launcher:
+  Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha each a stepper of minutes («+2», «0», «-3»), up to 30 earlier or
+  later, with today's adjusted time under the name. Home, Prayer day, the reminders and the adhan all
+  use the adjusted times.
+- Two more adhan voices: «المسجد النبوي» and «راغب مصطفى غلوش», the recordings meypod/al-azan uses
+  (`tools/fetch-adhans.sh` downloads them from meypod/audio_files).
+
+### Changed
+- Web preview (`site/`): night mode (Home's button and Settings → Display), the radio card's Station button, Settings →
+  Adjust the times and What's new, Marcellus for the big numbers with Western digits, and the prayer rules above
+  (adjusted times, the Hijri day from Maghrib, Jumu'ah until Maghrib, Umm al-Qura's Ramadan Isha, above 48°).
+- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
+  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
+  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
+  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
+  need its `TypefaceSpan`).
+- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
+  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
+  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
+  changing never moves. The view also no longer asks for a new layout every second.
+- The Hijri date turns at Maghrib, as the Islamic day does: from Maghrib to midnight it shows the next day's date,
+  and its weekday with it (Friday evening reads السبت). The weekday moved from the Gregorian line to the Hijri one
+  (Home, Prayer day, the screensaver). Ramadan follows the Hijri day, so its first night shows the suhoor and the
+  night of Eid doesn't; «سورة الكهف اليوم» shows from Thursday's Maghrib to Friday's. Jumu'ah replaces Dhuhr on
+  Friday until its Maghrib, then the strip says الظهر again.
+- Umm al-Qura (the Saudi cities): Isha is 2 hours after Maghrib in Ramadan instead of 1½, from the first night of
+  Ramadan to the last, as Saudi Arabia's calendar and meypod/al-azan have it.
+- Cities above 48° (London, Paris, Berlin, Amsterdam…): where summer nights never get dark enough for Fajr's and
+  Isha's angles, they are now a seventh of the night from Maghrib and before sunrise, as al-azan has it, instead of
+  both near 1 a.m.
+
+### Fixed
+- No blue screen before Settings, Prayer day and All apps. Android showed a starting window in Theme.Afnon's ground
+  (day lapis, also in night mode) while the screen drew: on the TCL 55P7K a `Splash Screen tv.afnon.home` layer
+  appears each time Settings opens. Theme.Afnon sets `windowDisablePreview` and Afnon's own screens open and close
+  with no transition, so the screen in front stays until the next one has drawn.
+- Afnon remote buttons (and the call to prayer) now also come back after a force-stop when Android marked the
+  service crashed: it stays listed as on but is never started again until it leaves the list. `ensureOn` takes it
+  out and puts it back a second later when it is listed but nothing runs, and looks again 3 s after listing a
+  missing one. On the TCL 55P7K, a force-stop and one press of Home left it off two times in three; now none.
+- Lists over the screen (Settings' lists and the radio card's Station) no longer cut off the last item: its focus
+  ring and the bottom of its tile were clipped, plainly with only two groups. The list is now as tall as its
+  whole tiles, rings included, and moves a whole item at a time when it scrolls.
+- The arch countdown no longer wraps onto a second line when a wide count (10:00:00 in Marcellus) is wider than the
+  arch: it stays on one line and gets a little smaller until it fits, sized as if every digit were a 0 (the
+  widest in Marcellus) so it doesn't change size from one second to the next.
+- Home's More row no longer repeats the favourites. It left out only the saved favourites, so when one of them
+  wasn't installed and another app filled its slot, that app showed in both rows. It now leaves out what the
+  favourites row shows.
+- TCL's remote pairing service (`com.tcl.tcl_bt_rcu_service`, "TCL_BT_RCU_Service") is no longer listed as an app:
+  its launcher entry is only a test screen.
+
+
 ## [0.7] - 2026-10-28
 
 ### Added

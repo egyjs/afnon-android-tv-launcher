@@ -65,8 +65,8 @@ public class NowActivity extends Screen {
         if (prayer == PrayerDay.DHUHR && new PrayerDay(this, time).friday) names[PrayerDay.DHUHR] = t.jumuah();
         TextView name = text(displayBold, 128, Tokens.PLASTER_100);
         name.setText(names[prayer]);
-        TextView when = text(display, 64, Tokens.GOLD_400);
-        when.setText(time(time, 0.5f));
+        TextView when = text(numbers, 64, Tokens.GOLD_400);
+        when.setText(displayTime(time, 0.5f));
         when.setTextDirection(rtl ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         for (TextView v : new TextView[] {verse, label, name, when}) {
             v.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -133,8 +133,14 @@ public class NowActivity extends Screen {
         TextView v = text(ui500, 28, Tokens.PLASTER_100);
         v.setGravity(Gravity.CENTER);
         b.addView(v, new FrameLayout.LayoutParams(-1, -1));
-        b.setLook(f -> v.setTextColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
+        b.setLook(f -> v.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100));
         return b;
+    }
+
+    /** See-through over what was playing, by day or night: its dimmed ground is the scrim token. */
+    @Override
+    int nightTheme() {
+        return 0;
     }
 
     @Override

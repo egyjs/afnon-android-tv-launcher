@@ -1,13 +1,14 @@
 // Settings (SettingsActivity): sections, each section's rows and the Asr preview, as HTML strings so the same
 // code renders the page at build time and re-renders it in the browser after every change.
 import voicesJson from '../data/adhans.json';
+import newsJson from '../data/news.json';
 import type { Ctx } from '../lib/ctx';
-import { CITIES, METHODS, REGIONS, STATIONS, cityOf, methodOf, stationOf, type Prefs, type Station } from '../lib/data';
+import { CITIES, METHODS, REGIONS, STATIONS, adjustOf, cityOf, methodOf, stationOf, type Prefs, type Station } from '../lib/data';
 import { ASR, clock, dayAdjustment, hijri, methodParams } from '../lib/prayer';
 import type { Text } from '../lib/text';
 import { loadFacing } from './prayer-day';
 
-export const PRAYER = 0, REMINDERS = 1, RADIO = 2, DISPLAY = 3, NETWORK = 4, DEVICE = 5, SECTIONS = 6;
+export const PRAYER = 0, ADJUST = 1, REMINDERS = 2, RADIO = 3, DISPLAY = 4, NETWORK = 5, DEVICE = 6, NEWS = 7, SECTIONS = 8;
 export type Kind = 'value' | 'seg' | 'step' | 'toggle';
 export const VOICES = voicesJson;
 
@@ -25,7 +26,8 @@ const trim = (v: number) => String(+v.toFixed(2));
 // ---------------------------------------------------------------- Text.java methods with logic, ported
 
 export const sectionName = (t: Text, i: number) =>
-  [t.s('sectionPrayer'), t.s('sectionReminders'), t.s('sectionRadio'), t.s('sectionDisplay'), t.ar ? 'الشبكة' : 'Network', t.s('sectionDevice')][i];
+  [t.s('sectionPrayer'), t.s('sectionAdjust'), t.s('sectionReminders'), t.s('sectionRadio'), t.s('sectionDisplay'),
+    t.ar ? 'الشبكة' : 'Network', t.s('sectionDevice'), t.s('sectionNews')][i];
 
 function locationHelp(t: Text, lat: number, lng: number) {
   const ns = lat >= 0 ? (t.ar ? 'ش' : 'N') : t.ar ? 'ج' : 'S';
@@ -76,6 +78,12 @@ export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
       { id: 'hijri', kind: 'step', label: t.s('hijriAdjust'), help: (t.ar ? 'اليوم: ' : 'Today: ') + hijri(t, c.day), value: t.days(p.hijriOffset) },
       { id: 'room', kind: 'value', label: t.s('roomTitle'), help: t.s('roomHelp'), value: facing < 0 ? t.s('notSet') : t.bearingLabel(facing) },
     ];
+    // Adjust the times: each of the six up to 30 minutes earlier or later, with what it is today under its name.
+    case ADJUST: return adjustOf(p).map((n, i) => ({
+      id: 'adj' + i, kind: 'step' as Kind, label: t.list('prayerNames')[i],
+      help: t.adjustTimeHelp(clock(t, c.day.times[i], c.h24)), value: t.minutesSigned(n),
+    }));
+    case NEWS: return [];
     case REMINDERS: return [
       { id: 'remind', kind: 'value', label: t.s('remind'), help: t.s('remindHelp'), value: t.d(t.list('remindChoices')[remindIndex(p)]), selected: remindIndex(p) },
       { id: 'adhan', kind: 'toggle', label: t.s('adhanRow'), help: t.s('adhanHelp'), on: p.adhan },
@@ -92,6 +100,7 @@ export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
       { id: 'lang', kind: 'seg', label: t.s('language'), help: t.s('languageHelp'), segs: [t.ar ? 'التلفاز' : 'TV', 'العربية', 'English'], selected: t.ar ? 1 : 2 },
       { id: 'digits', kind: 'seg', label: t.s('digits'), help: '', segs: ['0123', '٠١٢٣'], selected: t.eastern ? 1 : 0 },
       { id: 'clock', kind: 'seg', label: t.s('clockRow'), help: t.s('clockHelp'), segs: t.list('clocks').map(t.d), selected: Math.max(0, CLOCKS.indexOf(p.clock)) },
+      { id: 'night', kind: 'toggle', label: t.s('nightRow'), help: t.s('nightHelp'), on: !!p.night },
     ];
     case NETWORK: return [{ id: 'network', kind: 'value', label: t.s('networkRow'), help: t.s('networkHelp'), value: '' }];
     default: return [{ id: 'device', kind: 'value', label: t.s('deviceRow'), help: t.s('deviceHelp'), value: '' }];
@@ -101,18 +110,35 @@ export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
 /** Editing a seg or step row (OK, then ◀▶): the row and its unsaved choice or amount. */
 export type Edit = { row: number; draft: number };
 
-/** What editing starts from: the chosen segment, or the Hijri offset. */
-export const savedDraft = (c: Ctx, row: Row) => (row.kind === 'seg' ? row.selected! : (c.prefs as SPrefs).hijriOffset);
+/** An Adjust the times row's prayer (0…5), or -1. */
+const adjIndex = (row: Row) => (row.id.startsWith('adj') ? +row.id.slice(3) : -1);
 
-/** ◀▶ while editing (d = +1 toward the end), held to the row's range. */
-export const moveDraft = (row: Row, draft: number, d: number) =>
-  row.kind === 'seg' ? Math.max(0, Math.min(row.segs!.length - 1, draft + d)) : Math.max(-2, Math.min(2, draft + d));
+/** What editing starts from: the chosen segment, the time's adjustment or the Hijri offset. */
+export const savedDraft = (c: Ctx, row: Row) =>
+  row.kind === 'seg' ? row.selected! : adjIndex(row) >= 0 ? adjustOf(c.prefs)[adjIndex(row)] : (c.prefs as SPrefs).hijriOffset;
+
+/** ◀▶ while editing (d = +1 toward the end), held to the row's range: −30…30 minutes, or −2…2 days. */
+export function moveDraft(row: Row, draft: number, d: number) {
+  if (row.kind === 'seg') return Math.max(0, Math.min(row.segs!.length - 1, draft + d));
+  const max = adjIndex(row) >= 0 ? 30 : 2;
+  return Math.max(-max, Math.min(max, draft + d));
+}
 
 /** OK while editing: the new prefs, or null when the draft is what is already saved. 'lang' is the page's. */
 export function commit(c: Ctx, row: Row, draft: number): SPrefs | null {
   if (draft === savedDraft(c, row)) return null;
-  return row.kind === 'seg' ? pick(c, row.id, draft) : { ...(c.prefs as SPrefs), hijriOffset: draft };
+  if (row.kind === 'seg') return pick(c, row.id, draft);
+  const i = adjIndex(row);
+  if (i >= 0) {
+    const adjust = adjustOf(c.prefs);
+    adjust[i] = draft;
+    return { ...(c.prefs as SPrefs), adjust };
+  }
+  return { ...(c.prefs as SPrefs), hijriOffset: draft };
 }
+
+/** A step row's amount as shown while editing. */
+const stepValue = (t: Text, row: Row, n: number) => (adjIndex(row) >= 0 ? t.minutesSigned(n) : t.days(n));
 
 /** Choosing item i of a seg row. 'lang' is handled by the page (it moves to the other language's page). */
 export function pick(c: Ctx, id: string, i: number): SPrefs | null {
@@ -154,13 +180,26 @@ export function navHtml(t: Text, section: number) {
     `<button class="ft row nav${i === section ? ' open' : ''}" data-nav="${i}"${i === section ? ' data-focus-start' : ''} style="top:${152 + i * 86}px" data-hints="${hint}">${esc(sectionName(t, i))}</button>`).join('');
 }
 
-/** The rows; the one being edited shows its draft. */
+/** The rows (What's new: its page); the one being edited shows its draft. */
 export const rowsHtml = (c: Ctx, section: number, radioOn = false, edit: Edit | null = null) =>
-  rowsFor(c, section, radioOn).map((r, i) => {
+  section === NEWS ? newsHtml(c.t) : rowsFor(c, section, radioOn).map((r, i) => {
     if (edit?.row !== i) return rowHtml(c.t, r, i);
-    const shown = r.kind === 'seg' ? { ...r, selected: edit.draft } : { ...r, value: c.t.days(edit.draft) };
+    const shown = r.kind === 'seg' ? { ...r, selected: edit.draft } : { ...r, value: stepValue(c.t, r, edit.draft) };
     return rowHtml(c.t, shown, i, true);
   }).join('');
+
+/**
+ * What's new (SettingsActivity.newsPage): the latest releases, newest first, each its version and a few short
+ * lines (Text.news). Read-only; OK or toward the end goes into it, ▲▼ scroll it, toward the start or Back leave.
+ */
+export function newsHtml(t: Text) {
+  const hint = esc(JSON.stringify([t.s('hintMove'), t.s('hintBackMenu')]));
+  const groups = (newsJson as Record<string, string[][]>)[t.lang];
+  return `<div class="news" tabindex="0" data-news data-hints="${hint}">`
+    + groups.map(([version, ...lines]) => `<div class="nv">${esc(t.newsVersion(version))}</div>`
+      + lines.map((l) => `<div class="nl">•  ${esc(t.d(l))}</div>`).join('')).join('')
+    + '</div>';
+}
 export const previewHtml = (c: Ctx) => clock(c.t, c.day.times[ASR], c.h24);
 
 // ---------------------------------------------------------------- chooser lists

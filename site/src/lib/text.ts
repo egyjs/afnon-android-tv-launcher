@@ -101,6 +101,13 @@ export function makeText(lang: Lang, eastern = lang === 'ar') {
         : ['ahead of you', 'ahead, to your right', 'to your right', 'behind, to your right', 'behind you',
            'behind, to your left', 'to your left', 'ahead, to your left'])[sector(clockwise)],
     bearingLabel: (deg: number) => d(octant(deg) + ' · ' + deg + '°'),
+    /** A time's adjustment between its − and + buttons: "+2", "0", "-3"; LTR-embedded so the sign leads in Arabic. */
+    minutesSigned: (n: number) => '‪' + d(n > 0 ? '+' + n : String(n)) + '‬',
+    /** Under each time's name in Adjust the times: what it is today with the adjustment. */
+    adjustTimeHelp: (time: string) =>
+      d(ar ? 'اليوم ' + time + ' · بالدقائق، حتى 30 قبله أو بعده' : 'Today ' + time + ' · in minutes, up to 30 earlier or later'),
+    /** A release's heading on the What's new page: «أفنون 0.5» / "Afnon 0.5", in the chosen digits. */
+    newsVersion: (version: string) => (ar ? 'أفنون ' : 'Afnon ') + (eastern ? d(version).replace('.', '٫') : version),
     roomButton: (set: boolean) =>
       ar ? (set ? 'تغيير اتجاه الغرفة' : 'حدّد اتجاه الغرفة') : set ? 'Change room direction' : 'Set room direction',
   };

@@ -26,6 +26,13 @@ const { mode, screen, ground = 'lattice' } = Astro.props;
 <script is:inline>
   (() => {
     const frame = document.currentScript.previousElementSibling, stage = frame.firstElementChild;
+    // Night mode (Settings → Display, or Home's night button) before the first paint: the night palette on the stage.
+    // Arabic with Western digits: the big numbers in Marcellus (live.ts keeps both in step).
+    try {
+      const p = JSON.parse(localStorage.getItem('afnon-prefs') || '{}');
+      if (p.night) stage.setAttribute('data-night', '');
+      if (document.documentElement.lang === 'ar' && p.digits === 'western') stage.setAttribute('data-latin-digits', '');
+    } catch (e) {}
     const fit = () => stage.style.setProperty('--k', String(frame.clientWidth / 1920));
     new ResizeObserver(fit).observe(frame);
     fit();

@@ -34,7 +34,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
 </a>
 
 <div class="when">
-  <div class="clock display num" data-k="clock" set:html={m.html.clock} />
+  <div class="clock display numbers num" data-k="clock" set:html={m.html.clock} />
   <div class="hdate" data-k="hdate" set:html={m.html.hdate} />
   <div class="gdate" data-k="gdate" set:html={m.html.gdate} />
 </div>
@@ -49,6 +49,11 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     <Icon name="wifi" stroke={2} /> <span dir="ltr">Wi-Fi</span>
   </button>
 </div>
+<!-- Night mode, beside Settings: a full moon with a star while it is off, a sun while it is on. -->
+<button class="ft gear night-btn" data-night-toggle aria-label={t.s('nightOn')} data-hints={hints(t.hintOk(t.s('nightOn')))}>
+  <span class="when-day"><Icon name="night" size={34} /></span>
+  <span class="when-night"><Icon name="day" size={34} /></span>
+</button>
 <a class="ft gear" href={href('settings', lang) + '#tv'} aria-label={t.s('settings')} data-hints={hints(t.hintOk(t.s('settings')))}>
   <Icon name="gear" size={34} />
 </a>
@@ -100,11 +105,15 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     <span class="bars big" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
   </div>
   <div class="rc-buttons">
+    <!-- Play/Stop, Station, Screen off from the start side, each icon then label. -->
     <button class="ft rc-btn play" data-radio-toggle data-hints={hints(t.hintOk(t.s('radioPlay')), t.s('hintClose'))}>
-      <span data-radio-play-label>{t.s('radioPlay')}</span> <Icon name="play" size={24} />
+      <Icon name="play" size={26} /> <span data-radio-play-label>{t.s('radioPlay')}</span>
+    </button>
+    <button class="ft rc-btn" data-station data-hints={hints(t.hintOk(t.s('stationRow')), t.s('hintClose'))}>
+      <Icon name="radio" size={26} stroke={2} /> <span>{t.s('stationRow')}</span>
     </button>
     <button class="ft rc-btn dark" data-screen-off data-hints={hints(t.hintOk(t.s('screenOff')), t.s('hintClose'))}>
-      {t.s('screenOff')} <Icon name="moon" size={24} />
+      <Icon name="moon" size={26} /> <span>{t.s('screenOff')}</span>
     </button>
     <button class="visually-hidden" data-back data-radio-close tabindex="-1">{t.s('dismiss')}</button>
   </div>
@@ -116,6 +125,9 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   <p data-screen-off-note>{t.station(station)}<br />{t.screenOffNote()}</p>
 </div>
 
+<!-- The station list over the card (Screen.chooseStation): groups, then stations. -->
+<div class="chooser" data-chooser hidden></div>
+
 <div class="toast" data-toast-out hidden role="status"></div>
 <audio data-audio preload="none"></audio>
 
@@ -124,6 +136,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   import { homeModel } from './home';
   import { stationOf } from '../lib/data';
   import { makeText, type Lang } from '../lib/text';
+  import { chooserHtml, stationChoice, stationsOf } from './settings';
 
   const stage = document.querySelector<HTMLElement>('.tv')!;
   if (stage.dataset.screen === 'home') {
@@ -131,7 +144,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     const card = $('[data-card]');
     const forced = stage.dataset.mode === 'reminder';
     let dismissedFor = '';
-    const prefs = loadPrefs();
+    let prefs = loadPrefs();
     const t = makeText(document.documentElement.lang as Lang, prefs.digits === 'auto' ? document.documentElement.lang === 'ar' : prefs.digits === 'eastern');
 
     const showCard = (show: boolean) => {
@@ -142,7 +155,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
       $(show ? '[data-card-ok]' : '.arch-btn').setAttribute('data-focus-start', '');
       if (show && stage.contains(document.activeElement)) $('[data-card-ok]').focus({ preventScroll: true });
     };
-    live(homeModel, (c) => {
+    const update = live(homeModel, (c) => {
       const left = Math.ceil((c.day.nextTime.getTime() - c.now.getTime()) / 1000);
       const remind = c.prefs.remind * 60;
       const due = (forced || (remind > 0 && left > 0 && left <= remind)) && card.dataset.for !== dismissedFor;
@@ -169,7 +182,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     // Quran Radio: the chosen station's live stream.
     const audio = $<HTMLAudioElement>('[data-audio]');
     const rc = $('[data-radio-card]');
-    const st = stationOf(prefs);
+    let st = stationOf(prefs);
     const status = () => {
       const on = !audio.paused;
       stage.classList.toggle('radio-on', on);
@@ -179,8 +192,13 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     };
     audio.addEventListener('playing', status);
     audio.addEventListener('pause', status);
-    $('[data-station-name]').textContent = t.station(st);
-    $('[data-screen-off-note]').innerHTML = `${t.station(st)}<br>${t.screenOffNote()}`;
+    const showStation = () => {
+      $('[data-station-name]').textContent = t.station(st);
+      $('[data-screen-off-note]').innerHTML = `${t.station(st)}<br>${t.screenOffNote()}`;
+      $('[data-open-radio]').dataset.hints = JSON.stringify([t.hintOk(t.station(st))]);
+      status();
+    };
+    showStation();
     $('[data-open-radio]').addEventListener('click', () => {
       rc.hidden = false;
       $('[data-radio-toggle]').focus({ preventScroll: true });
@@ -202,6 +220,85 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     const wake = () => { off.hidden = true; $('[data-screen-off]').focus({ preventScroll: true }); };
     off.addEventListener('keydown', (e) => { e.preventDefault(); e.stopPropagation(); wake(); });
     off.addEventListener('click', wake);
+
+    // Night mode, beside Settings: OK switches at once (saved like any setting) and focus stays here.
+    const nightBtn = $('[data-night-toggle]');
+    const nightLabel = () => {
+      const label = t.s(prefs.night ? 'nightOff' : 'nightOn');
+      nightBtn.setAttribute('aria-label', label);
+      nightBtn.dataset.hints = JSON.stringify([t.hintOk(label)]);
+      // The key hints follow focus (tv.ts): show the new label at once.
+      if (document.activeElement === nightBtn) nightBtn.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    };
+    nightLabel();
+    nightBtn.addEventListener('click', () => {
+      prefs = { ...loadPrefs(), night: !prefs.night };
+      update(prefs);
+      nightLabel();
+    });
+
+    // Station (Screen.chooseStation): the broadcast stations or the reciters, then one of them. Playing radio
+    // moves to the pick at once; Back steps back to the groups, then closes, and Station takes focus again.
+    const chooserEl = $('[data-chooser]');
+    let back: (() => void) | null = null;
+    let onPick: (i: number) => void = () => {};
+    const items = () => [...chooserEl.querySelectorAll<HTMLElement>('[data-item]')];
+    const focusItem = (i: number) => {
+      const all = items();
+      const el = all[Math.max(0, Math.min(all.length - 1, i))];
+      if (!el) return;
+      el.focus({ preventScroll: true });
+      const list = el.parentElement!;
+      if (el.offsetTop < list.scrollTop) list.scrollTop = el.offsetTop - 10;
+      else if (el.offsetTop + el.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = el.offsetTop + el.offsetHeight - list.clientHeight + 10;
+    };
+    const open = (title: string, list: { label: string; chosen: boolean }[], picked: (i: number) => void, backTo: (() => void) | null) => {
+      back = backTo;
+      onPick = picked;
+      chooserEl.innerHTML = chooserHtml(t, title, list);
+      chooserEl.hidden = false;
+      focusItem(Math.max(0, list.findIndex((x) => x.chosen)));
+    };
+    const close = () => {
+      back = null;
+      chooserEl.hidden = true;
+      chooserEl.innerHTML = '';
+      $('[data-station]').focus({ preventScroll: true });
+    };
+    const chooseStation = () => {
+      open(t.s('stationRow'), t.list('stationGroups').map((g, i) => ({ label: g, chosen: i === (st.reciter ? 1 : 0) })),
+        (i) => openStations(i === 1), null);
+    };
+    const openStations = (reciters: boolean) => {
+      const found = stationsOf(reciters);
+      open(t.list('stationGroups')[reciters ? 1 : 0], found.map((s) => ({ label: stationChoice(t, s), chosen: s.id === st.id })), (i) => {
+        prefs = { ...loadPrefs(), station: found[i].id };
+        update(prefs);
+        st = stationOf(prefs);
+        if (!audio.paused) { audio.src = st.url; audio.play().catch(() => status()); }
+        showStation();
+        close();
+      }, chooseStation);
+    };
+    $('[data-station]').addEventListener('click', chooseStation);
+    chooserEl.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const k = e.key;
+      const vert = k === 'ArrowUp' ? -1 : k === 'ArrowDown' ? 1 : 0;
+      if (!vert && !['Enter', ' ', 'Escape', 'Backspace', 'ArrowLeft', 'ArrowRight'].includes(k)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const i = items().indexOf(document.activeElement as HTMLElement);
+      if (k === 'Escape' || k === 'Backspace') { if (back) back(); else close(); }
+      else if (vert) focusItem(i < 0 ? 0 : i + vert);
+      else if ((k === 'Enter' || k === ' ') && i >= 0) onPick(i);
+    });
+    chooserEl.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      const item = el.closest<HTMLElement>('[data-item]');
+      if (item) onPick(+item.dataset.item!);
+      else if (!el.closest('.ch-card')) close();
+    });
   }
 </script>
 
@@ -217,9 +314,14 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .hdate { font-size: var(--font-size-body); margin-top: 4px; }
   .gdate { font-size: 24px; color: var(--color-mist-400); margin-top: 14px; }
 
-  .pills { position: absolute; top: 56px; inset-inline-end: calc(1920px - var(--layout-courtyard-inset-inline-start) - var(--layout-courtyard-width) + 72px + 20px); display: flex; gap: 20px; }
+  /* Radio and Wi-Fi end 20px before the night button, which is 20px before Settings. */
+  .pills { position: absolute; top: 56px; inset-inline-end: calc(1920px - var(--layout-courtyard-inset-inline-start) - var(--layout-courtyard-width) + 2 * (72px + 20px)); display: flex; gap: 20px; }
   .pill { position: relative; height: 72px; padding: 0 28px; border-radius: 36px; align-items: center; gap: 14px; font-size: 24px; --rest-border: var(--color-line-soft); --rest-border-width: var(--border-chip-width); }
   .gear { inset-inline-start: calc(var(--layout-courtyard-inset-inline-start) + var(--layout-courtyard-width) - 72px); top: 56px; width: 72px; height: 72px; border-radius: 36px; align-items: center; justify-content: center; --rest-border: var(--color-line-soft); --rest-border-width: var(--border-chip-width); }
+  .night-btn { inset-inline-start: calc(var(--layout-courtyard-inset-inline-start) + var(--layout-courtyard-width) - 2 * 72px - 20px); }
+  .night-btn span { display: contents; }
+  .night-btn .when-night, :global(.tv[data-night]) .night-btn .when-day { display: none; }
+  :global(.tv[data-night]) .night-btn .when-night { display: contents; }
   .radio-pill .bars { display: none; }
   :global(.tv.radio-on) .radio-pill .bars { display: inline-flex; }
   :global(.tv.radio-on) .radio-pill .radio-off { display: none; }
@@ -231,7 +333,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .cells :global(.name) { font-size: var(--font-size-body); line-height: 1.1; }
   .cells :global(.time) { font-size: 34px; line-height: 1.1; white-space: nowrap; }
   :global(:lang(en)) .cells :global(.time) { font-size: 30px; }
-  .cells :global(.cell[data-state='now']) { background: var(--color-plaster-100); color: var(--color-lapis-900); }
+  .cells :global(.cell[data-state='now']) { background: var(--color-current-fill); color: var(--color-current-text); }
   .cells :global(.cell[data-state='next']) { background: transparent; color: var(--color-gold-400); box-shadow: inset 0 0 0 var(--border-next-prayer-width) var(--border-next-prayer-color); }
   .cells :global(.cell[data-state='past']) { background: var(--color-lapis-800-60); color: var(--color-mist-400); }
   .cells :global(.cell:is([data-state='now'], [data-state='next']) :is(.name, .time)) { font-weight: 600; }
@@ -244,13 +346,13 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .all { white-space: pre-line; padding: 12px; --rest-fill: transparent; --rest-border: var(--color-line-dash); --rest-border-width: 0; border: 2px dashed var(--color-line-dash); }
   .all:focus { border-color: transparent; }
 
-  .card { position: absolute; inset-inline-end: var(--space-safe-inline); bottom: var(--space-safe-block); width: var(--layout-toast-width); padding: 32px 36px; border-radius: var(--radius-panel); background: var(--color-plaster-100); color: var(--color-lapis-900); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 0 6px var(--color-on-plaster-border); --spatial-navigation-contain: contain; }
+  .card { position: absolute; inset-inline-end: var(--space-safe-inline); bottom: var(--space-safe-block); width: var(--layout-toast-width); padding: 32px 36px; border-radius: var(--radius-panel); background: var(--color-card-fill); color: var(--color-card-text); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 0 6px var(--color-on-plaster-border); --spatial-navigation-contain: contain; }
   .card[hidden] { display: none; }
   .card-label { display: flex; align-items: center; gap: 12px; font-size: var(--font-size-caption); color: var(--color-on-plaster-label); }
   .card-title { font-size: var(--font-size-title); line-height: var(--font-line-height-title); }
   .card-sub { font-size: 24px; color: var(--color-on-plaster-secondary); }
   .card-buttons { display: flex; gap: 16px; margin-top: 14px; }
-  .card-btn { position: relative; height: 68px; padding: 0 32px; border-radius: 34px; align-items: center; font-size: 24px; --rest-fill: transparent; --rest-border: var(--color-on-plaster-button-border); --rest-border-width: 2px; color: var(--color-lapis-900); }
+  .card-btn { position: relative; height: 68px; padding: 0 32px; border-radius: 34px; align-items: center; font-size: 24px; --rest-fill: transparent; --rest-border: var(--color-on-plaster-button-border); --rest-border-width: 2px; color: var(--color-card-text); }
   .card-btn.filled { --rest-fill: var(--color-lapis-900); --rest-border-width: 0; color: var(--color-plaster-100); }
   .card .card-btn:focus { background: var(--focus-fill); color: var(--focus-text); outline-color: var(--color-lapis-900); outline-offset: var(--focus-on-light-ring-offset); }
 
@@ -261,8 +363,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .rc-name { font-size: var(--font-size-title); line-height: var(--font-line-height-title); }
   .rc-where { font-size: var(--font-size-body); color: var(--color-gold-400); }
   .rc-buttons { display: flex; gap: 16px; }
-  .rc-btn { position: relative; height: 68px; padding: 0 32px; border-radius: 34px; align-items: center; gap: 14px; font-size: var(--font-size-body); }
-  .rc-btn.dark { --rest-fill: var(--color-lapis-900); }
+  .rc-btn { position: relative; height: 68px; padding-inline: 28px 32px; border-radius: 34px; align-items: center; gap: 12px; font-size: 24px; white-space: nowrap; --rest-fill: var(--color-lapis-900); --rest-border: var(--color-line-soft); --rest-border-width: 2px; }
   .rc-note { margin: 0; font-size: var(--font-size-label); color: var(--color-mist-400); }
 
   .bars { display: inline-flex; align-items: flex-end; gap: 6px; height: 48px; color: var(--color-gold-400); }
@@ -281,6 +382,6 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .screen-off[hidden] { display: none; }
   .screen-off .bars { color: var(--color-screensaver-text-dim); }
 
-  .toast { position: absolute; inset-inline-end: var(--space-safe-inline); bottom: var(--space-safe-block); max-width: var(--layout-toast-width); padding: 24px 32px; border-radius: var(--radius-panel); background: var(--color-plaster-100); color: var(--color-lapis-900); font-size: var(--font-size-body); }
+  .toast { position: absolute; inset-inline-end: var(--space-safe-inline); bottom: var(--space-safe-block); max-width: var(--layout-toast-width); padding: 24px 32px; border-radius: var(--radius-panel); background: var(--color-card-fill); color: var(--color-card-text); font-size: var(--font-size-body); }
   .toast[hidden] { display: none; }
 </style>

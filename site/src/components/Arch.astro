@@ -20,7 +20,7 @@ const m = model ?? archModel(ctx);
 <div class="info" style={`top:${infoTop}px`}>
   <div class="label caps" data-k="archLabel" set:html={m.html.archLabel} />
   <div class="name display-bold" data-k="archName" set:html={m.html.archName} />
-  <div class="count display num" dir="ltr" data-k="archCount" data-a="archCount" data-long={m.attr.archCount['data-long']} set:html={m.html.archCount} />
+  <div class="count display numbers num" dir="ltr" data-k="archCount" data-a="archCount" data-long={m.attr.archCount['data-long']} set:html={m.html.archCount} />
   <div class="sub" style={`font-size:${subSize}px;margin-top:${subGap}px`} data-k="archSub" set:html={m.html.archSub} />
   <div class="sub2" style={`color:${sub2Color};margin-top:${sub2Gap}px`} data-k="archSub2" set:html={m.html.archSub2} />
 </div>

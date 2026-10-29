@@ -24,7 +24,7 @@ const note = t.ar ? 'المعاينة على الويب لا تشغّل صوت �
   <p class="verse sacred" lang="ar" dir="rtl">حَيَّ عَلَى الصَّلَاةِ</p>
   <div class="label caps">{t.s('nowLabel')}</div>
   <div class="name display-bold" data-k="name" set:html={m.html.name} />
-  <div class="time display num" data-k="time" set:html={m.html.time} />
+  <div class="time display numbers num" data-k="time" set:html={m.html.time} />
   <button class="ft pill play" data-focus-start data-play data-nav-down=".dismiss" data-nav-up=".play" data-nav-left=".play" data-nav-right=".play">{labels.play}</button>
   <a class="ft pill dismiss" href={home} data-back data-nav-up=".play" data-nav-down=".dismiss" data-nav-left=".dismiss" data-nav-right=".dismiss">{t.s('dismiss')}</a>
   <p class="hint">{t.nowHint()}</p>

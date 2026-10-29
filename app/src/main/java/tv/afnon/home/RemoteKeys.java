@@ -117,18 +117,63 @@ public class RemoteKeys extends AccessibilityService {
      * service again unless it was turned off in Settings. Needs the WRITE_SECURE_SETTINGS grant from setup.
      */
     static void ensureOn(android.content.Context c) {
-        if (!Prefs.of(c).getBoolean(PREF_ON, true) || listed(c)) return;
+        ensureOn(c.getApplicationContext(), true);
+    }
+
+    /** again: after listing a missing service, look once more a little later (it may be marked crashed meanwhile). */
+    private static void ensureOn(android.content.Context c, boolean again) {
+        if (!Prefs.of(c).getBoolean(PREF_ON, true)) return;
+        android.content.ContentResolver cr = c.getContentResolver();
+        boolean listed = listed(c);
+        // Listed, yet Android runs no accessibility service: it was force-stopped while bound, and Android marked it
+        // crashed. A crashed service isn't bound again until it leaves the list (seen on the TCL 55P7K), so it
+        // leaves and comes back.
+        boolean stuck = listed && Settings.Secure.getInt(cr, Settings.Secure.ACCESSIBILITY_ENABLED, 0) == 0;
+        if (listed && !stuck) return;
         if (c.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) return;
-        String me = new ComponentName(c, RemoteKeys.class).flattenToShortString();
-        String s = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        ComponentName me = new ComponentName(c, RemoteKeys.class);
+        String others = withoutMe(Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES), me);
+        String all = others.isEmpty() ? me.flattenToShortString() : others + ":" + me.flattenToShortString();
         try {
-            Settings.Secure.putString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-                s == null || s.isEmpty() ? me : s + ":" + me);
-            Settings.Secure.putInt(c.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+            if (!stuck) {
+                // Listed again right after a force-stop, Android may still mark it crashed a moment later.
+                list(cr, all);
+                if (again) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> ensureOn(c, false), 3000);
+                }
+                return;
+            }
+            Settings.Secure.putString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, others);
+            // Android reads the list when it hears of a change; written back at once, it would only see the last.
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                try {
+                    list(cr, all);
+                } catch (SecurityException ignored) {
+                    // The grant was revoked meanwhile.
+                }
+            }, 1000);
         } catch (SecurityException ignored) {
             // The grant was revoked between the check and the write.
         }
+    }
+
+    private static void list(android.content.ContentResolver cr, String services) {
+        Settings.Secure.putString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, services);
+        Settings.Secure.putInt(cr, Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+    }
+
+    /** The enabled-services list without this service ("" if nothing else is on). */
+    private static String withoutMe(String services, ComponentName me) {
+        StringBuilder out = new StringBuilder();
+        if (services != null) {
+            for (String entry : services.split(":")) {
+                if (entry.isEmpty() || me.equals(ComponentName.unflattenFromString(entry))) continue;
+                if (out.length() > 0) out.append(':');
+                out.append(entry);
+            }
+        }
+        return out.toString();
     }
 
     /** Whether the TV's enabled accessibility services include this one. */

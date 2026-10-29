@@ -1,7 +1,7 @@
 // PrayerDay.java and Screen.java's clock helpers, on adhan-js (the JavaScript port of the app's adhan-java).
-import { CalculationMethod, Coordinates, Madhab, PrayerTimes, Qibla } from 'adhan';
+import { CalculationMethod, Coordinates, HighLatitudeRule, Madhab, PrayerTimes, Qibla } from 'adhan';
 import type { Text } from './text';
-import { cityOf, methodOf, type Prefs } from './data';
+import { adjustOf, cityOf, methodOf, type Prefs } from './data';
 
 export const FAJR = 0, SUNRISE = 1, DHUHR = 2, ASR = 3, MAGHRIB = 4, ISHA = 5;
 const RAMADAN = 8; // 0-based, as IslamicCalendar.RAMADAN
@@ -43,12 +43,23 @@ export function hijriOf(date: Date, offsetDays = 0) {
 
 export type PrayerDay = ReturnType<typeof prayerDay>;
 
+/** The Umm al-Qura month of the calendar day `days` after now's (PrayerDay.hijriMonthOf; no Hijri offset). */
+const hijriMonthOf = (now: Date, days: number) => hijriOf(now, days).month;
+
 /** One moment's view of the prayer day: the six times, the current prayer and the next. */
 export function prayerDay(now: Date, prefs: Prefs) {
   const city = cityOf(prefs);
   const where = new Coordinates(city.lat, city.lng);
-  const params = methodParams(methodOf(prefs));
+  const method = methodOf(prefs);
+  const params = methodParams(method);
   params.madhab = prefs.hanafi ? Madhab.Hanafi : Madhab.Shafi;
+  // Minutes added to each time (Settings → Adjust the times), to match a mosque's timetable.
+  const [fajr, sunrise, dhuhr, asr, maghrib, isha] = adjustOf(prefs);
+  params.adjustments = { fajr, sunrise, dhuhr, asr, maghrib, isha };
+  // Above 48° summer nights never get dark enough for Fajr's and Isha's angles: a seventh of the night.
+  if (city.lat > 48) params.highLatitudeRule = HighLatitudeRule.SeventhOfTheNight;
+  // Umm al-Qura's Isha is 2 hours after Maghrib in Ramadan; an evening belongs to the next Hijri day.
+  if (method === 'UMM_AL_QURA' && hijriMonthOf(now, 1) === RAMADAN) params.ishaInterval = 120;
   const at = (d: Date) => new PrayerTimes(where, d, params);
   const today = at(now);
   const times = [today.fajr, today.sunrise, today.dhuhr, today.asr, today.maghrib, today.isha].map(minute);
@@ -59,11 +70,19 @@ export function prayerDay(now: Date, prefs: Prefs) {
   let next = times.findIndex((t, i) => i !== SUNRISE && t > now);
   const tomorrowFajr = minute(at(addDays(now, 1)).fajr);
   if (next === -1) { next = FAJR; times[FAJR] = tomorrowFajr; }
-  const h = hijriOf(now, prefs.hijriOffset);
+  // The Hijri day begins at Maghrib: from then until midnight its date and weekday are the next day's
+  // (Friday evening is ليلة السبت). Ramadan follows it, so its first night has a suhoor and Eid's night none.
+  const eve = now < times[MAGHRIB] ? 0 : 1;
+  const weekday = (now.getDay() + eve) % 7; // 0 = Sunday, as Date.getDay
+  const h = hijriOf(now, prefs.hijriOffset + eve);
   return {
     city, times, nowIndex, nextIndex: next, nextTime: times[next],
     suhoorEnd: times[FAJR] > now ? times[FAJR] : tomorrowFajr,
-    friday: now.getDay() === 5,
+    // Jumu'ah ends with Friday at its Maghrib, and doesn't start on Thursday evening.
+    friday: now.getDay() === 5 && eve === 0,
+    // Surat al-Kahf: the Hijri Friday, from Thursday's Maghrib to Friday's.
+    kahf: weekday === 5,
+    weekday,
     ramadan: h.month === RAMADAN,
     hijri: h,
     qibla: Qibla(where) as number, // degrees clockwise from true north
@@ -95,16 +114,22 @@ export function clock(t: Text, d: Date, h24: boolean, markerScale = 1) {
   return markerScale === 1 ? `${hm} ${mark}` : `${hm} <small style="font-size:${markerScale}em">${mark}</small>`;
 }
 
-/** "Thursday 22 October 2026" in the page's language and digits. */
+/** "22 October 2026" in the page's language and digits; the weekday goes with the Hijri date. */
 export function gregorian(t: Text, d: Date) {
-  const parts = new Intl.DateTimeFormat(t.ar ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d);
+  const parts = new Intl.DateTimeFormat(t.ar ? 'ar-EG-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d);
   const get = (k: string) => parts.find((p) => p.type === k)?.value ?? '';
-  return t.d(`${get('weekday')} ${get('day')} ${get('month')} ${get('year')}`);
+  return t.d(`${get('day')} ${get('month')} ${get('year')}`);
 }
 
-/** "11 Jumada al-Ula 1448 AH". */
+/** The Hijri day's weekday name (Screen.weekday): "السبت" from Friday's Maghrib. */
+export function weekday(t: Text, day: PrayerDay) {
+  // 2026-11-01 is a Sunday; day.weekday counts from Sunday = 0.
+  return new Intl.DateTimeFormat(t.ar ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'long' }).format(new Date(2026, 10, 1 + day.weekday, 12));
+}
+
+/** "Saturday 11 Jumada al-Ula 1448 AH": the weekday turns at Maghrib with the Hijri date. */
 export function hijri(t: Text, day: PrayerDay) {
-  return t.d(`${day.hijri.day} ${t.list('hijriMonths')[day.hijri.month]} ${day.hijri.year}${t.s('hijriSuffix')}`);
+  return t.d(`${weekday(t, day)} ${day.hijri.day} ${t.list('hijriMonths')[day.hijri.month]} ${day.hijri.year}${t.s('hijriSuffix')}`);
 }
 
 /** Test moments, as `adb … --es test friday|ramadan` on the TV: the clock jumps there and keeps ticking. */

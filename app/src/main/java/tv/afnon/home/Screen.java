@@ -9,18 +9,23 @@ import android.content.res.Configuration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.TypefaceSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -28,6 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.IntConsumer;
 
 /**
  * What every Afnon screen shares: language and digit settings, fonts, design-px placement, the clock format,
@@ -41,6 +47,13 @@ abstract class Screen extends Activity {
     boolean rtl;
     boolean h24;
     Typeface ui400, ui500, ui600, display, displayBold, sacred;
+    /**
+     * The display font for numbers (the clock, the countdown, times and degrees): Marcellus, as in English, and in
+     * Arabic too with Western digits ({@link #marcellusDigits}); otherwise the display font.
+     */
+    Typeface numbers;
+    /** Where numbers are in Marcellus but the words in Amiri: the font for a time's ص/م; else null. */
+    Typeface marker;
     FrameLayout root;
     ArchView arch;
     TextView archLabel, archName, archCount, archSub, archSub2;
@@ -62,8 +75,16 @@ abstract class Screen extends Activity {
     /** Once a second while the screen is in front. */
     abstract void onTick();
 
+    /** The window theme in night mode; 0 keeps the manifest's (the call screen is see-through). */
+    int nightTheme() {
+        return R.style.Theme_Afnon_Night;
+    }
+
     @Override
     protected void onCreate(Bundle state) {
+        // Night mode: the night ground under the window too, before the window is made.
+        Tokens.use(Prefs.night(this));
+        if (Tokens.night && nightTheme() != 0) setTheme(nightTheme());
         super.onCreate(state);
         Ui.init(this);
         loadSettings(getIntent());
@@ -121,8 +142,18 @@ abstract class Screen extends Activity {
         }
         t = loadText(this);
         rtl = t.ar;
+        Tokens.use(Prefs.night(this));
         builtSettings = Prefs.key(this);
         return changed || (built != null && !built.equals(builtSettings));
+    }
+
+    /**
+     * Arabic with Western digits: the big numbers take English's Marcellus instead of Amiri (the user's choice),
+     * and the Arabic in them (ص/م) stays Amiri through a TypefaceSpan, which needs Android 9. Eastern digits keep
+     * Amiri: Marcellus has none.
+     */
+    static boolean marcellusDigits(Text t) {
+        return t.ar && !t.eastern && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
     }
 
     /** The saved language and digits, for screens and for the screensaver, which is not an Activity. */
@@ -166,7 +197,12 @@ abstract class Screen extends Activity {
         display = getResources().getFont(t.ar ? R.font.amiri_regular : R.font.marcellus_regular);
         displayBold = t.ar ? getResources().getFont(R.font.amiri_bold) : display;
         sacred = getResources().getFont(R.font.amiri_regular);
+        numbers = marcellusDigits(t) ? getResources().getFont(R.font.marcellus_regular) : display;
+        marker = numbers != display ? display : null;
 
+        // A chooser open over the old root goes with it; left set, it would swallow every key while nothing shows.
+        chooser = null;
+        chooserBack = null;
         root = new FrameLayout(this);
         root.setLayoutDirection(rtl ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
         root.setBackground(Ui.starLattice(this));
@@ -203,7 +239,7 @@ abstract class Screen extends Activity {
         info.setGravity(Gravity.CENTER_HORIZONTAL);
         archLabel = caps(text(ui400, 22, Tokens.MIST_400));
         archName = text(displayBold, 88, Tokens.GOLD_400);
-        archCount = text(display, 150, Tokens.PLASTER_100);
+        archCount = text(numbers, 150, Tokens.PLASTER_100);
         archCount.setTextDirection(View.TEXT_DIRECTION_LTR);
         archCount.setFontFeatureSettings("tnum");
         archSub = text(ui400, subSize, Tokens.MIST_400);
@@ -212,13 +248,22 @@ abstract class Screen extends Activity {
             v.setGravity(Gravity.CENTER_HORIZONTAL);
             info.addView(v, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
+        // The countdown spans the column from a start renderCountdown sets, so it never re-centres each second.
+        archCount.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+        archCount.setGravity(Gravity.LEFT);
+        archCount.setSingleLine(true);
+        countHead = null;
         ((LinearLayout.LayoutParams) archSub.getLayoutParams()).topMargin = Ui.ipx(subGap);
         ((LinearLayout.LayoutParams) archSub2.getLayoutParams()).topMargin = Ui.ipx(sub2Gap);
         lineHeight(archName, 1.15f);
         lineHeight(archCount, 1f);
         info.setClipChildren(false);
-        place(info, 136, infoTop, 520, ViewGroup.LayoutParams.WRAP_CONTENT);
+        place(info, 136, infoTop, ARCH_INFO_W, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
+    /** The arch's info column, and the countdown's text before its last two digits when its start was set. */
+    private static final float ARCH_INFO_W = 520;
+    private String countHead;
 
     /**
      * The arch countdown to day's next prayer: mm:ss under an hour at 150px, h:mm:ss above at 120px, and the
@@ -229,11 +274,35 @@ abstract class Screen extends Activity {
     long renderCountdown(PrayerDay day, Date now, boolean archFocused) {
         long left = secondsUntil(day.nextTime, now);
         long h = left / 3600;
-        archCount.setText(t.d(duration(left, true)));
+        String count = t.d(duration(left, true));
+        archCount.setText(count);
         float countSize = Ui.px(h > 0 ? Tokens.FONT_SIZE_DISPLAY_XL_HOURS : Tokens.FONT_SIZE_DISPLAY_XL);
+        // Marcellus digits are proportional: wide counts (10:00:00) can overflow the column, so it shrinks until it
+        // fits. It measures the count with every digit a 0, the widest, so the size changes only with the count's
+        // shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+        String widest = count.replaceAll("[0-9]", "0").replaceAll("[٠-٩]", "٠");
+        float maxW = Ui.px(ARCH_INFO_W);
+        android.graphics.Paint measure = new android.graphics.Paint(archCount.getPaint());
+        measure.setTextSize(countSize);
+        float minSize = Ui.px(80);
+        while (measure.measureText(widest) > maxW && countSize > minSize) {
+            countSize -= Ui.px(5);
+            measure.setTextSize(countSize);
+        }
         if (archCount.getTextSize() != countSize) {
             archCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, countSize);
             lineHeight(archCount, 1f);
+            countHead = null;
+        }
+        // Marcellus has no tabular digits (its 0 is nearly three 1s wide), so a centred countdown would sway every
+        // second. It starts where the text is centred with average-width seconds, set again only when something
+        // before the seconds changes: a digit that isn't changing never moves. Amiri's equal digits centre exactly.
+        String head = count.substring(0, count.length() - 2);
+        if (!head.equals(countHead)) {
+            countHead = head;
+            android.graphics.Paint p = archCount.getPaint();
+            float w = p.measureText(head) + p.measureText(t.d("0123456789")) / 5;
+            archCount.setPadding(Math.max(0, Math.round((Ui.px(ARCH_INFO_W) - w) / 2)), 0, 0, 0);
         }
         boolean approaching = left <= Tokens.APPROACH_MIN * 60L;
         arch.setState(approaching ? ArchView.APPROACHING : (archFocused ? ArchView.FOCUSED : ArchView.REST));
@@ -251,15 +320,24 @@ abstract class Screen extends Activity {
         return withSeconds ? String.format(Locale.US, "%d:%02d:%02d", h, m, s) : String.format(Locale.US, "%d:%02d", h, m);
     }
 
-    /** "Wednesday 21 October 2026" in the screen's language and digits. */
+    /** "21 October 2026" in the screen's language and digits; the weekday goes with the Hijri date. */
     String gregorian(Date now) {
-        Locale dateLocale = t.ar ? Locale.forLanguageTag("ar-EG-u-nu-latn") : Locale.UK;
-        return t.d(new SimpleDateFormat("EEEE d MMMM yyyy", dateLocale).format(now));
+        return t.d(new SimpleDateFormat("d MMMM yyyy", dateLocale(t)).format(now));
     }
 
-    /** "10 Jumada al-Ula 1448 AH". */
+    /** "Saturday 10 Jumada al-Ula 1448 AH": the weekday turns at Maghrib with the Hijri date. */
     String hijri(PrayerDay day) {
-        return t.d(day.hijriDay + " " + t.hijriMonths()[day.hijriMonth] + " " + day.hijriYear + t.hijriSuffix());
+        return t.d(weekday(t, day) + " " + day.hijriDay + " " + t.hijriMonths()[day.hijriMonth] + " " + day.hijriYear
+            + t.hijriSuffix());
+    }
+
+    /** The Hijri day's weekday name ("السبت" from Friday's Maghrib). */
+    static String weekday(Text t, PrayerDay day) {
+        return new java.text.DateFormatSymbols(dateLocale(t)).getWeekdays()[day.weekday];
+    }
+
+    private static Locale dateLocale(Text t) {
+        return t.ar ? Locale.forLanguageTag("ar-EG-u-nu-latn") : Locale.UK;
     }
 
     /**
@@ -270,13 +348,26 @@ abstract class Screen extends Activity {
         return clock(t, d, h24, markerScale);
     }
 
+    /** {@link #time} for a view in {@link #numbers}: its ص/م in the Arabic font. */
+    CharSequence displayTime(Date d, float markerScale) {
+        return clock(t, d, h24, markerScale, marker);
+    }
+
     static CharSequence clock(Text t, Date d, boolean h24, float markerScale) {
+        return clock(t, d, h24, markerScale, null);
+    }
+
+    /** marker, if given, is the typeface for the ص/م after digits drawn in Marcellus (Android 9+). */
+    static CharSequence clock(Text t, Date d, boolean h24, float markerScale, Typeface marker) {
         if (h24) return t.d(new SimpleDateFormat("HH:mm", Locale.US).format(d));
         String hm = t.d(new SimpleDateFormat("h:mm", Locale.US).format(d));
         Calendar c = Calendar.getInstance();
         c.setTime(d);
         SpannableString s = new SpannableString(hm + " " + t.ampm(c.get(Calendar.AM_PM) == Calendar.AM));
         if (markerScale != 1f) s.setSpan(new RelativeSizeSpan(markerScale), hm.length(), s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (marker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            s.setSpan(new TypefaceSpan(marker), hm.length() + 1, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         return s;
     }
 
@@ -309,6 +400,27 @@ abstract class Screen extends Activity {
         if (ssid == null || ssid.isEmpty() || "<unknown ssid>".equals(ssid)) return null;
         if (ssid.length() > 1 && ssid.startsWith("\"") && ssid.endsWith("\"")) ssid = ssid.substring(1, ssid.length() - 1);
         return ssid;
+    }
+
+    /**
+     * Afnon's own screens open with no transition: the one in front stays until the new one has drawn. (Its
+     * replacement, overrideActivityTransition, is Android 14+; these TVs run 11 and 12.)
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public void startActivity(Intent i, Bundle options) {
+        super.startActivity(i, options);
+        if (i.getComponent() != null && getPackageName().equals(i.getComponent().getPackageName())) {
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    /** …and close with none. */
+    @SuppressWarnings("deprecation")
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
     }
 
     void startSafely(Intent i) {
@@ -379,5 +491,159 @@ abstract class Screen extends Activity {
 
     static int size(float designPx) {
         return designPx < 0 ? (int) designPx : Ui.ipx(designPx);
+    }
+
+    // ---------------------------------------------------------------- list chooser
+
+    /** The list open over the screen (Settings' lists, the station from Home's radio card), or null. */
+    FrameLayout chooser;
+    /** What Back in the open chooser goes back to (the city list returns to the countries); null closes it. */
+    Runnable chooserBack;
+
+    /** The screen's key hints, which an open chooser takes over; null for none. */
+    LinearLayout hintLine() {
+        return null;
+    }
+
+    /** A chooser opened (the screen's own buttons step aside) or closed (they come back, and focus with them). */
+    void onChooser(boolean open) {}
+
+    /** A list over the screen (cities, methods, stations): OK picks, Back cancels. Up/Down are the system's own. */
+    void openChooser(String title, String[] items, int selected, IntConsumer pick) {
+        openChooser(title, items, selected, pick, null);
+    }
+
+    /** onFocus, if given, hears each item as focus reaches it (the adhan list plays that voice). */
+    void openChooser(String title, String[] items, int selected, IntConsumer pick, IntConsumer onFocus) {
+        chooser = new FrameLayout(this);
+        chooser.setBackgroundColor(Tokens.SCRIM_MENU);
+        chooser.setClickable(true);
+
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(Ui.ipx(48), Ui.ipx(40), Ui.ipx(48), Ui.ipx(32));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Tokens.LAPIS_800);
+        bg.setCornerRadius(Ui.px(24));
+        bg.setStroke(Ui.ipx(2), Tokens.GOLD_400_60);
+        card.setBackground(bg);
+        card.setClipChildren(true);
+
+        TextView head = text(displayBold, Tokens.FONT_SIZE_DISPLAY_S, Tokens.GOLD_400);
+        head.setText(title);
+        card.addView(head);
+        lineHeight(head, 1.2f);
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        // No fading edges: focus then scrolls by whole items, so none is ever cut at the top or bottom.
+        scroll.setVerticalFadingEdgeEnabled(false);
+        int reach = Ui.ipx(FocusTile.REACH);
+        // Padding at the sides only: ScrollView's focus scrolling ignores its own padding, so a focused tile could
+        // stop under a bottom padding and be clipped. Each tile already holds its focus ring (its reach) inside.
+        scroll.setPadding(reach, 0, reach, 0);
+        scroll.setClipToPadding(true);
+        scroll.setClipChildren(true);
+        int itemH = Ui.ipx(68 + 2 * FocusTile.REACH), gap = Ui.ipx(6 - 2 * FocusTile.REACH);
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setClipChildren(false);
+        FocusTile first = null;
+        for (int i = 0; i < items.length; i++) {
+            final int index = i;
+            boolean chosen = i == selected;
+            FocusTile item = new FocusTile(this, 14);
+            item.setFocusScale(1f);   // the list scrolls, so a grown tile would be clipped at its edges
+            item.setRest(chosen ? Tokens.LAPIS_700 : 0, 0, 0);
+            TextView v = text(chosen ? ui500 : ui400, 26, Tokens.PLASTER_100);
+            v.setText(items[i]);
+            v.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+            v.setPadding(Ui.ipx(24), 0, Ui.ipx(24), 0);
+            item.addView(v, new FrameLayout.LayoutParams(-1, -1));
+            item.setLook(f -> {
+                v.setTextColor(f ? Tokens.FOCUS_TEXT : (chosen ? Tokens.GOLD_400 : Tokens.PLASTER_100));
+                if (f && onFocus != null) onFocus.accept(index);
+            });
+            item.setOnClickListener(x -> {
+                pick.accept(index);
+                closeChooser();
+            });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, itemH);
+            if (i > 0) lp.topMargin = gap;
+            list.addView(item, lp);
+            if (chosen || first == null) first = item;
+        }
+        scroll.addView(list);
+        // Up to eight whole tiles, rings included, in the same screen px as the tiles (no rounding gap).
+        int shown = Math.max(1, Math.min(items.length, 8));
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(-1, shown * itemH + (shown - 1) * gap);
+        slp.topMargin = Ui.ipx(20);
+        slp.setMarginStart(-reach);
+        slp.setMarginEnd(-reach);
+        card.addView(scroll, slp);
+
+        chooser.addView(card, new FrameLayout.LayoutParams(Ui.ipx(900), -2, Gravity.CENTER));
+        onChooser(true);
+        root.addView(chooser, new FrameLayout.LayoutParams(-1, -1));
+        FocusTile start = first;
+        if (start != null) root.post(start::requestFocus);
+        LinearLayout hints = hintLine();
+        if (hints == null) return;
+        List<String> h = new java.util.ArrayList<>();
+        h.add(t.hintMove());
+        h.add(t.hintChoose());
+        h.add(t.hintBackCancel());
+        setHints(hints, h);
+    }
+
+    void closeChooser() {
+        root.removeView(chooser);
+        chooser = null;
+        chooserBack = null;
+        onChooser(false);
+    }
+
+    /** Keys while a chooser is open: Back goes back a step (or closes it), ◀▶ do nothing, the rest are the system's. */
+    boolean chooserKey(KeyEvent e) {
+        int k = e.getKeyCode();
+        if (k == KeyEvent.KEYCODE_BACK) {
+            if (e.getAction() != KeyEvent.ACTION_DOWN) {
+                Runnable back = chooserBack;
+                closeChooser();
+                if (back != null) back.run();
+            }
+            return true;
+        }
+        if (k == KeyEvent.KEYCODE_DPAD_LEFT || k == KeyEvent.KEYCODE_DPAD_RIGHT) return true;
+        return super.dispatchKeyEvent(e);
+    }
+
+    /**
+     * Station (Settings → Radio, and Home's radio card): the broadcast stations or the reciters, then one of them.
+     * Playing radio moves to the pick at once (Radio.switchTo); picked runs after it.
+     */
+    void chooseStation(Runnable picked) {
+        int sel = Radio.station(this).reciter ? 1 : 0;
+        // The station list opens once this chooser has closed (closeChooser runs after the pick).
+        openChooser(t.stationRow(), t.stationGroups(), sel, i -> root.post(() -> openStations(i == 1, picked)));
+    }
+
+    /** Station's second step: one group's stations. Back returns to the groups. */
+    private void openStations(boolean reciters, Runnable picked) {
+        List<Integer> found = new java.util.ArrayList<>();
+        for (int i = 0; i < Radio.STATIONS.length; i++) if (Radio.STATIONS[i].reciter == reciters) found.add(i);
+        String[] names = new String[found.size()];
+        int current = Radio.stationIndex(this);
+        // -1 when the station is in the other group: nothing is marked, focus starts on the first one.
+        int sel = -1;
+        for (int k = 0; k < names.length; k++) {
+            names[k] = t.stationChoice(Radio.STATIONS[found.get(k)]);
+            if (found.get(k) == current) sel = k;
+        }
+        openChooser(t.stationGroups()[reciters ? 1 : 0], names, sel, k -> {
+            Radio.switchTo(this, found.get(k));
+            picked.run();
+        });
+        chooserBack = () -> chooseStation(picked);
     }
 }
