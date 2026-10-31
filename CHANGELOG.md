@@ -30,8 +30,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   Quran radios in both Station lists (Settings and the radio card).
 - Settings → What's new («ما الجديد», the last section): the latest releases, newest first, each a few short
   lines in Arabic (or English) under its version, read-only and built only while it is open. OK or toward the
-  end goes into it, ▲▼ scroll it, Back or toward the start returns to the sections. It starts with 0.5 and this
-  release; the lines are `Text.news()`, and each release adds its own on top.
+  end goes into it, ▲▼ scroll it, Back or toward the start returns to the sections. It goes back to 0.5; the
+  lines are `Text.news()`, and each release adds its own on top.
 - Settings → Adjust the times («تعديل المواقيت», its own section), as in meypod/al-azan and the LG launcher:
   Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha each a stepper of minutes («+2», «0», «-3»), up to 30 earlier or
   later, with today's adjusted time under the name. Home, Prayer day, the reminders and the adhan all
@@ -50,7 +50,7 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - Canada: Montreal, Calgary, Ottawa, Edmonton, Winnipeg, Mississauga, Vancouver and Halifax (#25), on ISNA like
   Toronto. Denmark: Copenhagen (#23), on MWL. Now 245 cities in 45 countries.
 - Morocco: calculation method «وزارة الأوقاف والشؤون الإسلامية، المملكة المغربية» (Ministry of Habous) and 44 cities,
-  capital first then by size (Rabat, Casablanca, Fes, Tangier, Marrakech … Ifrane, Zagora), 236 cities in all. The
+  capital first then by size (Rabat, Casablanca, Fes, Tangier, Marrakech … Ifrane, Zagora). The
   ministry publishes times, not its method, so the rules were recovered from its tables (habous.gov.ma, October 2026
   for 44 cities, and Tetouan's whole 2019 year from the Internet Archive): Fajr 19° with seconds dropped, Isha 17°,
   Dhuhr transit + 5 min, Asr with the sun's declination at Asr itself, sunrise and Maghrib at each city's own
