@@ -3,6 +3,7 @@ package tv.afnon.home;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.provider.Settings;
 import android.view.KeyEvent;
@@ -154,7 +155,11 @@ public class RemoteKeys extends AccessibilityService {
         if (app != null) open = null;
         // Afnon Settings, which lists the TV's own under Device settings.
         else if (code == SETTINGS_KEY || code == KeyEvent.KEYCODE_SETTINGS) open = new Intent(this, SettingsActivity.class);
-        else if (code == KeyEvent.KEYCODE_TV || code == KeyEvent.KEYCODE_TV_INPUT) open = inputs();
+        else if (code == KeyEvent.KEYCODE_TV || code == KeyEvent.KEYCODE_TV_INPUT) {
+            open = inputs();
+            // TCL opens its own input bar on these (see targets()); a second start would close it.
+            if (tclInputBar(open)) return false;
+        }
         else if (code == KeyEvent.KEYCODE_ALL_APPS) open = new Intent(this, AllAppsActivity.class);
         else return false;
         // Nothing here answers it (the app is gone, or the firmware has no Android TV inputs screen): let the key
@@ -189,13 +194,18 @@ public class RemoteKeys extends AccessibilityService {
         // says, and the bar toggles: a second start from the remapping closed it again at once. Those two buttons
         // stay with the firmware there (TclKeys empties them).
         Intent inputs = inputs();
-        if (inputs != null && !(inputs.getComponent() != null && TCL_INPUT_BAR.equals(inputs.getComponent().getPackageName()))) {
+        if (inputs != null && !tclInputBar(inputs)) {
             out.put(KeyEvent.KEYCODE_TV, inputs);
             out.put(KeyEvent.KEYCODE_TV_INPUT, inputs);
         }
         out.put(KeyEvent.KEYCODE_ALL_APPS, new Intent(this, AllAppsActivity.class));
         for (Intent i : out.values()) i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         return out;
+    }
+
+    /** Whether {@code i} opens TCL's input bar, which the firmware itself opens on Source and TV. */
+    private static boolean tclInputBar(Intent i) {
+        return i != null && i.getComponent() != null && TCL_INPUT_BAR.equals(i.getComponent().getPackageName());
     }
 
     /** The Android TV inputs screen, else the firmware's own source menu; null if neither exists. */

@@ -729,7 +729,8 @@ public class MainActivity extends Screen {
      * and whether something is plugged in. OK switches to it, Back closes; the first row takes focus.
      */
     private void showInputsPanel(List<Inputs.Source> sources) {
-        if (inputsPanel != null || card != null) return;
+        // The button can outlive the sources it was made for (none listed now): nothing to show.
+        if (inputsPanel != null || card != null || sources.isEmpty()) return;
         closeRadioCard(false);
         inputsPanel = new FrameLayout(this);
         inputsPanel.setBackgroundColor(Tokens.SCRIM_PANEL);
