@@ -25,6 +25,15 @@ const METHOD: Record<string, () => ReturnType<typeof CalculationMethod.Egyptian>
     p.methodAdjustments = { ...p.methodAdjustments, dhuhr: 5, asr: 5, maghrib: 5 };
     return p;
   },
+  // Method.java/Habous.java: 19°/17° and Dhuhr +5. The app also rounds, uses each city's horizon and Asr's own
+  // declination; the preview leaves those out, so its Moroccan times can be a minute or a few off the app's.
+  MOROCCO_HABOUS: () => {
+    const p = CalculationMethod.Other();
+    p.fajrAngle = 19;
+    p.ishaAngle = 17;
+    p.methodAdjustments = { ...p.methodAdjustments, dhuhr: 5 };
+    return p;
+  },
 };
 /** Minutes a method adds to Dhuhr, Asr and Maghrib (Method.dayAdjustment). */
 export const methodParams = (m: string) => (METHOD[m] ?? METHOD.EGYPTIAN)();

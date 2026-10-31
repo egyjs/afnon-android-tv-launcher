@@ -3,10 +3,8 @@ package tv.afnon.home;
 import android.content.Context;
 import android.icu.util.IslamicCalendar;
 
-import com.batoulapps.adhan.CalculationParameters;
 import com.batoulapps.adhan.Coordinates;
 import com.batoulapps.adhan.Madhab;
-import com.batoulapps.adhan.PrayerTimes;
 import com.batoulapps.adhan.Qibla;
 import com.batoulapps.adhan.data.DateComponents;
 
@@ -33,19 +31,13 @@ final class PrayerDay {
 
     /** With the saved location, method, Asr school and Hijri adjustment (Afnon Settings). */
     PrayerDay(Context c, Date now) {
-        this(now, Prefs.where(c), Prefs.method(c), Prefs.madhab(c), Prefs.hijriOffset(c));
+        this(now, Prefs.where(c), Prefs.method(c), Prefs.madhab(c), Prefs.hijriOffset(c), Habous.horizon(Prefs.city(c).id));
     }
 
-    PrayerDay(Date now, Coordinates where, Method method, Madhab madhab, int hijriOffset) {
-        CalculationParameters params = method.parameters();
-        params.madhab = madhab;
-        PrayerTimes today = new PrayerTimes(where, DateComponents.from(now), params);
-        times[FAJR] = minute(today.fajr);
-        times[SUNRISE] = minute(today.sunrise);
-        times[DHUHR] = minute(today.dhuhr);
-        times[ASR] = minute(today.asr);
-        times[MAGHRIB] = minute(today.maghrib);
-        times[ISHA] = minute(today.isha);
+    /** {@code horizon}: the city's {sunrise, Maghrib} arc minutes below the horizon (see {@link Habous#horizon}). */
+    PrayerDay(Date now, Coordinates where, Method method, Madhab madhab, int hijriOffset, int[] horizon) {
+        Date[] today = method.times(where, DateComponents.from(now), madhab, horizon);
+        for (int i = 0; i < 6; i++) times[i] = minute(today[i]);
 
         int latest = -1;
         for (int i = 0; i < 6; i++) if (!times[i].after(now)) latest = i;
@@ -58,7 +50,7 @@ final class PrayerDay {
         Calendar c = Calendar.getInstance();
         c.setTime(now);
         c.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrowFajr = minute(new PrayerTimes(where, DateComponents.from(c.getTime()), params).fajr);
+        Date tomorrowFajr = minute(method.times(where, DateComponents.from(c.getTime()), madhab, horizon)[FAJR]);
         if (next == -1) {
             next = FAJR;
             times[FAJR] = tomorrowFajr;

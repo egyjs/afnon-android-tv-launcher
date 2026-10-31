@@ -6,7 +6,7 @@
 
 <p dir="rtl"><b>أفنون: شاشة رئيسية لتلفاز أندرويد، تدور حول يوم الصلاة: المواقيت والقبلة والأذان وإذاعة القرآن الكريم.</b></p>
 
-Arabic first (RTL) and English · Offline prayer times for 192 cities · 14 adhan voices · Qibla · 16 Quran radio stations and reciters
+Arabic first (RTL) and English · Offline prayer times for 245 cities · 14 adhan voices · Qibla · 17 Quran radio stations and reciters
 
 **[⬇ Download the APK](https://github.com/egyjs/afnon-android-tv-launcher/releases/latest/download/afnon.apk)** · [Releases](https://github.com/egyjs/afnon-android-tv-launcher/releases) · **[Try it in your browser](https://egyjs.github.io/afnon-android-tv-launcher/)**
 
@@ -55,13 +55,16 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 ## Features
 
 - **Prayer times, fully offline.** Calculated on the TV with
-  [adhan-java](https://github.com/batoulapps/adhan-java). It ships with 192 cities in 43 countries across
+  [adhan-java](https://github.com/batoulapps/adhan-java). It ships with 245 cities in 45 countries across
   the Arab world, Asia, Europe, the Americas, Africa and Oceania, picked by region, then country, then city. Each
   city starts on the method and Asr school its mosques use; you can still choose the calculation method (Egyptian,
-  Umm al-Qura, MWL, Karachi, Oman's Ministry of Awqaf and more), the Asr school (Shafi'i or Hanafi) and a Hijri date offset. Oman's cities start on the Ministry of
-  Awqaf's method, fitted to its [published timetable](https://www.mara.gov.om/arabic/calendar_page1.asp) so every
-  prayer is within a minute or two of it (see `Method.OMAN_AWQAF`). The Hijri date and Ramadan mode always use the
-  Umm al-Qura calendar, so where local moon sighting differs (the United States, for one) set the offset.
+  Umm al-Qura, MWL, Karachi, Oman's Ministry of Awqaf, Morocco's Ministry of Habous and more), the Asr school
+  (Shafi'i or Hanafi) and a Hijri date offset. Oman's cities start on the Ministry of Awqaf's method, fitted to its
+  [published timetable](https://www.mara.gov.om/arabic/calendar_page1.asp) so every prayer is within a minute or two
+  of it (see `Method.OMAN_AWQAF`). Morocco's start on the Ministry of Habous's rules, recovered from its
+  [timetables](https://habous.gov.ma) (see `Habous`); Morocco has kept GMT all year since 20 September 2026, so a TV
+  with older time-zone data needs a GMT+0 zone until its firmware updates. The Hijri date and Ramadan mode always
+  use the Umm al-Qura calendar, so where local moon sighting differs (the United States, for one) set the offset.
 - **Qibla and room direction.** The Qibla bearing from your city, and a one-time "which way does
   the TV face" setting, so the screen can say *"Qibla is behind you"*.
 - **The adhan.** 14 voices to choose from, plus a separate Fajr adhan. If the TV is muted or at
@@ -72,7 +75,7 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 - **Friday and Ramadan.** Both modes switch themselves on from the date.
 - **Quran Radio.** إذاعة القرآن الكريم from Cairo (98.2 FM) by default, streamed live. Settings → Radio
   → Station picks another:
-  - Quran radios: Nablus, Shabab FM Quran (Nablus), Qatar 1 and 2, Jordan.
+  - Quran radios: Nablus, Shabab FM Quran (Nablus), Qatar 1 and 2, Oman, Jordan.
   - Ten reciters' 24/7 channels from mp3quran.net (Alafasy, Abdul Basit, Al-Minshawi, Al-Husary, Al-Muaiqly,
     Al-Ghamdi, Al-Sudais, Al-Dosari, Al-Qatami, Mohammad Rashad Al-Shareef).
   - Live level bars, from the audio itself.
@@ -96,9 +99,9 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 Afnon has **no accounts, no analytics and no ads**. The radio is the only feature that uses the
 internet, and it connects only to the chosen station's stream, one at a time: `stream.radiojar.com` (Cairo),
 `quran-radio.org` (Nablus), `streaming.zaytonatube.com` (Shabab FM), `live.kwikmotion.com` (Qatar),
-`jrtv-live.ercdn.net` (Jordan) or `backup.qurango.net` (the reciters). The list is in `Radio.STATIONS`. Afnon
-makes no other network requests, and its [network security config](app/src/main/res/xml/network_security.xml)
-allows plain HTTP for the Cairo stream only.
+`jrtv-live.ercdn.net` (Jordan), `partwota.cdn.mgmlcdn.com` (Oman) or `backup.qurango.net` (the reciters). The list
+is in `Radio.STATIONS`. Afnon makes no other network requests, and its
+[network security config](app/src/main/res/xml/network_security.xml) allows plain HTTP for the Cairo stream only.
 Your city and settings stay on the TV.
 
 The [web preview](https://egyjs.github.io/afnon-android-tv-launcher/) is a separate static site, not the app. It loads
@@ -287,7 +290,7 @@ docs/screenshots/     the images above, all from the real TV
 **أفنون** شاشة رئيسية لتلفاز أندرويد، تبدأ من يوم الصلاة. الصلاة القادمة والعدّ التنازلي في قلب
 محراب، ومواقيت اليوم الستة في الأعلى، وتطبيقاتك المفضلة تحتها. ويأتي الأذان إلى التلفاز وحده في وقته.
 
-- **مواقيت بلا إنترنت**: تُحسب على التلفاز نفسه، مع ١٩٢ مدينة في ٤٣ دولة تُختار بالمنطقة ثم الدولة ثم المدينة، وعدة طرق حساب، والمذهب الشافعي أو الحنفي في
+- **مواقيت بلا إنترنت**: تُحسب على التلفاز نفسه، مع ٢٤٥ مدينة في ٤٥ دولة تُختار بالمنطقة ثم الدولة ثم المدينة، وعدة طرق حساب، والمذهب الشافعي أو الحنفي في
   العصر، وتعديل التاريخ الهجري. التاريخ الهجري ووضع رمضان يعتمدان دائمًا على تقويم أم القرى، فإن اختلفت رؤية الهلال
   المحلية (كما في الولايات المتحدة) فاضبط التعديل.
 - **القبلة واتجاه الغرفة**: اتجاه القبلة من مدينتك، وإعداد لمرة واحدة لاتجاه التلفاز، فتقول لك الشاشة
@@ -297,7 +300,7 @@ docs/screenshots/     the images above, all from the real TV
 - **الجمعة ورمضان**: تتغير الشاشة وحدها؛ الجمعة مكان الظهر مع تذكير بسورة الكهف، والإفطار والسحور في رمضان.
 - **إذاعة القرآن الكريم**: من القاهرة (٩٨٫٢ إف إم) افتراضيًا، بث مباشر، وأعمدة تتحرك مع صوت التلاوة نفسه. تتوقف
   للأذان ثم تُستأنف، ويمكن إطفاء الشاشة أثناء الاستماع لتوفير الكهرباء. ومن الإعدادات ← الإذاعة ← المحطة:
-  إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
+  إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر وعُمان والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
 - **أزرار الريموت**: أزرار التطبيقات والإعدادات والمدخلات تعمل مع أفنون. والخدمة نفسها تأتي بالأذان، فإن
   أوقف أحد تطبيقات التنظيف أفنون أعادت الشاشة الرئيسية تشغيلها.
 - **مصادر الإدخال**: زر بجانب الإعدادات في الرئيسية يفتح قائمة المصادر في التلفاز كما يفعل زر المصدر، لأجهزة التحكم التي ليس فيها هذا الزر. وإن لم تكن للتلفاز قائمة خاصة، يعرض أفنون منافذ HDMI وAV بنفسه.
@@ -317,7 +320,7 @@ docs/screenshots/     the images above, all from the real TV
 - Adhan recordings: [abodehq/Athan-MP3](https://github.com/abodehq/Athan-MP3). They are not in the
   source; `fetch-adhans.sh` downloads them, and the release APK includes them with this credit. If you
   hold the rights to a recording and want it removed, open an issue.
-- Radio: إذاعة القرآن الكريم, Cairo; Holy Quran Radio, Nablus; Shabab FM; Qatar's and Jordan's Quran radios;
+- Radio: إذاعة القرآن الكريم, Cairo; Holy Quran Radio, Nablus; Shabab FM; Qatar's, Oman's and Jordan's Quran radios;
   and [mp3quran.net](https://mp3quran.net)'s reciter channels, each via its own public stream. Afnon is not
   affiliated with any of them.
 - Fonts: [Amiri](https://github.com/aliftype/amiri), [Alexandria](https://fonts.google.com/specimen/Alexandria)
