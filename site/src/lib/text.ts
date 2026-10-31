@@ -83,6 +83,7 @@ export function makeText(lang: Lang, eastern = lang === 'ar') {
         NORTH_AMERICA: ar ? 'الجمعية الإسلامية لأمريكا الشمالية' : 'ISNA, North America',
         MOON_SIGHTING_COMMITTEE: ar ? 'لجنة رؤية الهلال' : 'Moonsighting Committee',
         SINGAPORE: ar ? 'سنغافورة' : 'Singapore',
+        OMAN_AWQAF: ar ? 'وزارة الأوقاف والشؤون الدينية، سلطنة عُمان' : 'Ministry of Awqaf, Oman',
       })[m] ?? (ar ? 'الهيئة المصرية العامة للمساحة' : 'Egyptian General Authority of Survey'),
     place: (city: string, country: string) => city + (ar ? '، ' : ', ') + country,
     days: (n: number) => {

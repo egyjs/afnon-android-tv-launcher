@@ -91,7 +91,7 @@ console.log(`  ${Object.keys(strings).length} strings; by hand in text.ts: ${ski
 
 const prefs = src('Prefs.java');
 const consts = Object.fromEntries(
-  [...prefs.matchAll(/static final CalculationMethod (\w+) = CalculationMethod\.(\w+);/g)].map((m) => [m[1], m[2]]),
+  [...prefs.matchAll(/static final (?:Calculation)?Method (\w+) = (?:Calculation)?Method\.(\w+);/g)].map((m) => [m[1], m[2]]),
 );
 const cityRe = new RegExp(
   String.raw`new City\(${STR}, ${STR}, ${STR}, ${STR}, ${STR}, ([-\d.]+), ([-\d.]+), (?:CalculationMethod\.)?(\w+)(?:, (\w+))?\)`, 'g');
@@ -109,8 +109,8 @@ const lost = [...new Set(cities.map((c) => c.countryEn))].filter((n) => !regions
 if (lost.length) throw new Error(`Prefs.REGIONS is missing ${lost.join(', ')}`);
 write('regions.json', regions);
 
-const methodsBlock = /CalculationMethod\[\] METHODS = \{([^}]*)\}/.exec(prefs)[1];
-write('methods.json', [...methodsBlock.matchAll(/CalculationMethod\.(\w+)/g)].map((m) => m[1]));
+const methodsBlock = /Method\[\] METHODS = \{([^}]*)\}/.exec(prefs)[1];
+write('methods.json', [...methodsBlock.matchAll(/Method\.(\w+)/g)].map((m) => m[1]));
 
 // ---------------------------------------------------------------- Radio.STATIONS
 

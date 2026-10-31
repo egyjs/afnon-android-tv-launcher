@@ -17,8 +17,18 @@ const METHOD: Record<string, () => ReturnType<typeof CalculationMethod.Egyptian>
   NORTH_AMERICA: CalculationMethod.NorthAmerica,
   MOON_SIGHTING_COMMITTEE: CalculationMethod.MoonsightingCommittee,
   SINGAPORE: CalculationMethod.Singapore,
+  // Method.java: the ministry's own timetable fitted at 18° with +5 min on Dhuhr, Asr and Maghrib.
+  OMAN_AWQAF: () => {
+    const p = CalculationMethod.Other();
+    p.fajrAngle = 18;
+    p.ishaAngle = 18;
+    p.methodAdjustments = { ...p.methodAdjustments, dhuhr: 5, asr: 5, maghrib: 5 };
+    return p;
+  },
 };
+/** Minutes a method adds to Dhuhr, Asr and Maghrib (Method.dayAdjustment). */
 export const methodParams = (m: string) => (METHOD[m] ?? METHOD.EGYPTIAN)();
+export const dayAdjustment = (m: string) => methodParams(m).methodAdjustments.dhuhr;
 
 const minute = (d: Date) => new Date(Math.floor(d.getTime() / 60000) * 60000);
 const addDays = (d: Date, n: number) => { const c = new Date(d); c.setDate(c.getDate() + n); return c; };

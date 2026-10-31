@@ -1,7 +1,8 @@
 # Releasing Afnon
 
 How to version, release and publish Afnon on GitHub (`egyjs/afnon-android-tv-launcher`). Run everything from the
-repo root in Git Bash, with `TV` set to the test TV's address.
+repo root in Git Bash (Windows) or a Linux shell, with `TV` set to the test TV's address. Either machine needs the
+release key below.
 
 ## How it is published today
 
@@ -25,7 +26,9 @@ repo root in Git Bash, with `TV` set to the test TV's address.
 ## Signing (read once)
 
 Releases are **debug-signed** with `~/.android/debug.keystore` (certificate SHA-256 starts `b061307c`). This is
-deliberate: `tools/restore.sh` uses `run-as`, which only works on debuggable builds. Every release must be signed
+deliberate: `tools/restore.sh` uses `run-as`, which only works on debuggable builds. To release from another machine,
+copy that file to its `~/.android/debug.keystore` (back up the one there first) and check the fingerprint with
+`keytool -list -v -keystore ~/.android/debug.keystore -storepass android`. Every release must be signed
 with that same key, or `adb install -r` fails on TVs that already have Afnon (signatures do not match) and users
 would have to uninstall and lose their settings. Keep a backup of that keystore somewhere safe. Never rebuild it.
 
@@ -46,7 +49,7 @@ would have to uninstall and lose their settings. Keep a backup of that keystore 
    ```
 5. **Check the APK.**
    ```bash
-   BT=~/AppData/Local/Android/Sdk/build-tools/35.0.0
+   BT=~/AppData/Local/Android/Sdk/build-tools/35.0.0     # Linux: ~/Android/Sdk/build-tools/35.0.0, no .exe/.bat
    $BT/aapt.exe dump badging afnon.apk | head -1          # versionCode and versionName are the new ones
    $BT/apksigner.bat verify --print-certs afnon.apk | grep SHA-256   # b061307c0c67a15b…
    sha256sum afnon.apk                                     # for the release notes

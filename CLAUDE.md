@@ -52,6 +52,12 @@ a button sends and who handled it.
 - `PrayerDay`, `Prefs` (cities and methods), `Reminders`, `Adhans`, `Radio`/`RadioBars`, `Apps` (launching).
 - `RemoteKeys` is the accessibility service. It is always on, so it also hosts `PrayerWatch` (reminders, banner,
   the call). Turning it off stops the call to prayer.
+- Android removes a force-stopped app's accessibility service from `enabled_accessibility_services` (TV cleaners
+  force-stop apps, and so does `am force-stop` in testing). `RemoteKeys.ensureOn`, called from Home's `onResume`,
+  lists it again unless pref `remote_on` is false (set in `onUnbind` when the service is no longer listed, i.e.
+  turned off in Settings or by `restore.sh`). After a force-stop in tests, open Home before checking the service.
+- `Apps.installed` skips phone-only (`CATEGORY_LAUNCHER` without a TV entry) system apps that were never updated,
+  unless Afnon names them or they are favourites.
 
 ### Remote buttons and the volume-hold bug (fixed 2026-10-21)
 
@@ -94,6 +100,14 @@ and 190. Audio Only via `com.tcl.settings.SHOW_WINDOW`. `APP_AUTO_START` appop k
 `FirmwareKeys` detects CVTE boards (`android.intent.action.HOTKEYSERVICE`): no key filtering there, and Home opens
 CVTE's source menu for Source. `Redirects` (pref `redirects`, `from=to` packages) repoints buttons the firmware
 hard-wires to an app. Tested on one Super General (Android 9) only; any change here must leave TCL untouched.
+
+## Other brands (Xiaomi)
+
+One Xiaomi MiTV-MOOQ0 (Android TV 10, MediaTek, 1.8 GB, low-RAM mode), debloated with cleanyourtv's
+`examples/xiaomi-mitv-mooq0` list. Stock launcher `com.google.android.tvlauncher` (no launcherx, so setup leaves
+Google's setup app alone; on that TV it owns the saved Wi-Fi network and must stay enabled). Input sends
+`KEYCODE_MEDIA_RECORD` (130), not mapped yet. Not checked there: holding Volume (the service filters keys on
+non-TCL, non-CVTE firmware), Audio Only, the remote's buttons. Live TV/HDMI is `com.mediatek.wwtv.tvcenter`.
 
 ## Web preview (`site/`)
 

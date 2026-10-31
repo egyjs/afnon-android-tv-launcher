@@ -10,8 +10,8 @@ android {
         applicationId 'tv.afnon.home'
         minSdk 26
         targetSdk 34
-        versionCode 9
-        versionName '0.6'
+        versionCode 11
+        versionName '0.7'
     }
 
     compileOptions {

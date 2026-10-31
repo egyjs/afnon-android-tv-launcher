@@ -6,7 +6,7 @@
 
 <p dir="rtl"><b>أفنون: شاشة رئيسية لتلفاز أندرويد، تدور حول يوم الصلاة: المواقيت والقبلة والأذان وإذاعة القرآن الكريم.</b></p>
 
-Arabic first (RTL) and English · Offline prayer times for 136 cities · 14 adhan voices · Qibla · 16 Quran radio stations and reciters
+Arabic first (RTL) and English · Offline prayer times for 192 cities · 14 adhan voices · Qibla · 16 Quran radio stations and reciters
 
 **[⬇ Download the APK](https://github.com/egyjs/afnon-android-tv-launcher/releases/latest/download/afnon.apk)** · [Releases](https://github.com/egyjs/afnon-android-tv-launcher/releases) · **[Try it in your browser](https://egyjs.github.io/afnon-android-tv-launcher/)**
 
@@ -21,7 +21,8 @@ Arabic first (RTL) and English · Offline prayer times for 136 cities · 14 adha
 Afnon replaces the stock launcher on an Android TV with one quiet screen. The next prayer and a live
 countdown sit inside a mihrab arch. The day's six times run across the top, your favourite apps sit
 below, and the call to prayer comes to the TV by itself. Built and tested on a **TCL 55P7K (Google
-TV, Android 12)**, driven only by the remote's D-pad.
+TV, Android 12)**, driven only by the remote's D-pad, and also run on a Super General (CVTE) and a Xiaomi
+Mi TV (see the notes below).
 
 ### How it started
 
@@ -54,10 +55,12 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 ## Features
 
 - **Prayer times, fully offline.** Calculated on the TV with
-  [adhan-java](https://github.com/batoulapps/adhan-java). It ships with 136 cities in 43 countries across
+  [adhan-java](https://github.com/batoulapps/adhan-java). It ships with 192 cities in 43 countries across
   the Arab world, Asia, Europe, the Americas, Africa and Oceania, picked by region, then country, then city. Each
   city starts on the method and Asr school its mosques use; you can still choose the calculation method (Egyptian,
-  Umm al-Qura, MWL, Karachi and more), the Asr school (Shafi'i or Hanafi) and a Hijri date offset. The Hijri date and Ramadan mode always use the
+  Umm al-Qura, MWL, Karachi, Oman's Ministry of Awqaf and more), the Asr school (Shafi'i or Hanafi) and a Hijri date offset. Oman's cities start on the Ministry of
+  Awqaf's method, fitted to its [published timetable](https://www.mara.gov.om/arabic/calendar_page1.asp) so every
+  prayer is within a minute or two of it (see `Method.OMAN_AWQAF`). The Hijri date and Ramadan mode always use the
   Umm al-Qura calendar, so where local moon sighting differs (the United States, for one) set the offset.
 - **Qibla and room direction.** The Qibla bearing from your city, and a one-time "which way does
   the TV face" setting, so the screen can say *"Qibla is behind you"*.
@@ -78,6 +81,8 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
     recitation keeps playing.
 - **Remote buttons.** An accessibility service maps the remote's app buttons, and its Settings,
   Input and All apps buttons, to Afnon. The stock home's background service can then be disabled.
+  The same service brings the call to prayer, so if a TV cleaner force-stops Afnon (which switches the
+  service off), Home switches it back on. Turning it off in Settings → Accessibility is respected.
 - **Inputs.** A button beside Settings on Home opens the TV's input menu, as the Source button
   does, for remotes without one. Where the TV has no menu of its own, Afnon lists the HDMI and AV
   sources itself.
@@ -103,7 +108,7 @@ nothing from other sites except the station's stream when you press Play, and ke
 |---|---|
 | `INTERNET`, `WAKE_LOCK` | The radio stream, kept playing with the screen off |
 | `RECORD_AUDIO` | Required by Android's Visualizer, to read Afnon's **own** player for the level bars. It does not use the microphone. |
-| `WRITE_SECURE_SETTINGS` | Turns the TV's sleep timer off while the radio plays, and puts it back after. On TCL, also writes the remote button mappings (see TCL notes) |
+| `WRITE_SECURE_SETTINGS` | Turns the TV's sleep timer off while the radio plays, and puts it back after. Turns Afnon's own remote buttons service back on after a force-stop. On TCL, also writes the remote button mappings (see TCL notes) |
 | `ACCESS_FINE_LOCATION` | Android 9+ hides the Wi-Fi name without it; Home shows the name. Afnon never reads the TV's location |
 | Accessibility service | Remote button mapping (see `RemoteKeys.java`) |
 
@@ -145,6 +150,10 @@ adb -s $TV shell pm grant tv.afnon.home android.permission.ACCESS_FINE_LOCATION
 ```
 
 Then turn on **Afnon remote buttons** in the TV's Settings → Accessibility. The APK includes the adhan recordings.
+
+If Home still opens the stock launcher (stock Android TV and Google TV keep theirs ahead of any app), use the
+phone installer or `tools/install.sh`: they turn the stock launcher off behind a safety switch that turns it back
+on if Afnon doesn't come up, and the installer's cleanup can undo it.
 
 ### From source
 
@@ -227,6 +236,23 @@ detects them by their hotkey service and each piece is skipped elsewhere:
 - If Afnon guesses wrong about key filtering on some TV, the `key_filter` preference (`on`/`off`) forces it.
 - `install.sh` grants location, which Android 9+ needs before Home can show the Wi-Fi name.
 
+## Other brands (Xiaomi)
+
+Tested on one Xiaomi Mi TV (MiTV-MOOQ0, Android TV 10, 1.8 GB RAM, MediaTek), after a debloat with
+[cleanyourtv](https://github.com/Gathin23/cleanyourtv)'s list for that model. Home, the app list, favourites,
+the screensaver and the remote buttons service run (its buttons are not checked with the remote yet), and `install.sh` makes Afnon Home there (it turns the stock
+launcher off behind its safety switch). Notes:
+
+- Xiaomi's TV Manager force-stops apps, and Android then switches the remote buttons service off. Home turns
+  it back on.
+- The firmware gives a few built-in apps a phone-style entry only (Clock, MediaTek's Netflix watcher, a
+  disclaimer screen). Afnon leaves those out of its app list.
+- The remote's Input button sends `KEYCODE_MEDIA_RECORD` (130). Afnon doesn't map it yet; open Live TV from
+  the favourites for HDMI.
+- Holding Volume and the Audio Only screen-off have not been checked there yet.
+- Free memory matters on this 1.8 GB set: a screen-mirroring app stuck at full CPU (AirScreen) had filled
+  RAM and swap and froze other apps before Afnon was installed.
+
 ## Project layout
 
 ```
@@ -261,7 +287,7 @@ docs/screenshots/     the images above, all from the real TV
 **أفنون** شاشة رئيسية لتلفاز أندرويد، تبدأ من يوم الصلاة. الصلاة القادمة والعدّ التنازلي في قلب
 محراب، ومواقيت اليوم الستة في الأعلى، وتطبيقاتك المفضلة تحتها. ويأتي الأذان إلى التلفاز وحده في وقته.
 
-- **مواقيت بلا إنترنت**: تُحسب على التلفاز نفسه، مع ١٣٦ مدينة في ٤٣ دولة تُختار بالمنطقة ثم الدولة ثم المدينة، وعدة طرق حساب، والمذهب الشافعي أو الحنفي في
+- **مواقيت بلا إنترنت**: تُحسب على التلفاز نفسه، مع ١٩٢ مدينة في ٤٣ دولة تُختار بالمنطقة ثم الدولة ثم المدينة، وعدة طرق حساب، والمذهب الشافعي أو الحنفي في
   العصر، وتعديل التاريخ الهجري. التاريخ الهجري ووضع رمضان يعتمدان دائمًا على تقويم أم القرى، فإن اختلفت رؤية الهلال
   المحلية (كما في الولايات المتحدة) فاضبط التعديل.
 - **القبلة واتجاه الغرفة**: اتجاه القبلة من مدينتك، وإعداد لمرة واحدة لاتجاه التلفاز، فتقول لك الشاشة
@@ -272,7 +298,8 @@ docs/screenshots/     the images above, all from the real TV
 - **إذاعة القرآن الكريم**: من القاهرة (٩٨٫٢ إف إم) افتراضيًا، بث مباشر، وأعمدة تتحرك مع صوت التلاوة نفسه. تتوقف
   للأذان ثم تُستأنف، ويمكن إطفاء الشاشة أثناء الاستماع لتوفير الكهرباء. ومن الإعدادات ← الإذاعة ← المحطة:
   إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
-- **أزرار الريموت**: أزرار التطبيقات والإعدادات والمدخلات تعمل مع أفنون.
+- **أزرار الريموت**: أزرار التطبيقات والإعدادات والمدخلات تعمل مع أفنون. والخدمة نفسها تأتي بالأذان، فإن
+  أوقف أحد تطبيقات التنظيف أفنون أعادت الشاشة الرئيسية تشغيلها.
 - **مصادر الإدخال**: زر بجانب الإعدادات في الرئيسية يفتح قائمة المصادر في التلفاز كما يفعل زر المصدر، لأجهزة التحكم التي ليس فيها هذا الزر. وإن لم تكن للتلفاز قائمة خاصة، يعرض أفنون منافذ HDMI وAV بنفسه.
 - **العربية أولًا**: من اليمين إلى اليسار، مع الإنجليزية، والأرقام عربية أو لاتينية.
 - **بلا حسابات ولا إعلانات ولا تتبّع**. الإذاعة وحدها تستخدم الإنترنت.

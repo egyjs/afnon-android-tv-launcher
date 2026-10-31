@@ -23,7 +23,8 @@ calculation method used locally.
 
 ## 2. Add your TV
 
-Afnon is built and tested on a TCL 55P7K (Google TV, Android 12). If you run it on another TV,
+Afnon is built and tested on a TCL 55P7K (Google TV, Android 12), and has also run on a Super General (CVTE,
+Android 9) and a Xiaomi MiTV-MOOQ0 (Android TV 10); the README has notes for each. If you run it on another TV,
 tell us how it went, even if everything worked:
 
 - Model, Android version and RAM.

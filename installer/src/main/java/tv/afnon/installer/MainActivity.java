@@ -654,6 +654,17 @@ public final class MainActivity extends Activity {
             });
         }
         installedOk = allRequired;
+        if (!allRequired) {
+            // A required step is red: stay on the list until the user retries it or goes on anyway.
+            post(g, () -> {
+                hero.set(Hero.Mode.PROBLEM);
+                titleView.setText(R.string.done_partly_title);
+                leadView.setText(R.string.steps_failed_lead);
+                foot(Ui.primary(this, getString(R.string.try_again), v -> go(this::install)));
+                foot(Ui.secondary(this, getString(R.string.continue_), v -> go(() -> new Personalise(this, tv).start())));
+            });
+            return;
+        }
         // A moment on the finished list, then the next stage.
         Thread.sleep(900);
         post(g, () -> new Personalise(this, tv).start());

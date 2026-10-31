@@ -58,21 +58,47 @@ final class Apps {
     /**
      * Every app that has a TV or a phone-style launcher entry, one per package, not hidden. Cached for two
      * seconds: one screen build asks several times, and each query is slow on this TV.
+     *
+     * A phone-style entry alone does not count for a preinstalled, never-updated system app, unless Afnon knows it
+     * by name or it is a saved favourite: on a Xiaomi MiTV-MOOQ0 those are Clock, MediaTek's Netflix watcher and a
+     * vendor disclaimer screen, which showed up on Home as "com.mediatek.tv.serv…". Sideloaded phone apps still count.
      */
     static synchronized List<String> installed(Context c) {
         long now = android.os.SystemClock.uptimeMillis();
         if (cached != null && now - cachedAt < 2000) return new ArrayList<>(cached);
         PackageManager pm = c.getPackageManager();
         Set<String> found = new LinkedHashSet<>();
-        for (String category : new String[] {Intent.CATEGORY_LEANBACK_LAUNCHER, Intent.CATEGORY_LAUNCHER}) {
-            for (ResolveInfo r : pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(category), 0)) {
-                String p = r.activityInfo.packageName;
-                if (!HIDDEN.contains(p)) found.add(p);
+        Set<String> known = null;
+        for (ResolveInfo r : pm.queryIntentActivities(
+                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER), 0)) {
+            String p = r.activityInfo.packageName;
+            if (!HIDDEN.contains(p)) found.add(p);
+        }
+        for (ResolveInfo r : pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0)) {
+            String p = r.activityInfo.packageName;
+            if (HIDDEN.contains(p) || found.contains(p)) continue;
+            int flags = r.activityInfo.applicationInfo.flags;
+            boolean stock = (flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                && (flags & android.content.pm.ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0;
+            if (stock) {
+                if (known == null) known = known(c);
+                if (!known.contains(p)) continue;
             }
+            found.add(p);
         }
         cached = new ArrayList<>(found);
         cachedAt = now;
         return new ArrayList<>(cached);
+    }
+
+    /** Packages Afnon names, suggests or was told to keep on Home: always listed when installed. */
+    private static Set<String> known(Context c) {
+        Set<String> out = new HashSet<>(Arrays.asList(DEFAULT_FAVOURITES));
+        out.addAll(Arrays.asList(MORE_FIRST));
+        out.addAll(AR_NAMES.keySet());
+        out.addAll(EN_NAMES.keySet());
+        out.addAll(favourites(c));
+        return out;
     }
 
     /** Favourites first, in their saved order; then the rest by name in the screen's language. */
@@ -116,7 +142,10 @@ final class Apps {
         return out;
     }
 
-    /** Always four for Home: the saved favourites that are installed, topped up from the rest if some went away. */
+    /**
+     * Four for Home: the saved favourites that are installed, topped up from the rest if some went away. Fewer on
+     * a TV with fewer apps; Home shows the missing ones as empty tiles.
+     */
     static List<String> slots(Context c, Text t) {
         List<String> installed = installed(c);
         List<String> out = new ArrayList<>();
@@ -143,6 +172,7 @@ final class Apps {
     }
 
     static Drawable icon(Context c, String pkg) {
+        if (pkg == null) return null;
         try {
             return c.getPackageManager().getApplicationIcon(pkg);
         } catch (PackageManager.NameNotFoundException e) {

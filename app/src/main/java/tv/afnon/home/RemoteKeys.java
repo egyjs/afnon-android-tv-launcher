@@ -47,9 +47,17 @@ public class RemoteKeys extends AccessibilityService {
     /** The running service, so a new button table applies at once; null while the service is off. */
     private static RemoteKeys running;
 
+    /**
+     * Pref: false once the service was turned off in Settings; {@link #ensureOn} keeps it on otherwise. Unset counts
+     * as on: setup grants WRITE_SECURE_SETTINGS and turns the service on together, and TVs set up before this pref
+     * existed had lost the service too.
+     */
+    private static final String PREF_ON = "remote_on";
+
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        Prefs.of(this).edit().putBoolean(PREF_ON, true).apply();
         running = this;
         applyKeys();
         // The radio may have left the TV's sleep timer off (a crash, a reboot mid-listen): put it back.
@@ -91,6 +99,43 @@ public class RemoteKeys extends AccessibilityService {
         }
         boolean tcl = TclKeys.install(this, targets());
         filterKeys(!tcl && FirmwareKeys.shouldFilter(this));
+    }
+
+    /** Turned off in Settings (no longer listed there): stop {@link #ensureOn} from turning it back on. */
+    @Override
+    public boolean onUnbind(Intent intent) {
+        if (!listed(this)) Prefs.of(this).edit().putBoolean(PREF_ON, false).apply();
+        return super.onUnbind(intent);
+    }
+
+    /**
+     * Android drops an accessibility service from the enabled list when its app is force-stopped, which TV
+     * "cleaners" do (Xiaomi's TV Manager boost, for one), and the call to prayer then stays off until someone
+     * turns it on in Settings. Found off on a Xiaomi MiTV-MOOQ0 and on the TCL 55P7K. Home calls this; it lists the
+     * service again unless it was turned off in Settings. Needs the WRITE_SECURE_SETTINGS grant from setup.
+     */
+    static void ensureOn(android.content.Context c) {
+        if (!Prefs.of(c).getBoolean(PREF_ON, true) || listed(c)) return;
+        if (c.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) return;
+        String me = new ComponentName(c, RemoteKeys.class).flattenToShortString();
+        String s = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        try {
+            Settings.Secure.putString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                s == null || s.isEmpty() ? me : s + ":" + me);
+            Settings.Secure.putInt(c.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+        } catch (SecurityException ignored) {
+            // The grant was revoked between the check and the write.
+        }
+    }
+
+    /** Whether the TV's enabled accessibility services include this one. */
+    private static boolean listed(android.content.Context c) {
+        String s = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (s == null) return false;
+        ComponentName me = new ComponentName(c, RemoteKeys.class);
+        for (String entry : s.split(":")) if (me.equals(ComponentName.unflattenFromString(entry))) return true;
+        return false;
     }
 
     @Override

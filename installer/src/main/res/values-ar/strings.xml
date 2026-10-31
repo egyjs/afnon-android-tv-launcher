@@ -88,6 +88,7 @@
     <string name="check_title">تحقّق من</string>
     <string name="check_body">• التلفاز يعمل وغير نائم.\n• التصحيح مفعّل في خيارات المطوّرين.\n• التلفاز وهذا الهاتف على شبكة الواي فاي نفسها.</string>
     <string name="try_again">أعد المحاولة</string>
+    <string name="steps_failed_lead">أفنون على التلفاز، لكن خطوة باللون الأحمر لم تكتمل. أعد المحاولة، أو تابِع وارجع إليها لاحقًا.</string>
     <string name="back">رجوع</string>
 
     <!-- Make it yours -->
