@@ -136,6 +136,24 @@ favourites.
 7. Radio Settings row: "Screensaver while listening".
 8. The 7 remaining safe-list apps were turned off on the TV on 2026-10-22, logged in `state/disabled.log`.
 
+## Requests from issue #26 (2026-10-31)
+
+[#26](https://github.com/egyjs/afnon-android-tv-launcher/issues/26) asked for three things:
+
+- **Islamic screensaver (verses and hadith, with sources):** already planned. Verses are item 13 (verse of the day,
+  surah:ayah shown); hadith is item 14 (alternate days, each checked against the six books and Al-Albani's grades).
+  The issue's "verses, hadith or both" choice becomes item 13's Settings row with three values once item 14 ships.
+- **Weather on Home:** not taken. It needs a weather service, so it is under Not copying with UrTV's weather.
+- **Thmanyah font (خط ثمانية), chosen in Settings:** open question 1 below.
+
 ## Open questions
 
-None. Next: Phase 1.
+1. **Thmanyah as a choice for the Arabic UI font.** Before any mock:
+   - its licence must allow bundling in an MIT app
+   - the APK size it adds
+   - Arabic shaping and digits on the TV
+   - how it sits next to Amiri, which stays for Quranic text whatever is chosen
+
+   It would be a Settings → Display row, defaulting to the current font.
+
+Next: Phase 1.
