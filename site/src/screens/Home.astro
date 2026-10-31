@@ -1,5 +1,5 @@
 ---
-// Home (MainActivity): arch, clock and dates, Radio / Wi-Fi / Settings, prayer cells, favourites, more apps,
+// Home (MainActivity): arch, clock and dates, Radio / Wi-Fi / Inputs / Settings, prayer cells, favourites, more apps,
 // key hints, plus the reminder card (Reminders) and the Quran Radio card.
 import Arch from '../components/Arch.astro';
 import Icon from '../components/Icon.astro';
@@ -49,6 +49,9 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
     <Icon name="wifi" stroke={2} /> <span dir="ltr">Wi-Fi</span>
   </button>
 </div>
+<button class="ft gear inputs" data-toast={`${W.site} ${t.s('inputs')}`} aria-label={t.s('inputs')} data-hints={hints(t.hintOk(t.s('inputs')))}>
+  <Icon name="input" size={34} />
+</button>
 <a class="ft gear" href={href('settings', lang) + '#tv'} aria-label={t.s('settings')} data-hints={hints(t.hintOk(t.s('settings')))}>
   <Icon name="gear" size={34} />
 </a>
@@ -217,9 +220,10 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .hdate { font-size: var(--font-size-body); margin-top: 4px; }
   .gdate { font-size: 24px; color: var(--color-mist-400); margin-top: 14px; }
 
-  .pills { position: absolute; top: 56px; inset-inline-end: calc(1920px - var(--layout-courtyard-inset-inline-start) - var(--layout-courtyard-width) + 72px + 20px); display: flex; gap: 20px; }
+  .pills { position: absolute; top: 56px; inset-inline-end: calc(1920px - var(--layout-courtyard-inset-inline-start) - var(--layout-courtyard-width) + 2 * (72px + 20px)); display: flex; gap: 20px; }
   .pill { position: relative; height: 72px; padding: 0 28px; border-radius: 36px; align-items: center; gap: 14px; font-size: 24px; --rest-border: var(--color-line-soft); --rest-border-width: var(--border-chip-width); }
   .gear { inset-inline-start: calc(var(--layout-courtyard-inset-inline-start) + var(--layout-courtyard-width) - 72px); top: 56px; width: 72px; height: 72px; border-radius: 36px; align-items: center; justify-content: center; --rest-border: var(--color-line-soft); --rest-border-width: var(--border-chip-width); }
+  .gear.inputs { inset-inline-start: calc(var(--layout-courtyard-inset-inline-start) + var(--layout-courtyard-width) - 2 * 72px - 20px); }
   .radio-pill .bars { display: none; }
   :global(.tv.radio-on) .radio-pill .bars { display: inline-flex; }
   :global(.tv.radio-on) .radio-pill .radio-off { display: none; }

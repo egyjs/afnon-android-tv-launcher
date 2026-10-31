@@ -63,6 +63,12 @@ final class Text {
     String open(String app) { return ar ? "فتح " + app : "Open " + app; }
     String network() { return ar ? "إعدادات الشبكة" : "Network settings"; }
 
+    // Inputs panel (design/Inputs.dc.html)
+    String inputs() { return ar ? "مصادر الإدخال" : "Inputs"; }
+    String inputSwitch() { return ar ? "تبديل" : "Switch"; }
+    String inputOn() { return ar ? "متصل" : "Connected"; }
+    String inputOff() { return ar ? "غير متصل" : "Not connected"; }
+
     // Screensaver (design/Screensaver.dc.html)
     /**
      * "in 27 min". Arabic counts take their proper forms: دقيقة واحدة، دقيقتين، ٣–١٠ دقائق، ١١+ دقيقة. An hour

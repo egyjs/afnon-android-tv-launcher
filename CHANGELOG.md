@@ -5,6 +5,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 ## [Unreleased]
 
 ### Added
+- Inputs on Home (#20): a round button between Wi-Fi and Settings, for remotes without a Source button. It opens
+  what Source opens, the TV's own inputs screen (TCL's input bar on the 55P7K). Where the firmware has none, it
+  opens Afnon's Inputs panel (design/Inputs.dc.html): the TV's passthrough sources from the TV Input Framework,
+  HDMI first, and OK switches to one through the TV's own player. Whether something is plugged in shows only
+  where the TV reports it. A TV with neither gets no button. `--es test inputs` presses the button and
+  `--es test inputs-panel` opens Afnon's panel.
 - Oman's Holy Quran Radio (إذاعة القرآن الكريم، سلطنة عُمان, ayn.om/live/164) in Settings → Radio: its public HLS
   stream on the Mangomolo CDN, which plays without a token. It adds the host `partwota.cdn.mgmlcdn.com` to the
   README's Privacy list.
@@ -21,6 +27,11 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   on the minute and within one throughout. Each city sits at the point the table matches, within 7 km of its centre.
   Morocco keeps legal time on GMT since 20 September 2026 (decree 2.26.530): TVs whose time-zone data predates it
   show Africa/Casablanca an hour ahead, so set such a TV to a GMT+0 zone until its firmware updates.
+
+### Fixed
+- TCL: the remote's Source button opened the input bar and closed it again at once, so nothing seemed to happen.
+  TCL's window manager opens that bar (com.tcl.suspension) on Source itself, and a second start from Afnon's
+  remapping toggled it shut; Source and TV are left to the firmware there now.
 
 ## [0.7] - 2026-10-28
 

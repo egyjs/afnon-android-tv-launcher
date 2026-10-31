@@ -28,6 +28,14 @@
         </intent>
         <!-- CVTE's source menu, which Home opens for the Source button (FirmwareKeys.sourceMenu). -->
         <package android:name="com.cvte.tv.globalui" />
+        <!-- The TV's own inputs screen (Inputs.screen), and the player that opens a passthrough input (Inputs.list). -->
+        <intent>
+            <action android:name="com.android.tv.action.VIEW_INPUTS" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="content" android:host="android.media.tv" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
