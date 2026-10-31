@@ -4,6 +4,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+## [0.8] - 2026-10-31
+
 ### Added
 - Night mode: a dimmer, warmer palette for watching at night on every screen (Home, Prayer day, Settings, All
   apps, the call, the reminder banner, the screensaver and screen-off), from the LG version's night colours.
@@ -320,7 +322,8 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...HEAD
+[0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
 [0.7]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6...v0.6.1
 [0.6]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.5...v0.6

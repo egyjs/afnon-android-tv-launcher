@@ -44,7 +44,7 @@ would have to uninstall and lose their settings. Keep a backup of that keystore 
    ```bash
    bash tools/fetch-adhans.sh          # no-op if they are already there
    bash tools/fetch-announce.sh        # the 12 spoken lines (pip install edge-tts); no-op if there
-   ls app/src/main/assets/adhan/*.mp3 | wc -l   # expect 14
+   ls app/src/main/assets/adhan/*.mp3 | wc -l   # expect 16
    ls app/src/main/assets/announce/*.mp3 | wc -l   # expect 12
    ./gradlew clean :app:assembleDebug
    cp app/build/outputs/apk/debug/app-debug.apk afnon.apk
