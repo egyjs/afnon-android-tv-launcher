@@ -66,6 +66,9 @@ final class Radio {
             "https://live.kwikmotion.com/qmcquranradiolive/quranradio/playlist.m3u8", false),
         new Station("qatar2", QURAN_AR + " 2", QURAN_EN + " 2", "قطر", "Qatar",
             "https://live.kwikmotion.com/qmcquranradio2live/quranradio2/playlist.m3u8", false),
+        // ayn.om/live/164, Mangomolo HLS.
+        new Station("oman", QURAN_AR, QURAN_EN, "سلطنة عُمان · مسقط", "Oman · Muscat",
+            "https://partwota.cdn.mgmlcdn.com/quranrdoorg/quranrdo.stream_aac/chunklist.m3u8", false),
         new Station("jordan", QURAN_AR, QURAN_EN, "الأردن", "Jordan",
             "https://jrtv-live.ercdn.net/jrradio/quranradio.m3u8", false),
         // The Saudi Broadcasting Authority's own audio streams, as Saudi Radio+ (radioplus.sba.sa) plays them:

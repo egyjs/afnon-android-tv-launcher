@@ -63,6 +63,12 @@ final class Text {
     String open(String app) { return ar ? "فتح " + app : "Open " + app; }
     String network() { return ar ? "إعدادات الشبكة" : "Network settings"; }
 
+    // Inputs panel (design/Inputs.dc.html)
+    String inputs() { return ar ? "مصادر الإدخال" : "Inputs"; }
+    String inputSwitch() { return ar ? "تبديل" : "Switch"; }
+    String inputOn() { return ar ? "متصل" : "Connected"; }
+    String inputOff() { return ar ? "غير متصل" : "Not connected"; }
+
     // Screensaver (design/Screensaver.dc.html)
     /**
      * "in 27 min". Arabic counts take their proper forms: دقيقة واحدة، دقيقتين، ٣–١٠ دقائق، ١١+ دقيقة. An hour
@@ -191,6 +197,7 @@ final class Text {
             case "MOON_SIGHTING_COMMITTEE": return ar ? "لجنة رؤية الهلال" : "Moonsighting Committee";
             case "SINGAPORE": return ar ? "سنغافورة" : "Singapore";
             case "OMAN_AWQAF": return ar ? "وزارة الأوقاف والشؤون الدينية، سلطنة عُمان" : "Ministry of Awqaf, Oman";
+            case "MOROCCO_HABOUS": return ar ? "وزارة الأوقاف والشؤون الإسلامية، المملكة المغربية" : "Ministry of Habous, Morocco";
             default: return ar ? "الهيئة المصرية العامة للمساحة" : "Egyptian General Authority of Survey";
         }
     }
@@ -208,7 +215,9 @@ final class Text {
                 + (m == Method.UMM_AL_QURA ? (ar ? " (120 في رمضان)" : " (120 in Ramadan)") : "")
             : (ar ? "العشاء " : "Isha ") + trim(p.ishaAngle) + "°";
         int plus = m.dayAdjustment();
-        String extra = plus == 0 ? ""
+        String extra = m == Method.MOROCCO_HABOUS
+            ? ar ? " · الظهر +5 دقائق · أفق كل مدينة" : " · Dhuhr +5 min · each city's horizon"
+            : plus == 0 ? ""
             : ar ? " · +" + plus + " دقائق للظهر والعصر والمغرب" : " · Dhuhr, Asr and Maghrib +" + plus + " min";
         return d(fajr + " · " + isha + extra);
     }

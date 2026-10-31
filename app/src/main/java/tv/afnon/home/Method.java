@@ -2,7 +2,13 @@ package tv.afnon.home;
 
 import com.batoulapps.adhan.CalculationMethod;
 import com.batoulapps.adhan.CalculationParameters;
+import com.batoulapps.adhan.Coordinates;
+import com.batoulapps.adhan.Madhab;
 import com.batoulapps.adhan.PrayerAdjustments;
+import com.batoulapps.adhan.PrayerTimes;
+import com.batoulapps.adhan.data.DateComponents;
+
+import java.util.Date;
 
 /**
  * A prayer-time calculation method: one of adhan-java's, or one Afnon defines itself where adhan-java has none
@@ -49,11 +55,39 @@ final class Method {
      */
     static final Method OMAN_AWQAF = new Method("OMAN_AWQAF", null);
 
+    /**
+     * Morocco's Ministry of Habous and Islamic Affairs: Fajr 19°, Isha 17°, Dhuhr 5 minutes after transit, and
+     * sunrise and Maghrib at each city's own horizon. Its rounding, horizons and Asr need {@link Habous}, so its
+     * {@link #parameters()} (19°/17°) only describe it and stand in where the sun doesn't reach those angles.
+     */
+    static final Method MOROCCO_HABOUS = new Method("MOROCCO_HABOUS", null);
+
     /** Fresh parameters on every call: callers set the Asr school on them. */
     CalculationParameters parameters() {
         if (base != null) return base.getParameters();
+        if (this == MOROCCO_HABOUS) return new CalculationParameters(19.0, 17.0, CalculationMethod.OTHER);
         return new CalculationParameters(18.0, 18.0, CalculationMethod.OTHER)
             .withMethodAdjustments(new PrayerAdjustments(0, 0, 5, 5, 5, 0));
+    }
+
+    /**
+     * The six times (PrayerDay.FAJR..ISHA) for a day, seconds dropped. {@code params} is this method's
+     * {@link #parameters()} with the caller's Asr school, adjustments and rules (PrayerDay). {@code horizon} is the
+     * city's {sunrise, Maghrib} arc minutes below the horizon, which only Morocco's method uses.
+     */
+    Date[] times(Coordinates where, DateComponents day, CalculationParameters params, int[] horizon) {
+        if (this == MOROCCO_HABOUS) {
+            Date[] t = Habous.times(where, day, params.madhab, horizon);
+            if (t != null) {
+                // Adjust the times, in whole minutes after the ministry's rounding, as adhan adds them.
+                PrayerAdjustments a = params.adjustments;
+                int[] minutes = {a.fajr, a.sunrise, a.dhuhr, a.asr, a.maghrib, a.isha};
+                for (int i = 0; i < 6; i++) t[i] = new Date(t[i].getTime() + minutes[i] * 60_000L);
+                return t;
+            }
+        }
+        PrayerTimes p = new PrayerTimes(where, day, params);
+        return new Date[] {p.fajr, p.sunrise, p.dhuhr, p.asr, p.maghrib, p.isha};
     }
 
     /** Minutes the method adds to Dhuhr, Asr and Maghrib (the same for all three), or 0. */
