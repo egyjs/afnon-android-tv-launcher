@@ -62,10 +62,6 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   both near 1 a.m.
 
 ### Fixed
-- No blue screen before Settings, Prayer day and All apps. Android showed a starting window in Theme.Afnon's ground
-  (day lapis, also in night mode) while the screen drew: on the TCL 55P7K a `Splash Screen tv.afnon.home` layer
-  appears each time Settings opens. Theme.Afnon sets `windowDisablePreview` and Afnon's own screens open and close
-  with no transition, so the screen in front stays until the next one has drawn.
 - Afnon remote buttons (and the call to prayer) now also come back after a force-stop when Android marked the
   service crashed: it stays listed as on but is never started again until it leaves the list. `ensureOn` takes it
   out and puts it back a second later when it is listed but nothing runs, and looks again 3 s after listing a
