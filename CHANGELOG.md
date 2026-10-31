@@ -39,17 +39,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ### Changed
 - Web preview (`site/`): night mode (Home's button and Settings → Display), the radio card's Station button, Settings →
-  Adjust the times and What's new, Marcellus for the big numbers with Western digits, and the prayer rules above
-  (adjusted times, the Hijri day from Maghrib, Jumu'ah until Maghrib, Umm al-Qura's Ramadan Isha, above 48°).
-- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
-  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
-  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
-  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
-  need its `TypefaceSpan`).
-- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
-  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
-  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
-  changing never moves. The view also no longer asks for a new layout every second.
+  Adjust the times and What's new, and the prayer rules above (adjusted times, the Hijri day from Maghrib,
+  Jumu'ah until Maghrib, Umm al-Qura's Ramadan Isha, above 48°).
 - The Hijri date turns at Maghrib, as the Islamic day does: from Maghrib to midnight it shows the next day's date,
   and its weekday with it (Friday evening reads السبت). The weekday moved from the Gregorian line to the Hijri one
   (Home, Prayer day, the screensaver). Ramadan follows the Hijri day, so its first night shows the suhoor and the

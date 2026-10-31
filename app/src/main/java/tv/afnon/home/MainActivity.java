@@ -213,7 +213,7 @@ public class MainActivity extends Screen {
         // Courtyard: clock and dates, then Wi-Fi and Settings at the end side.
         LinearLayout when = new LinearLayout(this);
         when.setOrientation(LinearLayout.VERTICAL);
-        clock = text(numbers, 96, Tokens.PLASTER_100);
+        clock = text(display, 96, Tokens.PLASTER_100);
         clock.setIncludeFontPadding(false);
         clock.setTextDirection(rtl ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         clock.setFontFeatureSettings("tnum");
@@ -477,7 +477,7 @@ public class MainActivity extends Screen {
 
     private void renderMinute(Date now) {
         readClockFormat();
-        clock.setText(displayTime(now, 0.4f));
+        clock.setText(time(now, 0.4f));
         gdate.setText(gregorian(now));
         hdate.setText(hijri(day) + t.sep() + t.city());
 
