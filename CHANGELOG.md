@@ -4,6 +4,21 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Changed
+- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
+  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
+  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
+  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
+  need its `TypefaceSpan`).
+- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
+  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
+  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
+  changing never moves. The view also no longer asks for a new layout every second.
+
+### Fixed
+- The arch countdown stays on one line: a wide count (10:00:00 in Marcellus) was wider than the arch and wrapped.
+  It gets a little smaller until it fits, measured as if every digit were a 0 (the widest), so its size changes
+  only with the count's shape (h:mm:ss to hh:mm:ss), never from one second to the next.
 ## [0.8] - 2026-10-31
 
 ### Added
@@ -123,17 +138,6 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 ### Changed
 - Calculation methods are `Method` objects (`Method.java`) instead of adhan-java's enum, so Afnon can define its own;
   the saved ids are unchanged. The web preview mirrors the new method.
-
-### Changed
-- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
-  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
-  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
-  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
-  need its `TypefaceSpan`).
-- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
-  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
-  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
-  changing never moves. The view also no longer asks for a new layout every second.
 
 ## [0.6.1] - 2026-10-25
 
