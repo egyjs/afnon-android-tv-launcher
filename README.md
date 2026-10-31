@@ -6,7 +6,7 @@
 
 <p dir="rtl"><b>أفنون: شاشة رئيسية لتلفاز أندرويد، تدور حول يوم الصلاة: المواقيت والقبلة والأذان وإذاعة القرآن الكريم.</b></p>
 
-Arabic first (RTL) and English · Offline prayer times for 245 cities · 14 adhan voices · Qibla · 16 Quran radio stations and reciters
+Arabic first (RTL) and English · Offline prayer times for 245 cities · 14 adhan voices · Qibla · 17 Quran radio stations and reciters
 
 **[⬇ Download the APK](https://github.com/egyjs/afnon-android-tv-launcher/releases/latest/download/afnon.apk)** · [Releases](https://github.com/egyjs/afnon-android-tv-launcher/releases) · **[Try it in your browser](https://egyjs.github.io/afnon-android-tv-launcher/)**
 
@@ -75,7 +75,7 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 - **Friday and Ramadan.** Both modes switch themselves on from the date.
 - **Quran Radio.** إذاعة القرآن الكريم from Cairo (98.2 FM) by default, streamed live. Settings → Radio
   → Station picks another:
-  - Quran radios: Nablus, Shabab FM Quran (Nablus), Qatar 1 and 2, Jordan.
+  - Quran radios: Nablus, Shabab FM Quran (Nablus), Qatar 1 and 2, Oman, Jordan.
   - Ten reciters' 24/7 channels from mp3quran.net (Alafasy, Abdul Basit, Al-Minshawi, Al-Husary, Al-Muaiqly,
     Al-Ghamdi, Al-Sudais, Al-Dosari, Al-Qatami, Mohammad Rashad Al-Shareef).
   - Live level bars, from the audio itself.
@@ -96,9 +96,9 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
 Afnon has **no accounts, no analytics and no ads**. The radio is the only feature that uses the
 internet, and it connects only to the chosen station's stream, one at a time: `stream.radiojar.com` (Cairo),
 `quran-radio.org` (Nablus), `streaming.zaytonatube.com` (Shabab FM), `live.kwikmotion.com` (Qatar),
-`jrtv-live.ercdn.net` (Jordan) or `backup.qurango.net` (the reciters). The list is in `Radio.STATIONS`. Afnon
-makes no other network requests, and its [network security config](app/src/main/res/xml/network_security.xml)
-allows plain HTTP for the Cairo stream only.
+`jrtv-live.ercdn.net` (Jordan), `partwota.cdn.mgmlcdn.com` (Oman) or `backup.qurango.net` (the reciters). The list
+is in `Radio.STATIONS`. Afnon makes no other network requests, and its
+[network security config](app/src/main/res/xml/network_security.xml) allows plain HTTP for the Cairo stream only.
 Your city and settings stay on the TV.
 
 The [web preview](https://egyjs.github.io/afnon-android-tv-launcher/) is a separate static site, not the app. It loads
@@ -296,7 +296,7 @@ docs/screenshots/     the images above, all from the real TV
 - **الجمعة ورمضان**: تتغير الشاشة وحدها؛ الجمعة مكان الظهر مع تذكير بسورة الكهف، والإفطار والسحور في رمضان.
 - **إذاعة القرآن الكريم**: من القاهرة (٩٨٫٢ إف إم) افتراضيًا، بث مباشر، وأعمدة تتحرك مع صوت التلاوة نفسه. تتوقف
   للأذان ثم تُستأنف، ويمكن إطفاء الشاشة أثناء الاستماع لتوفير الكهرباء. ومن الإعدادات ← الإذاعة ← المحطة:
-  إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
+  إذاعات القرآن الكريم من نابلس وشباب إف إم وقطر وعُمان والأردن، أو قناة أحد القرّاء العشرة على مدار الساعة.
 - **أزرار الريموت**: أزرار التطبيقات والإعدادات والمدخلات تعمل مع أفنون. والخدمة نفسها تأتي بالأذان، فإن
   أوقف أحد تطبيقات التنظيف أفنون أعادت الشاشة الرئيسية تشغيلها.
 - **العربية أولًا**: من اليمين إلى اليسار، مع الإنجليزية، والأرقام عربية أو لاتينية.
@@ -315,7 +315,7 @@ docs/screenshots/     the images above, all from the real TV
 - Adhan recordings: [abodehq/Athan-MP3](https://github.com/abodehq/Athan-MP3). They are not in the
   source; `fetch-adhans.sh` downloads them, and the release APK includes them with this credit. If you
   hold the rights to a recording and want it removed, open an issue.
-- Radio: إذاعة القرآن الكريم, Cairo; Holy Quran Radio, Nablus; Shabab FM; Qatar's and Jordan's Quran radios;
+- Radio: إذاعة القرآن الكريم, Cairo; Holy Quran Radio, Nablus; Shabab FM; Qatar's, Oman's and Jordan's Quran radios;
   and [mp3quran.net](https://mp3quran.net)'s reciter channels, each via its own public stream. Afnon is not
   affiliated with any of them.
 - Fonts: [Amiri](https://github.com/aliftype/amiri), [Alexandria](https://fonts.google.com/specimen/Alexandria)
