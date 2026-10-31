@@ -42,6 +42,8 @@ export function live(model: (c: Ctx) => Model, onTick?: (c: Ctx) => void) {
   let shift = mode ? shiftFor(mode, prefs) : 0;
   const render = () => {
     const c = makeCtx(lang, prefs, new Date(Date.now() + shift), mode);
+    // Night mode: tokens.css's night palette on the stage (Tokens.use(night)).
+    stage.toggleAttribute('data-night', !!prefs.night);
     bind(stage, model(c));
     onTick?.(c);
   };

@@ -26,6 +26,11 @@ const { mode, screen, ground = 'lattice' } = Astro.props;
 <script is:inline>
   (() => {
     const frame = document.currentScript.previousElementSibling, stage = frame.firstElementChild;
+    // Night mode (Settings → Display, or Home's night button) before the first paint: the night palette on the stage.
+    try {
+      const p = JSON.parse(localStorage.getItem('afnon-prefs') || '{}');
+      if (p.night) stage.setAttribute('data-night', '');
+    } catch (e) {}
     const fit = () => stage.style.setProperty('--k', String(frame.clientWidth / 1920));
     new ResizeObserver(fit).observe(frame);
     fit();

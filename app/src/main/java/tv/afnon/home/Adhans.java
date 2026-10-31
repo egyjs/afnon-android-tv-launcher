@@ -30,6 +30,9 @@ final class Adhans {
         {"abdulbasit", "عبد الباسط عبد الصمد", "Abdul Basit"},
         {"nuyne", "أحمد نعينع", "Ahmad Nuaina"},
         {"makkah", "الحرم المكي", "Makkah, Al-Haram"},
+        // From meypod/al-azan's audio (github.com/meypod/audio_files); tools/fetch-adhans.sh downloads them too.
+        {"nabawi", "المسجد النبوي", "Madinah, Al-Masjid an-Nabawi"},
+        {"ghalwash", "راغب مصطفى غلوش", "Ragheb Mustafa Ghalwash"},
     };
 
     static int index(String id) {

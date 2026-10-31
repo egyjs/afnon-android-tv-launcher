@@ -105,7 +105,7 @@ public class PrayerDayActivity extends Screen {
         r.addView(label, lp);
         b.addView(r, new FrameLayout.LayoutParams(-2, -1));
         b.setLook(f -> {
-            int c = f ? Tokens.LAPIS_900 : Tokens.PLASTER_100;
+            int c = f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100;
             label.setTextColor(c);
             back.setColor(c);
         });
@@ -208,7 +208,7 @@ public class PrayerDayActivity extends Screen {
         roomLabel = text(ui400, 22, Tokens.PLASTER_100);
         roomLabel.setGravity(Gravity.CENTER);
         roomButton.addView(roomLabel, new FrameLayout.LayoutParams(-1, -1));
-        roomButton.setLook(f -> roomLabel.setTextColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
+        roomButton.setLook(f -> roomLabel.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100));
         roomButton.setOnClickListener(v -> openPicker());
         roomButton.setOnFocusChangeListener((v, has) -> {
             if (has) {
@@ -377,15 +377,19 @@ public class PrayerDayActivity extends Screen {
         return prefs().getBoolean("bell_" + i, i != PrayerDay.SUNRISE);
     }
 
-    /** design: now = plaster, focused = gold, past = lapis-800 at 60% with mist text, upcoming = lapis-800. */
+    /**
+     * design: now = plaster (current.fill), focused = gold (focus.fill), past = lapis-800 at 60% with mist text,
+     * upcoming = lapis-800.
+     */
     private void paintRow(int i) {
         if (rowName[i] == null || bell[i] == null) return;
         boolean focused = row[i] != null && row[i].isFocused();
         int s = state[i];
-        int fill = s == 1 ? Tokens.PLASTER_100 : (s == 0 ? Tokens.LAPIS_800_60 : Tokens.LAPIS_800);
+        int fill = s == 1 ? Tokens.CURRENT_FILL : (s == 0 ? Tokens.LAPIS_800_60 : Tokens.LAPIS_800);
         if (row[i] != null) row[i].setRest(fill, 0, 0);
         boolean dark = focused || s == 1;
-        int fg = dark ? Tokens.LAPIS_900 : (s == 0 ? Tokens.MIST_400 : Tokens.PLASTER_100);
+        int ink = focused ? Tokens.FOCUS_TEXT : Tokens.CURRENT_TEXT;
+        int fg = dark ? ink : (s == 0 ? Tokens.MIST_400 : Tokens.PLASTER_100);
         for (TextView v : new TextView[] {rowName[i], rowStatus[i], rowTime[i]}) v.setTextColor(fg);
         rowName[i].setTypeface(dark ? ui600 : ui400);
 
@@ -399,7 +403,7 @@ public class PrayerDayActivity extends Screen {
         } else {
             g.setColor(0);
             g.setStroke(Ui.ipx(2), Tokens.BELL_OFF_BORDER);
-            bellIcon[i].setColor(dark ? Tokens.LAPIS_900 : Tokens.MIST_400);
+            bellIcon[i].setColor(dark ? ink : Tokens.MIST_400);
             bell[i].setAlpha(0.7f);
         }
         bell[i].setBackground(g);

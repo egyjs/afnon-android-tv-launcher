@@ -87,6 +87,29 @@ for (const m of text.matchAll(methodRe)) {
 write('strings.json', strings);
 console.log(`  ${Object.keys(strings).length} strings; by hand in text.ts: ${skipped.join(', ')}`);
 
+// Text.news(): Settings → What's new, {ar, en} lists of groups [version, line, line…] (string literals joined by +).
+{
+  const body = /String\[\]\[\] news\(\) \{([\s\S]*?)\n {4}\}/.exec(text)?.[1];
+  if (!body) throw new Error('Text.news() not found');
+  const [arPart, enPart] = body.split(/\n\s*return new String\[\]\[\] (?=\{)/);
+  const groups = (code) => {
+    const out = [];
+    let depth = 0, group = null, item = null;
+    const re = new RegExp(String.raw`${STR}|[{},]`, 'g');
+    for (const m of code.slice(code.indexOf('{')).matchAll(re)) {
+      const tok = m[0];
+      if (tok === '{') { if (++depth === 2) { group = []; item = null; } }
+      else if (tok === '}') { if (depth-- === 2) { if (item !== null) group.push(item); out.push(group); group = null; } }
+      else if (tok === ',') { if (depth === 2 && item !== null) { group.push(item); item = null; } }
+      else if (depth === 2) item = (item ?? '') + unescape(m[1]);
+    }
+    return out;
+  };
+  const news = { ar: groups(arPart), en: groups(enPart) };
+  if (!news.ar.length || news.ar.length !== news.en.length) throw new Error('Text.news(): Arabic and English differ');
+  write('news.json', news);
+}
+
 // ---------------------------------------------------------------- Prefs: cities and methods
 
 const prefs = src('Prefs.java');

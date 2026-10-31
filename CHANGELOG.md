@@ -5,7 +5,38 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 ## [Unreleased]
 
 ### Added
-- Inputs on Home (#20): a round button between Wi-Fi and Settings, for remotes without a Source button. It opens
+- Night mode: a dimmer, warmer palette for watching at night on every screen (Home, Prayer day, Settings, All
+  apps, the call, the reminder banner, the screensaver and screen-off), from the LG version's night colours.
+  Near-black and a little warm; text, gold and lines at about half brightness; the reminder card and the current
+  prayer dark instead of plaster; focus a dim amber fill with light text and a clear ring. A round button beside
+  Home's Settings gear switches it at once (a full moon with a star while off, a sun while on; focus stays on
+  it), and so does Settings → Display → Night mode. Off by default.
+  - The colours are tokens: `afnon-mihrab/tokens.night.json` overrides `tokens.json` by the same paths, and
+    `npm run tokens` generates both palettes into `Tokens.java` (colour fields that `Tokens.use(night)` switches)
+    and `colors.xml` (`night_*`). Nothing is overlaid, filtered or layered; screens are built in the palette.
+  - New tokens `color.current.*` (the current prayer, a chosen segment) and `color.card.*` (the reminder card),
+    and the focused-text colour is now `focus.text` everywhere. By day every colour is unchanged.
+- Night mode dims other apps' icons too, on Home's favourites and in All apps: a little warm and about 60% as
+  bright, so a red YouTube logo doesn't glare. Each icon takes one colour filter that multiplies it by the new
+  token `color.app-icon-tint` (no extra view or layer); by day there is no filter.
+- Home's radio card has a Station button («المحطة», with the radio-waves icon) between Play and Screen off, as in
+  the LG version. It opens the same list as Settings → Radio → Station, over Home: the Quran radio stations or
+  the reciters, then one of them. Playing radio moves to the pick at once and the card shows it; Back steps back
+  through the list, and focus returns to Station. ◀▶ move along the three buttons (mirrored in Arabic).
+- Two Quran radio stations from the Saudi Broadcasting Authority, its own audio streams as Saudi Radio+ plays
+  them (`live.kwikmotion.com`, HLS, AAC): إذاعة القرآن الكريم · السعودية and إذاعة نداء الإسلام, with the
+  Quran radios in both Station lists (Settings and the radio card).
+- Settings → What's new («ما الجديد», the last section): the latest releases, newest first, each a few short
+  lines in Arabic (or English) under its version, read-only and built only while it is open. OK or toward the
+  end goes into it, ▲▼ scroll it, Back or toward the start returns to the sections. It starts with 0.5 and this
+  release; the lines are `Text.news()`, and each release adds its own on top.
+- Settings → Adjust the times («تعديل المواقيت», its own section), as in meypod/al-azan and the LG launcher:
+  Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha each a stepper of minutes («+2», «0», «-3»), up to 30 earlier or
+  later, with today's adjusted time under the name. Home, Prayer day, the reminders and the adhan all
+  use the adjusted times.
+- Two more adhan voices: «المسجد النبوي» and «راغب مصطفى غلوش», the recordings meypod/al-azan uses
+  (`tools/fetch-adhans.sh` downloads them from meypod/audio_files).
+- Inputs on Home (#20): a round button between Wi-Fi and the night button, for remotes without a Source button. It opens
   what Source opens, the TV's own inputs screen (TCL's input bar on the 55P7K). Where the firmware has none, it
   opens Afnon's Inputs panel (design/Inputs.dc.html): the TV's passthrough sources from the TV Input Framework,
   HDMI first, and OK switches to one through the TV's own player. Whether something is plugged in shows only
@@ -28,7 +59,36 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   Morocco keeps legal time on GMT since 20 September 2026 (decree 2.26.530): TVs whose time-zone data predates it
   show Africa/Casablanca an hour ahead, so set such a TV to a GMT+0 zone until its firmware updates.
 
+### Changed
+- Web preview (`site/`): night mode (Home's button and Settings → Display), the radio card's Station button, Settings →
+  Adjust the times and What's new, and the prayer rules above (adjusted times, the Hijri day from Maghrib,
+  Jumu'ah until Maghrib, Umm al-Qura's Ramadan Isha, above 48°).
+- The Hijri date turns at Maghrib, as the Islamic day does: from Maghrib to midnight it shows the next day's date,
+  and its weekday with it (Friday evening reads السبت). The weekday moved from the Gregorian line to the Hijri one
+  (Home, Prayer day, the screensaver). Ramadan follows the Hijri day, so its first night shows the suhoor and the
+  night of Eid doesn't; «سورة الكهف اليوم» shows from Thursday's Maghrib to Friday's. Jumu'ah replaces Dhuhr on
+  Friday until its Maghrib, then the strip says الظهر again.
+- Umm al-Qura (the Saudi cities): Isha is 2 hours after Maghrib in Ramadan instead of 1½, from the first night of
+  Ramadan to the last (moved by the Hijri offset with the date shown), as Saudi Arabia's calendar and
+  meypod/al-azan have it. Settings shows it under the method.
+- Cities beyond 48°, north or south (London, Paris, Berlin, Amsterdam, Copenhagen, Edmonton…): Fajr is no earlier
+  than a seventh of the night before sunrise and Isha no later than a seventh after Maghrib, as al-azan has it.
+  On summer nights, when the sun never reaches their angles, both were near 1 a.m.; the limit also moves them by
+  some minutes from about spring to autumn.
+
 ### Fixed
+- Afnon remote buttons (and the call to prayer) now also come back after a force-stop when Android marked the
+  service crashed: it stays listed as on but is never started again until it leaves the list. `ensureOn` takes it
+  out and puts it back a second later when it is listed but nothing runs, and looks again 3 s after listing a
+  missing one. On the TCL 55P7K, a force-stop and one press of Home left it off two times in three; now none.
+- Lists over the screen (Settings' lists and the radio card's Station) no longer cut off the last item: its focus
+  ring and the bottom of its tile were clipped, plainly with only two groups. The list is now as tall as its
+  whole tiles, rings included, and moves a whole item at a time when it scrolls.
+- Home's More row no longer repeats the favourites. It left out only the saved favourites, so when one of them
+  wasn't installed and another app filled its slot, that app showed in both rows. It now leaves out what the
+  favourites row shows.
+- TCL's remote pairing service (`com.tcl.tcl_bt_rcu_service`, "TCL_BT_RCU_Service") is no longer listed as an app:
+  its launcher entry is only a test screen.
 - TCL: the remote's Source button opened the input bar and closed it again at once, so nothing seemed to happen.
   TCL's window manager opens that bar (com.tcl.suspension) on Source itself, and a second start from Afnon's
   remapping toggled it shut; Source and TV are left to the firmware there now.

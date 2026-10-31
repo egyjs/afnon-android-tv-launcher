@@ -12,7 +12,8 @@ import android.widget.FrameLayout;
  *
  * <p>The view is larger than the design rect by the focus ring's reach (6px gap + 4px ring) on every side, so the
  * ring is drawn inside its own bounds. Place it with {@link #REACH} subtracted from x and y and added twice to w
- * and h. Focused: gold-400 fill, plaster-100 ring, scale 1.06, all in 120ms (tokens.json focus.*).
+ * and h. Focused: focus.fill (gold-400; a dim amber at night), focus.ring-color ring, scale 1.06, all in 120ms
+ * (tokens.json focus.*). Content on it takes focus.text.
  */
 class FocusTile extends FrameLayout {
     static final float REACH = Tokens.FOCUS_RING_OFFSET + Tokens.FOCUS_RING_WIDTH;
@@ -45,7 +46,7 @@ class FocusTile extends FrameLayout {
         setClipChildren(false);
         border.setStyle(Paint.Style.STROKE);
         ring.setStyle(Paint.Style.STROKE);
-        ring.setColor(Tokens.PLASTER_100);
+        ring.setColor(Tokens.FOCUS_RING_COLOR);
         ring.setStrokeWidth(Ui.px(Tokens.FOCUS_RING_WIDTH));
         setRest(Tokens.LAPIS_800, 0, 0);
     }
@@ -91,7 +92,7 @@ class FocusTile extends FrameLayout {
         float reach = Ui.px(REACH);
         box.set(reach, reach, getWidth() - reach, getHeight() - reach);
         boolean focused = isFocused();
-        int f = focused ? Tokens.GOLD_400 : restFill;
+        int f = focused ? Tokens.FOCUS_FILL : restFill;
         if (f != 0) {
             fill.setColor(f);
             c.drawRoundRect(box, radius, radius, fill);

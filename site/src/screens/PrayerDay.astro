@@ -51,7 +51,7 @@ const dial = (needle: string, north: string, a: Record<string, Record<string, st
     {...{ [toEnd]: '.room-btn', [toStart]: `[data-row="${i}"]` }} {...(i === day.times.length - 1 ? { 'data-nav-down': `[data-row="${i}"]` } : {})} {...(i === 0 ? { 'data-nav-up': '.home-pill' } : {})} {...(i === day.nextIndex ? { 'data-focus-start': '' } : {})}>
     <span class="r-name" data-k={'n' + i} set:html={m.html['n' + i]} />
     <span class="r-status" data-k={'s' + i} set:html={m.html['s' + i]} />
-    <span class="r-time display num" data-k={'t' + i} set:html={m.html['t' + i]} />
+    <span class="r-time display numbers num" data-k={'t' + i} set:html={m.html['t' + i]} />
     <span class="bell"><Icon name="bell" size={26} stroke={2} /></span>
   </button>
 ))}
@@ -60,7 +60,7 @@ const dial = (needle: string, north: string, a: Record<string, Record<string, st
   <div class="q-label caps">{t.s('qibla')}</div>
   <div class="dial" set:html={dial('needle', 'northMark', m.attr as any)} />
   <div class="q-north" data-k="northLabel" set:html={m.html.northLabel} />
-  <div class="q-deg display num" dir="ltr" data-k="deg" set:html={m.html.deg} />
+  <div class="q-deg display numbers num" dir="ltr" data-k="deg" set:html={m.html.deg} />
   <div class="q-dir" data-k="direction" set:html={m.html.direction} />
   <div class="q-hint" data-k="qiblaHint" set:html={m.html.qiblaHint} />
 </section>
@@ -173,7 +173,7 @@ const dial = (needle: string, north: string, a: Record<string, Record<string, st
     inset-inline-start: var(--layout-courtyard-inset-inline-start); width: var(--layout-day-row-width); height: var(--layout-day-row-height);
     border-radius: var(--radius-row); align-items: center; gap: 20px; padding-inline: 28px 20px; text-align: start;
   }
-  .day-row[data-state='now'] { --rest-fill: var(--color-plaster-100); color: var(--color-lapis-900); }
+  .day-row[data-state='now'] { --rest-fill: var(--color-current-fill); color: var(--color-current-text); }
   .day-row[data-state='past'] { --rest-fill: var(--color-lapis-800-60); color: var(--color-mist-400); }
   .day-row:focus { color: var(--focus-text); }
   .r-name { flex: 1; font-size: 32px; }
@@ -186,8 +186,9 @@ const dial = (needle: string, north: string, a: Record<string, Record<string, st
   .day-row[data-bell='true']:is(:focus, [data-state='now']) .bell,
   :global(.tv:not(:focus-within)) .day-row[data-bell='true'][data-focus-start] .bell { background: var(--color-lapis-900); }
   .day-row[data-bell='false'] .bell { box-shadow: inset 0 0 0 2px var(--color-bell-off-border); color: var(--color-mist-400); opacity: 0.7; }
-  .day-row[data-bell='false']:is(:focus, [data-state='now']) .bell,
-  :global(.tv:not(:focus-within)) .day-row[data-bell='false'][data-focus-start] .bell { color: var(--color-lapis-900); }
+  .day-row[data-bell='false'][data-state='now'] .bell { color: var(--color-current-text); }
+  .day-row[data-bell='false']:focus .bell,
+  :global(.tv:not(:focus-within)) .day-row[data-bell='false'][data-focus-start] .bell { color: var(--focus-text); }
 
   .qibla {
     position: absolute; inset-inline-start: 1424px; top: 236px; width: 400px; height: 698px; padding: 28px 32px;

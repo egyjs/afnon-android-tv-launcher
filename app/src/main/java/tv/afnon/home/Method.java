@@ -71,16 +71,21 @@ final class Method {
     }
 
     /**
-     * The six times (PrayerDay.FAJR..ISHA) for a day, seconds dropped. {@code horizon} is the city's
-     * {sunrise, Maghrib} arc minutes below the horizon, which only Morocco's method uses.
+     * The six times (PrayerDay.FAJR..ISHA) for a day, seconds dropped. {@code params} is this method's
+     * {@link #parameters()} with the caller's Asr school, adjustments and rules (PrayerDay). {@code horizon} is the
+     * city's {sunrise, Maghrib} arc minutes below the horizon, which only Morocco's method uses.
      */
-    Date[] times(Coordinates where, DateComponents day, Madhab madhab, int[] horizon) {
+    Date[] times(Coordinates where, DateComponents day, CalculationParameters params, int[] horizon) {
         if (this == MOROCCO_HABOUS) {
-            Date[] t = Habous.times(where, day, madhab, horizon);
-            if (t != null) return t;
+            Date[] t = Habous.times(where, day, params.madhab, horizon);
+            if (t != null) {
+                // Adjust the times, in whole minutes after the ministry's rounding, as adhan adds them.
+                PrayerAdjustments a = params.adjustments;
+                int[] minutes = {a.fajr, a.sunrise, a.dhuhr, a.asr, a.maghrib, a.isha};
+                for (int i = 0; i < 6; i++) t[i] = new Date(t[i].getTime() + minutes[i] * 60_000L);
+                return t;
+            }
         }
-        CalculationParameters params = parameters();
-        params.madhab = madhab;
         PrayerTimes p = new PrayerTimes(where, day, params);
         return new Date[] {p.fajr, p.sunrise, p.dhuhr, p.asr, p.maghrib, p.isha};
     }

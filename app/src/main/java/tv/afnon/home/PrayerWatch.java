@@ -138,6 +138,8 @@ final class PrayerWatch {
         hideBanner();
         Ui.init(service);
         Text t = Screen.loadText(service);
+        // Over other apps too, the banner takes the palette of Settings → Display → Night mode.
+        Tokens.use(Prefs.night(service));
         boolean h24 = Prefs.clock24(service);
         Typeface ui = service.getResources().getFont(R.font.alexandria_regular);
         Typeface display = service.getResources().getFont(t.ar ? R.font.amiri_bold : R.font.marcellus_regular);

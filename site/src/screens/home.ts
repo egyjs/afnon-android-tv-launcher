@@ -22,7 +22,7 @@ export function archModel(c: Ctx) {
   let label = t.s('nextPrayer'), name = names[day.nextIndex];
   let sub = t.s('adhanAt') + ' ' + nextTime + t.sep() + day.city[t.lang], sub2 = '';
   if (day.friday && day.nextIndex === DHUHR) label = t.s('jumuahLabel');
-  if (day.friday) sub2 = t.s('kahf');
+  if (day.kahf) sub2 = t.s('kahf');
   if (day.ramadan) {
     sub2 = t.d((t.ar ? 'السحور حتى ' : 'Suhoor ends ') + clock(t, day.suhoorEnd, h24));
     if (day.nextIndex === MAGHRIB) {

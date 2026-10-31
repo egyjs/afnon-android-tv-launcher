@@ -27,4 +27,12 @@ abdulbasit|Athan Abed Albase6.mp3
 nuyne|Athan Ahmad Nuyne3.mp3
 makkah|Athan Makkah.mp3
 LIST
+# Two more that meypod/al-azan uses, from https://github.com/meypod/audio_files (no licence stated there either).
+BASE2="https://raw.githubusercontent.com/meypod/audio_files/main/adhan"
+for item in nabawi\|masjid_an_nabawi.mp3 ghalwash\|ragheb_mustafa_ghalwash.mp3; do
+  id="${item%%|*}"
+  [ -f "$DEST/$id.mp3" ] && continue
+  echo "  $id"
+  curl -fsSL -o "$DEST/$id.mp3" "$BASE2/${item#*|}"
+done
 echo "Adhan recordings are in $DEST"

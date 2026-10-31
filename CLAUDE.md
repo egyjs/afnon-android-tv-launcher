@@ -21,7 +21,8 @@ real TV over ADB, never just in the build.
 - No network access except the chosen radio station's stream (hosts listed in `Radio.STATIONS` and the README's
   Privacy section). No analytics, ads or feeds.
 - Colours/sizes/timings from `afnon-mihrab/tokens.json` (generated into `Tokens.java`, `colors.xml` and the site's
-  `tokens.css` by `cd site && npm run tokens`; never edit those by hand); every string in Arabic and English in
+  `tokens.css` by `cd site && npm run tokens`; never edit those by hand). Night mode's colours are
+  `tokens.night.json`; colours are read when a view is built, so never copy one into a `static final`. Every string in Arabic and English in
   `Text.java`. Arabic (RTL) is the
   default; check RTL and LTR. No letter-spacing on Arabic. Quranic text uses Amiri and must be exact (surah:ayah).
 - D-pad focus is explicit per screen, with Left/Right swapped in RTL.

@@ -133,8 +133,14 @@ public class NowActivity extends Screen {
         TextView v = text(ui500, 28, Tokens.PLASTER_100);
         v.setGravity(Gravity.CENTER);
         b.addView(v, new FrameLayout.LayoutParams(-1, -1));
-        b.setLook(f -> v.setTextColor(f ? Tokens.LAPIS_900 : Tokens.PLASTER_100));
+        b.setLook(f -> v.setTextColor(f ? Tokens.FOCUS_TEXT : Tokens.PLASTER_100));
         return b;
+    }
+
+    /** See-through over what was playing, by day or night: its dimmed ground is the scrim token. */
+    @Override
+    int nightTheme() {
+        return 0;
     }
 
     @Override

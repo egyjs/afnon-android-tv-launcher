@@ -3,8 +3,11 @@ package tv.afnon.home;
 import android.content.Context;
 import android.icu.util.IslamicCalendar;
 
+import com.batoulapps.adhan.CalculationParameters;
 import com.batoulapps.adhan.Coordinates;
+import com.batoulapps.adhan.HighLatitudeRule;
 import com.batoulapps.adhan.Madhab;
+import com.batoulapps.adhan.PrayerAdjustments;
 import com.batoulapps.adhan.Qibla;
 import com.batoulapps.adhan.data.DateComponents;
 
@@ -24,19 +27,41 @@ final class PrayerDay {
     final Date nextTime;
     /** The Fajr that ends tonight's Suhoor: today's before dawn, otherwise tomorrow's. */
     final Date suhoorEnd;
+    /** Jumu'ah in Dhuhr's place: Friday until its Maghrib, when the Hijri day turns to Saturday. */
     final boolean friday;
+    /** Surat al-Kahf: the Hijri Friday, from Thursday's Maghrib to Friday's. */
+    final boolean kahf;
+    /** The Hijri day's weekday (Calendar.SUNDAY…SATURDAY), which turns at Maghrib with its date. */
+    final int weekday;
     final boolean ramadan;
     final int hijriDay, hijriMonth, hijriYear;
     final double qibla;
 
-    /** With the saved location, method, Asr school and Hijri adjustment (Afnon Settings). */
+    /** With the saved location, method, Asr school, adjustments and Hijri adjustment (Afnon Settings). */
     PrayerDay(Context c, Date now) {
-        this(now, Prefs.where(c), Prefs.method(c), Prefs.madhab(c), Prefs.hijriOffset(c), Habous.horizon(Prefs.city(c).id));
+        this(now, Prefs.where(c), Prefs.method(c), Prefs.madhab(c), Prefs.adjustments(c), Prefs.hijriOffset(c),
+            Habous.horizon(Prefs.city(c).id));
     }
 
     /** {@code horizon}: the city's {sunrise, Maghrib} arc minutes below the horizon (see {@link Habous#horizon}). */
-    PrayerDay(Date now, Coordinates where, Method method, Madhab madhab, int hijriOffset, int[] horizon) {
-        Date[] today = method.times(where, DateComponents.from(now), madhab, horizon);
+    PrayerDay(Date now, Coordinates where, Method method, Madhab madhab, int[] adjust, int hijriOffset, int[] horizon) {
+        CalculationParameters params = method.parameters();
+        params.madhab = madhab;
+        // Minutes added to each time (Settings → Adjust the times), to match a mosque's timetable.
+        params.adjustments = new PrayerAdjustments(adjust[FAJR], adjust[SUNRISE], adjust[DHUHR], adjust[ASR],
+            adjust[MAGHRIB], adjust[ISHA]);
+        // Beyond 48° (London, Paris, Berlin…) Fajr is no earlier than a seventh of the night before sunrise and
+        // Isha no later than a seventh after Maghrib, as meypod/al-azan does; adhan's default, the middle of the
+        // night, put both near 1 a.m. on summer nights, when the sun never reaches their angles. North or south;
+        // nearer the equator nothing changes.
+        if (Math.abs(where.latitude) > 48) params.highLatitudeRule = HighLatitudeRule.SEVENTH_OF_THE_NIGHT;
+        // Umm al-Qura's Isha is 2 hours after Maghrib in Ramadan, not 1½, as Saudi Arabia's calendar and al-azan
+        // have it. An evening belongs to the next Hijri day, so this runs from the first night of Ramadan (the
+        // first tarawih) to the last, and not on the night of Eid. The Hijri offset moves it with the date shown.
+        if (method == Method.UMM_AL_QURA && hijriMonthOf(now, 1 + hijriOffset) == IslamicCalendar.RAMADAN) {
+            params.ishaInterval = 120;
+        }
+        Date[] today = method.times(where, DateComponents.from(now), params, horizon);
         for (int i = 0; i < 6; i++) times[i] = minute(today[i]);
 
         int latest = -1;
@@ -50,7 +75,7 @@ final class PrayerDay {
         Calendar c = Calendar.getInstance();
         c.setTime(now);
         c.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrowFajr = minute(method.times(where, DateComponents.from(c.getTime()), madhab, horizon)[FAJR]);
+        Date tomorrowFajr = minute(method.times(where, DateComponents.from(c.getTime()), params, horizon)[FAJR]);
         if (next == -1) {
             next = FAJR;
             times[FAJR] = tomorrowFajr;
@@ -60,18 +85,37 @@ final class PrayerDay {
         suhoorEnd = times[FAJR].after(now) ? times[FAJR] : tomorrowFajr;
 
         c.setTime(now);
-        friday = c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY;
+        int dow = c.get(Calendar.DAY_OF_WEEK);
+        // The Hijri day begins at Maghrib: from then until midnight its date and weekday are the next day's
+        // (Friday evening is ليلة السبت). Ramadan follows it, so its first night has a suhoor and Eid's night none.
+        int eve = now.before(times[MAGHRIB]) ? 0 : 1;
+        weekday = (dow - 1 + eve) % 7 + 1;
+        // Jumu'ah ends with Friday at its Maghrib, and doesn't start on Thursday evening (that Dhuhr has passed).
+        friday = dow == Calendar.FRIDAY && eve == 0;
+        kahf = weekday == Calendar.FRIDAY;
 
         IslamicCalendar h = new IslamicCalendar();
         h.setCalculationType(IslamicCalendar.CalculationType.ISLAMIC_UMALQURA);
         h.setTime(now);
-        if (hijriOffset != 0) h.add(IslamicCalendar.DAY_OF_MONTH, hijriOffset);
+        if (hijriOffset + eve != 0) h.add(IslamicCalendar.DAY_OF_MONTH, hijriOffset + eve);
         hijriDay = h.get(IslamicCalendar.DAY_OF_MONTH);
         hijriMonth = h.get(IslamicCalendar.MONTH);
         hijriYear = h.get(IslamicCalendar.YEAR);
         ramadan = hijriMonth == IslamicCalendar.RAMADAN;
 
         qibla = new Qibla(where).direction;
+    }
+
+    /** The Umm al-Qura month (IslamicCalendar.MUHARRAM…) of the calendar day days after now's, at noon. */
+    private static int hijriMonthOf(Date now, int days) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(now);
+        c.add(Calendar.DAY_OF_MONTH, days);
+        c.set(Calendar.HOUR_OF_DAY, 12);
+        IslamicCalendar h = new IslamicCalendar();
+        h.setCalculationType(IslamicCalendar.CalculationType.ISLAMIC_UMALQURA);
+        h.setTime(c.getTime());
+        return h.get(IslamicCalendar.MONTH);
     }
 
     /**
