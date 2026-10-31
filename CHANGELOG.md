@@ -47,10 +47,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   night of Eid doesn't; «سورة الكهف اليوم» shows from Thursday's Maghrib to Friday's. Jumu'ah replaces Dhuhr on
   Friday until its Maghrib, then the strip says الظهر again.
 - Umm al-Qura (the Saudi cities): Isha is 2 hours after Maghrib in Ramadan instead of 1½, from the first night of
-  Ramadan to the last, as Saudi Arabia's calendar and meypod/al-azan have it.
-- Cities above 48° (London, Paris, Berlin, Amsterdam…): where summer nights never get dark enough for Fajr's and
-  Isha's angles, they are now a seventh of the night from Maghrib and before sunrise, as al-azan has it, instead of
-  both near 1 a.m.
+  Ramadan to the last (moved by the Hijri offset with the date shown), as Saudi Arabia's calendar and
+  meypod/al-azan have it. Settings shows it under the method.
+- Cities beyond 48°, north or south (London, Paris, Berlin, Amsterdam, Copenhagen, Edmonton…): Fajr is no earlier
+  than a seventh of the night before sunrise and Isha no later than a seventh after Maghrib, as al-azan has it.
+  On summer nights, when the sun never reaches their angles, both were near 1 a.m.; the limit also moves them by
+  some minutes from about spring to autumn.
 
 ### Fixed
 - Afnon remote buttons (and the call to prayer) now also come back after a force-stop when Android marked the

@@ -61,9 +61,6 @@ h1, h2, h3 { font-family: var(--display); font-weight: var(--display-weight); li
 .tv .display { font-family: var(--display); }
 .tv .display-bold { font-family: var(--display); font-weight: var(--display-weight); }
 .tv .abs { position: absolute; }
-/* Screen.numbers: in Arabic with Western digits the big numbers take Marcellus, their ص/م staying in Amiri. */
-.tv[data-latin-digits] .numbers { font-family: var(--font-family-display-en); font-weight: 400; }
-.tv[data-latin-digits] .numbers small { font-family: var(--font-family-display-ar); }
 
 /* A focusable tile, as FocusTile.java: rest look, then gold fill + plaster ring + scale on focus. */
 .ft {

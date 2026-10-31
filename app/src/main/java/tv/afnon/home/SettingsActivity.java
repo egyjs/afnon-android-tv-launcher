@@ -469,7 +469,11 @@ public class SettingsActivity extends Screen {
     private Row adjustRow(int prayer) {
         return new Row(STEP) {
             String label() { return t.prayerNames()[prayer]; }
-            String help() { return t.adjustTimeHelp(time(day.times[prayer], 1f).toString()); }
+            String help() {
+                // After Isha, PrayerDay holds tomorrow's Fajr.
+                boolean tomorrow = prayer == PrayerDay.FAJR && day.times[prayer].after(day.times[PrayerDay.ISHA]);
+                return t.adjustTimeHelp(time(day.times[prayer], 1f).toString(), tomorrow);
+            }
             int amount() { return Prefs.adjustments(SettingsActivity.this)[prayer]; }
             void setAmount(int n) { Prefs.setAdjustment(SettingsActivity.this, prayer, n); }
             int lowest() { return -30; }

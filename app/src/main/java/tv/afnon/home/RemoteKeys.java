@@ -148,7 +148,11 @@ public class RemoteKeys extends AccessibilityService {
             // Android reads the list when it hears of a change; written back at once, it would only see the last.
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                 try {
-                    list(cr, all);
+                    // Read again: another service may have been turned on or off in that second.
+                    String rest = withoutMe(Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES), me);
+                    list(cr, rest.isEmpty() ? me.flattenToShortString() : rest + ":" + me.flattenToShortString());
+                    // Out of the list for that second, it may have reached onUnbind, which takes it as turned off.
+                    Prefs.of(c).edit().putBoolean(PREF_ON, true).apply();
                 } catch (SecurityException ignored) {
                     // The grant was revoked meanwhile.
                 }

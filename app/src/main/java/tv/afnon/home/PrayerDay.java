@@ -49,14 +49,15 @@ final class PrayerDay {
         // Minutes added to each time (Settings → Adjust the times), to match a mosque's timetable.
         params.adjustments = new PrayerAdjustments(adjust[FAJR], adjust[SUNRISE], adjust[DHUHR], adjust[ASR],
             adjust[MAGHRIB], adjust[ISHA]);
-        // Where summer nights never get dark enough for Fajr's and Isha's angles (above 48°: London, Paris,
-        // Berlin…), a seventh of the night after Maghrib and before sunrise, as meypod/al-azan does; adhan's
-        // default, the middle of the night, put both near 1 a.m. Below 48° nothing changes.
-        if (where.latitude > 48) params.highLatitudeRule = HighLatitudeRule.SEVENTH_OF_THE_NIGHT;
+        // Beyond 48° (London, Paris, Berlin…) Fajr is no earlier than a seventh of the night before sunrise and
+        // Isha no later than a seventh after Maghrib, as meypod/al-azan does; adhan's default, the middle of the
+        // night, put both near 1 a.m. on summer nights, when the sun never reaches their angles. North or south;
+        // nearer the equator nothing changes.
+        if (Math.abs(where.latitude) > 48) params.highLatitudeRule = HighLatitudeRule.SEVENTH_OF_THE_NIGHT;
         // Umm al-Qura's Isha is 2 hours after Maghrib in Ramadan, not 1½, as Saudi Arabia's calendar and al-azan
         // have it. An evening belongs to the next Hijri day, so this runs from the first night of Ramadan (the
-        // first tarawih) to the last, and not on the night of Eid.
-        if (method == Method.UMM_AL_QURA &&hijriMonthOf(now, 1) == IslamicCalendar.RAMADAN) {
+        // first tarawih) to the last, and not on the night of Eid. The Hijri offset moves it with the date shown.
+        if (method == Method.UMM_AL_QURA && hijriMonthOf(now, 1 + hijriOffset) == IslamicCalendar.RAMADAN) {
             params.ishaInterval = 120;
         }
         PrayerTimes today = new PrayerTimes(where, DateComponents.from(now), params);

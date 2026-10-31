@@ -43,7 +43,7 @@ export function hijriOf(date: Date, offsetDays = 0) {
 
 export type PrayerDay = ReturnType<typeof prayerDay>;
 
-/** The Umm al-Qura month of the calendar day `days` after now's (PrayerDay.hijriMonthOf; no Hijri offset). */
+/** The Umm al-Qura month of the calendar day `days` after now's (PrayerDay.hijriMonthOf). */
 const hijriMonthOf = (now: Date, days: number) => hijriOf(now, days).month;
 
 /** One moment's view of the prayer day: the six times, the current prayer and the next. */
@@ -56,10 +56,10 @@ export function prayerDay(now: Date, prefs: Prefs) {
   // Minutes added to each time (Settings → Adjust the times), to match a mosque's timetable.
   const [fajr, sunrise, dhuhr, asr, maghrib, isha] = adjustOf(prefs);
   params.adjustments = { fajr, sunrise, dhuhr, asr, maghrib, isha };
-  // Above 48° summer nights never get dark enough for Fajr's and Isha's angles: a seventh of the night.
-  if (city.lat > 48) params.highLatitudeRule = HighLatitudeRule.SeventhOfTheNight;
+  // Beyond 48°, north or south, Fajr and Isha stay within a seventh of the night of sunrise and Maghrib.
+  if (Math.abs(city.lat) > 48) params.highLatitudeRule = HighLatitudeRule.SeventhOfTheNight;
   // Umm al-Qura's Isha is 2 hours after Maghrib in Ramadan; an evening belongs to the next Hijri day.
-  if (method === 'UMM_AL_QURA' && hijriMonthOf(now, 1) === RAMADAN) params.ishaInterval = 120;
+  if (method === 'UMM_AL_QURA' && hijriMonthOf(now, 1 + prefs.hijriOffset) === RAMADAN) params.ishaInterval = 120;
   const at = (d: Date) => new PrayerTimes(where, d, params);
   const today = at(now);
   const times = [today.fajr, today.sunrise, today.dhuhr, today.asr, today.maghrib, today.isha].map(minute);

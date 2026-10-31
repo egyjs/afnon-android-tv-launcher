@@ -39,7 +39,8 @@ function methodAngles(t: Text, m: string) {
   const p = methodParams(m);
   const fajr = (t.ar ? 'زاوية الفجر ' : 'Fajr angle ') + trim(p.fajrAngle) + '°';
   const isha = p.ishaInterval > 0
-    ? t.ar ? `العشاء بعد المغرب بـ ${p.ishaInterval} دقيقة` : `Isha ${p.ishaInterval} min after Maghrib`
+    ? (t.ar ? `العشاء بعد المغرب بـ ${p.ishaInterval} دقيقة` : `Isha ${p.ishaInterval} min after Maghrib`) +
+      (m === 'UMM_AL_QURA' ? (t.ar ? ' (120 في رمضان)' : ' (120 in Ramadan)') : '')
     : (t.ar ? 'العشاء ' : 'Isha ') + trim(p.ishaAngle) + '°';
   const plus = dayAdjustment(m);
   const extra = plus === 0 ? '' : t.ar ? ` · +${plus} دقائق للظهر والعصر والمغرب` : ` · Dhuhr, Asr and Maghrib +${plus} min`;
@@ -81,7 +82,8 @@ export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
     // Adjust the times: each of the six up to 30 minutes earlier or later, with what it is today under its name.
     case ADJUST: return adjustOf(p).map((n, i) => ({
       id: 'adj' + i, kind: 'step' as Kind, label: t.list('prayerNames')[i],
-      help: t.adjustTimeHelp(clock(t, c.day.times[i], c.h24)), value: t.minutesSigned(n),
+      help: t.adjustTimeHelp(clock(t, c.day.times[i], c.h24), i === 0 && c.day.times[0] > c.day.times[5]),
+      value: t.minutesSigned(n),
     }));
     case NEWS: return [];
     case REMINDERS: return [

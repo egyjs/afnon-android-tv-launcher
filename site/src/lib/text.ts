@@ -103,9 +103,10 @@ export function makeText(lang: Lang, eastern = lang === 'ar') {
     bearingLabel: (deg: number) => d(octant(deg) + ' · ' + deg + '°'),
     /** A time's adjustment between its − and + buttons: "+2", "0", "-3"; LTR-embedded so the sign leads in Arabic. */
     minutesSigned: (n: number) => '‪' + d(n > 0 ? '+' + n : String(n)) + '‬',
-    /** Under each time's name in Adjust the times: what it is today with the adjustment. */
-    adjustTimeHelp: (time: string) =>
-      d(ar ? 'اليوم ' + time + ' · بالدقائق، حتى 30 قبله أو بعده' : 'Today ' + time + ' · in minutes, up to 30 earlier or later'),
+    /** Under each time's name in Adjust the times: what it is with the adjustment (Fajr is tomorrow's after Isha). */
+    adjustTimeHelp: (time: string, tomorrow = false) =>
+      d(ar ? (tomorrow ? 'غدًا ' : 'اليوم ') + time + ' · بالدقائق، حتى 30 قبله أو بعده'
+        : (tomorrow ? 'Tomorrow ' : 'Today ') + time + ' · in minutes, up to 30 earlier or later'),
     /** A release's heading on the What's new page: «أفنون 0.5» / "Afnon 0.5", in the chosen digits. */
     newsVersion: (version: string) => (ar ? 'أفنون ' : 'Afnon ') + (eastern ? d(version).replace('.', '٫') : version),
     roomButton: (set: boolean) =>
