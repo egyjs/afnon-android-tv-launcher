@@ -10,12 +10,14 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.TypefaceSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -45,6 +47,13 @@ abstract class Screen extends Activity {
     boolean rtl;
     boolean h24;
     Typeface ui400, ui500, ui600, display, displayBold, sacred;
+    /**
+     * The display font for numbers (the clock, the countdown, times and degrees): Marcellus, as in English, and in
+     * Arabic too with Western digits ({@link #marcellusDigits}); otherwise the display font.
+     */
+    Typeface numbers;
+    /** Where numbers are in Marcellus but the words in Amiri: the font for a time's ص/م; else null. */
+    Typeface marker;
     FrameLayout root;
     ArchView arch;
     TextView archLabel, archName, archCount, archSub, archSub2;
@@ -138,6 +147,15 @@ abstract class Screen extends Activity {
         return changed || (built != null && !built.equals(builtSettings));
     }
 
+    /**
+     * Arabic with Western digits: the big numbers take English's Marcellus instead of Amiri (the user's choice),
+     * and the Arabic in them (ص/م) stays Amiri through a TypefaceSpan, which needs Android 9. Eastern digits keep
+     * Amiri: Marcellus has none.
+     */
+    static boolean marcellusDigits(Text t) {
+        return t.ar && !t.eastern && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+    }
+
     /** The saved language and digits, for screens and for the screensaver, which is not an Activity. */
     static Text loadText(Context c) {
         SharedPreferences p = c.getSharedPreferences("afnon", MODE_PRIVATE);
@@ -179,6 +197,8 @@ abstract class Screen extends Activity {
         display = getResources().getFont(t.ar ? R.font.amiri_regular : R.font.marcellus_regular);
         displayBold = t.ar ? getResources().getFont(R.font.amiri_bold) : display;
         sacred = getResources().getFont(R.font.amiri_regular);
+        numbers = marcellusDigits(t) ? getResources().getFont(R.font.marcellus_regular) : display;
+        marker = numbers != display ? display : null;
 
         // A chooser open over the old root goes with it; left set, it would swallow every key while nothing shows.
         chooser = null;
@@ -219,7 +239,7 @@ abstract class Screen extends Activity {
         info.setGravity(Gravity.CENTER_HORIZONTAL);
         archLabel = caps(text(ui400, 22, Tokens.MIST_400));
         archName = text(displayBold, 88, Tokens.GOLD_400);
-        archCount = text(display, 150, Tokens.PLASTER_100);
+        archCount = text(numbers, 150, Tokens.PLASTER_100);
         archCount.setTextDirection(View.TEXT_DIRECTION_LTR);
         archCount.setFontFeatureSettings("tnum");
         archSub = text(ui400, subSize, Tokens.MIST_400);
@@ -228,13 +248,22 @@ abstract class Screen extends Activity {
             v.setGravity(Gravity.CENTER_HORIZONTAL);
             info.addView(v, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
+        // The countdown spans the column from a start renderCountdown sets, so it never re-centres each second.
+        archCount.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+        archCount.setGravity(Gravity.LEFT);
+        archCount.setSingleLine(true);
+        countHead = null;
         ((LinearLayout.LayoutParams) archSub.getLayoutParams()).topMargin = Ui.ipx(subGap);
         ((LinearLayout.LayoutParams) archSub2.getLayoutParams()).topMargin = Ui.ipx(sub2Gap);
         lineHeight(archName, 1.15f);
         lineHeight(archCount, 1f);
         info.setClipChildren(false);
-        place(info, 136, infoTop, 520, ViewGroup.LayoutParams.WRAP_CONTENT);
+        place(info, 136, infoTop, ARCH_INFO_W, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
+
+    /** The arch's info column, and the countdown's text before its last two digits when its start was set. */
+    private static final float ARCH_INFO_W = 520;
+    private String countHead;
 
     /**
      * The arch countdown to day's next prayer: mm:ss under an hour at 150px, h:mm:ss above at 120px, and the
@@ -245,11 +274,35 @@ abstract class Screen extends Activity {
     long renderCountdown(PrayerDay day, Date now, boolean archFocused) {
         long left = secondsUntil(day.nextTime, now);
         long h = left / 3600;
-        archCount.setText(t.d(duration(left, true)));
+        String count = t.d(duration(left, true));
+        archCount.setText(count);
         float countSize = Ui.px(h > 0 ? Tokens.FONT_SIZE_DISPLAY_XL_HOURS : Tokens.FONT_SIZE_DISPLAY_XL);
+        // Marcellus digits are proportional: wide counts (10:00:00) can overflow the column, so it shrinks until it
+        // fits. It measures the count with every digit a 0, the widest, so the size changes only with the count's
+        // shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+        String widest = count.replaceAll("[0-9]", "0").replaceAll("[٠-٩]", "٠");
+        float maxW = Ui.px(ARCH_INFO_W);
+        android.graphics.Paint measure = new android.graphics.Paint(archCount.getPaint());
+        measure.setTextSize(countSize);
+        float minSize = Ui.px(80);
+        while (measure.measureText(widest) > maxW && countSize > minSize) {
+            countSize -= Ui.px(5);
+            measure.setTextSize(countSize);
+        }
         if (archCount.getTextSize() != countSize) {
             archCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, countSize);
             lineHeight(archCount, 1f);
+            countHead = null;
+        }
+        // Marcellus has no tabular digits (its 0 is nearly three 1s wide), so a centred countdown would sway every
+        // second. It starts where the text is centred with average-width seconds, set again only when something
+        // before the seconds changes: a digit that isn't changing never moves. Amiri's equal digits centre exactly.
+        String head = count.substring(0, count.length() - 2);
+        if (!head.equals(countHead)) {
+            countHead = head;
+            android.graphics.Paint p = archCount.getPaint();
+            float w = p.measureText(head) + p.measureText(t.d("0123456789")) / 5;
+            archCount.setPadding(Math.max(0, Math.round((Ui.px(ARCH_INFO_W) - w) / 2)), 0, 0, 0);
         }
         boolean approaching = left <= Tokens.APPROACH_MIN * 60L;
         arch.setState(approaching ? ArchView.APPROACHING : (archFocused ? ArchView.FOCUSED : ArchView.REST));
@@ -295,13 +348,26 @@ abstract class Screen extends Activity {
         return clock(t, d, h24, markerScale);
     }
 
+    /** {@link #time} for a view in {@link #numbers}: its ص/م in the Arabic font. */
+    CharSequence displayTime(Date d, float markerScale) {
+        return clock(t, d, h24, markerScale, marker);
+    }
+
     static CharSequence clock(Text t, Date d, boolean h24, float markerScale) {
+        return clock(t, d, h24, markerScale, null);
+    }
+
+    /** marker, if given, is the typeface for the ص/م after digits drawn in Marcellus (Android 9+). */
+    static CharSequence clock(Text t, Date d, boolean h24, float markerScale, Typeface marker) {
         if (h24) return t.d(new SimpleDateFormat("HH:mm", Locale.US).format(d));
         String hm = t.d(new SimpleDateFormat("h:mm", Locale.US).format(d));
         Calendar c = Calendar.getInstance();
         c.setTime(d);
         SpannableString s = new SpannableString(hm + " " + t.ampm(c.get(Calendar.AM_PM) == Calendar.AM));
         if (markerScale != 1f) s.setSpan(new RelativeSizeSpan(markerScale), hm.length(), s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (marker != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            s.setSpan(new TypefaceSpan(marker), hm.length() + 1, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         return s;
     }
 
