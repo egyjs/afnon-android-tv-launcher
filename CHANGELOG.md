@@ -19,6 +19,7 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - The arch countdown stays on one line: a wide count (10:00:00 in Marcellus) was wider than the arch and wrapped.
   It gets a little smaller until it fits, measured as if every digit were a 0 (the widest), so its size changes
   only with the count's shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+
 ## [0.8] - 2026-10-31
 
 ### Added
