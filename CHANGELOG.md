@@ -4,6 +4,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-03
+
 ### Changed
 - Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
   is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
@@ -19,6 +21,9 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - The arch countdown stays on one line: a wide count (10:00:00 in Marcellus) was wider than the arch and wrapped.
   It gets a little smaller until it fits, measured as if every digit were a 0 (the widest), so its size changes
   only with the count's shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+- Xiaomi MiTV: the remote's Input button did nothing. It sends Source (178), and the firmware opens the stock
+  launcher's inputs panel, which setup disables. Where the TV has no inputs screen of its own, Source and TV now
+  open Afnon's Inputs panel (Home's), as the Inputs button on Home does. TCL and CVTE are unchanged.
 
 ## [0.8] - 2026-10-31
 
@@ -338,7 +343,8 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...v0.8.1
 [0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
 [0.7]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6...v0.6.1

@@ -257,9 +257,9 @@ public class RemoteKeys extends AccessibilityService {
         return i != null && i.getComponent() != null && TCL_INPUT_BAR.equals(i.getComponent().getPackageName());
     }
 
-    /** The Android TV inputs screen, else the firmware's own source menu; null if neither exists. */
+    /** The Android TV inputs screen, else the firmware's own source menu, else Afnon's panel; null if none. */
     private Intent inputs() {
-        return Inputs.screen(this);
+        return Inputs.source(this);
     }
 
     private void filterKeys(boolean on) {

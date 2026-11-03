@@ -123,6 +123,11 @@ public class MainActivity extends Screen {
      * `--es station <id>` (ids in Radio.STATIONS) picks a radio station as Settings does, before any test runs.
      */
     private void runTest(Intent i) {
+        // Source on a TV without its own inputs screen (RemoteKeys): Afnon's panel. After onNewIntent's focus post.
+        if (i != null && i.getBooleanExtra(Inputs.EXTRA_PANEL, false)) {
+            i.removeExtra(Inputs.EXTRA_PANEL);
+            root.post(() -> showInputsPanel(Inputs.list(this)));
+        }
         String station = i == null ? null : i.getStringExtra("station");
         if (station != null) {
             i.removeExtra("station");

@@ -255,6 +255,9 @@ final class Text {
      */
     String[][] news() {
         if (ar) return new String[][] {
+            {"0.8.1",
+                "تلفاز شاومي: زر المصادر في الريموت يفتح قائمة مصادر الإدخال",
+                "الأرقام الكبيرة بخط Marcellus مع الأرقام الغربية، والعدّ التنازلي ثابت لا يتحرك كل ثانية"},
             {"0.8",
                 "تعديل المواقيت: كل وقت حتى 30 دقيقة قبله أو بعده، لمطابقة تقويم مسجدك",
                 "التاريخ الهجري ويومه يتغيّران عند المغرب، ومعهما رمضان وتذكير سورة الكهف",
@@ -290,6 +293,9 @@ final class Text {
                 "مرجع الآية «النساء 103» بالأرقام المختارة"},
         };
         return new String[][] {
+            {"0.8.1",
+                "Xiaomi TVs: the remote's Input button opens the list of inputs",
+                "With Western digits the big numbers are in Marcellus, and the countdown no longer shifts every second"},
             {"0.8",
                 "Adjust the times: each up to 30 minutes earlier or later, to match your mosque's timetable",
                 "The Hijri date and its weekday turn at Maghrib, and Ramadan and the Al-Kahf reminder with them",
