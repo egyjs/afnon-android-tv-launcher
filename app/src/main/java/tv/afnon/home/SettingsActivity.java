@@ -34,8 +34,9 @@ import java.util.Locale;
  * <p>Keys: the arrows only ever move. Up/Down go through the sections or the rows, toward the end side (or OK)
  * goes into the rows, toward the start side goes back to the sections. OK is the only key that changes anything:
  * it opens a list, flips a switch, or starts editing a choice or a stepper. While editing, ◀▶ move the choice,
- * OK saves it and Back cancels. Back on a row returns to the sections, Back again goes Home. Network and Device
- * settings open the TV's own screens. Every save shows ✓ Saved at the end of the hint line for a moment.
+ * OK saves it and Back cancels. Back on a row returns to the sections, Back again goes Home. Network settings
+ * opens the TV's own screen; Device has the TV's settings and Afnon updates (Updates), the only row that goes
+ * online. Every save shows ✓ Saved at the end of the hint line for a moment.
  */
 public class SettingsActivity extends Screen {
 
@@ -458,6 +459,12 @@ public class SettingsActivity extends Screen {
                     String label() { return t.deviceRow(); }
                     String help() { return t.deviceHelp(); }
                     void open() { startSafely(new Intent(Settings.ACTION_SETTINGS)); }
+                },
+                new Row(VALUE) {
+                    String label() { return t.updateRow(); }
+                    String help() { return t.updateHelp(Updates.state(), Updates.failure(), Updates.current(c), Updates.latest()); }
+                    String value() { return t.updateValue(Updates.state(), Updates.percent(), Updates.latest()); }
+                    void open() { Updates.press(c); refresh(); }
                 });
         }
     }
@@ -509,7 +516,16 @@ public class SettingsActivity extends Screen {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // A check or download shows its progress while Device is open.
+        Updates.listen(() -> { if (section == DEVICE) refresh(); });
+        if (section == DEVICE && day != null) refresh();
+    }
+
+    @Override
     protected void onPause() {
+        Updates.listen(null);
         stopPreview();
         super.onPause();
     }
@@ -747,7 +763,6 @@ public class SettingsActivity extends Screen {
         if (onNav) {
             if (vertical) navTo(section + up);
             else if (ok && section == NETWORK) startSafely(new Intent(Settings.ACTION_WIFI_SETTINGS));
-            else if (ok && section == DEVICE) startSafely(new Intent(Settings.ACTION_SETTINGS));
             else if ((ok || toEnd) && newsPage != null) focusNews();
             else if ((ok || toEnd) && !rows.isEmpty()) focusRow(0);
             return true;

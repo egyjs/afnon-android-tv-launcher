@@ -29,6 +29,14 @@ export const sectionName = (t: Text, i: number) =>
   [t.s('sectionPrayer'), t.s('sectionAdjust'), t.s('sectionReminders'), t.s('sectionRadio'), t.s('sectionDisplay'),
     t.ar ? 'الشبكة' : 'Network', t.s('sectionDevice'), t.s('sectionNews')][i];
 
+/** Text.updateHelp before a check: the version (What's new's top group, as in the release) and what OK does. */
+function updateHelp(t: Text) {
+  const v = (newsJson as Record<string, string[][]>)[t.lang][0][0];
+  const now = t.eastern ? t.d(v).replace('.', '٫') : v;
+  return t.ar ? `الإصدار ${now}${t.d(' · ')}يتصل بـ GitHub فقط عند الضغط على OK`
+    : `Version ${now} · contacts GitHub only when you press OK`;
+}
+
 function locationHelp(t: Text, lat: number, lng: number) {
   const ns = lat >= 0 ? (t.ar ? 'ش' : 'N') : t.ar ? 'ج' : 'S';
   const ew = lng >= 0 ? (t.ar ? 'ق' : 'E') : t.ar ? 'غ' : 'W';
@@ -107,7 +115,10 @@ export function rowsFor(c: Ctx, section: number, radioOn = false): Row[] {
       { id: 'night', kind: 'toggle', label: t.s('nightRow'), help: t.s('nightHelp'), on: !!p.night },
     ];
     case NETWORK: return [{ id: 'network', kind: 'value', label: t.s('networkRow'), help: t.s('networkHelp'), value: '' }];
-    default: return [{ id: 'device', kind: 'value', label: t.s('deviceRow'), help: t.s('deviceHelp'), value: '' }];
+    default: return [
+      { id: 'device', kind: 'value', label: t.s('deviceRow'), help: t.s('deviceHelp'), value: '' },
+      { id: 'update', kind: 'value', label: t.s('updateRow'), help: updateHelp(t), value: t.ar ? 'تحقّق' : 'Check' },
+    ];
   }
 }
 

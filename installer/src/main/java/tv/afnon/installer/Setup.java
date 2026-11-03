@@ -54,7 +54,9 @@ final class Setup {
             + "0|Quran Radio level bars and sleep timer|مؤشّر صوت إذاعة القرآن ومؤقّت النوم|pm grant tv.afnon.home android.permission.RECORD_AUDIO && pm grant tv.afnon.home android.permission.WRITE_SECURE_SETTINGS\n"
             + "?|d=$(dumpsys package tv.afnon.home); echo \"$d\" | grep -q 'RECORD_AUDIO: granted=true' && echo \"$d\" | grep -q 'WRITE_SECURE_SETTINGS: granted=true'\n"
             + "0|Wi-Fi name in Settings|اسم الواي فاي في الإعدادات|pm grant tv.afnon.home android.permission.ACCESS_FINE_LOCATION\n"
-            + "?|dumpsys package tv.afnon.home | grep -q 'ACCESS_FINE_LOCATION: granted=true'\n";
+            + "?|dumpsys package tv.afnon.home | grep -q 'ACCESS_FINE_LOCATION: granted=true'\n"
+            + "0|Afnon can install its updates|أفنون يثبّت تحديثاته|appops set tv.afnon.home REQUEST_INSTALL_PACKAGES allow\n"
+            + "?|appops get tv.afnon.home REQUEST_INSTALL_PACKAGES | grep -q allow\n";
 
     /** The setup steps for that release; never empty. */
     static List<Step> steps(String tag) {
