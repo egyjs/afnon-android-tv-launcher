@@ -20,7 +20,8 @@ import java.util.regex.Pattern;
  * Home's Inputs button, for remotes without a Source button. It opens the TV's own inputs screen, as Source does
  * ({@link #screen}). Where the firmware has none, Home shows its own panel (design/Inputs.dc.html) of the sources
  * the TV Input Framework lists ({@link #list}), which works with or without the stock launcher; switching opens the
- * input's passthrough channel in the TV's own player (com.tcl.tv on TCL).
+ * input's passthrough channel in the TV's own player (com.tcl.tv on TCL). Its first row is the TV's channels: the
+ * tuner's channel list, which also takes the player off an HDMI or AV input it was left on.
  */
 final class Inputs {
     private Inputs() {}
@@ -32,18 +33,29 @@ final class Inputs {
         final String id, name, badge;
         /** Whether something is plugged in; null where the TV doesn't say (it never reports a port as empty). */
         Boolean connected;
+        /** The TV's input state (TvInputManager.INPUT_STATE_*), for the order. */
+        final int state;
+        /** The TV's own channels (its built-in tuner), named by the panel rather than by the TV. */
+        final boolean tuner;
         final Intent open;
 
-        Source(String id, String name, String badge, Boolean connected, Intent open) {
+        Source(String id, String name, String badge, Boolean connected, int state, boolean tuner, Intent open) {
             this.id = id;
             this.name = name;
             this.badge = badge;
             this.connected = connected;
+            this.state = state;
+            this.tuner = tuner;
             this.open = open;
         }
     }
 
-    /** The passthrough inputs a player can open, HDMI first, each group in label order; empty if there are none. */
+    /**
+     * The TV's channels (its first tuner, opened on its channel list, so the player leaves an HDMI or AV input it
+     * was left on), then the passthrough inputs a player can open: HDMI, then the rest, the ones with something
+     * plugged in first, then by label. AV is left out: nothing uses it, and an empty input shows only "No signal"
+     * (the Xiaomi MiTV lists it). Empty if there is nothing to switch to.
+     */
     static List<Source> list(Context c) {
         List<Source> out = new ArrayList<>();
         TvInputManager tim = (TvInputManager) c.getSystemService(Context.TV_INPUT_SERVICE);
@@ -54,25 +66,41 @@ final class Inputs {
         } catch (RuntimeException e) {
             return out;
         }
+        Source tuner = null;
         for (TvInputInfo info : infos) {
-            // Tuners have channels rather than one picture to show; the TV's own screen covers them.
-            if (!info.isPassthroughInput() || info.isHidden(c)) continue;
+            if (info.isHidden(c)) continue;
+            if (info.getType() == TvInputInfo.TYPE_TUNER) {
+                // One row for the channels, however many tuners the TV has (the MiTV's two play the same list).
+                if (tuner != null && tuner.id.compareTo(info.getId()) <= 0) continue;
+                Intent watch = explicit(c, new Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(TvContract.buildChannelsUriForInput(info.getId()), TvContract.Channels.CONTENT_TYPE));
+                if (watch != null) tuner = new Source(info.getId(), String.valueOf(info.loadLabel(c)), "TV", null,
+                    TvInputManager.INPUT_STATE_CONNECTED, true, watch);
+                continue;
+            }
+            if (!info.isPassthroughInput() || info.getType() == TvInputInfo.TYPE_COMPOSITE) continue;
             Intent open = explicit(c, new Intent(Intent.ACTION_VIEW, TvContract.buildChannelUriForPassthroughInput(info.getId())));
             if (open == null) continue;
             CharSequence custom = info.loadCustomLabel(c), label = info.loadLabel(c);
             String name = String.valueOf(!TextUtils.isEmpty(custom) ? custom : label);
-            boolean connected = tim.getInputState(info.getId()) != TvInputManager.INPUT_STATE_DISCONNECTED;
-            out.add(new Source(info.getId(), name, badge(info.getType(), String.valueOf(label)), connected, open));
+            int state = tim.getInputState(info.getId());
+            boolean connected = state != TvInputManager.INPUT_STATE_DISCONNECTED;
+            out.add(new Source(info.getId(), name, badge(info.getType(), String.valueOf(label)), connected, state, false, open));
         }
         // The 55P7K calls every port connected or standby, empty or not; a TV that never says "disconnected"
         // doesn't know, so the panel shows no state rather than a wrong one.
         boolean tracks = false;
         for (Source s : out) tracks |= !s.connected;
         if (!tracks) for (Source s : out) s.connected = null;
+        // INPUT_STATE_CONNECTED (0) before standby (1) before disconnected (2): the MiTV calls only a port with
+        // a device on it connected.
         Collections.sort(out, (a, b) -> {
             boolean ha = a.badge.startsWith("H"), hb = b.badge.startsWith("H");
-            return ha != hb ? (ha ? -1 : 1) : a.name.compareToIgnoreCase(b.name);
+            if (ha != hb) return ha ? -1 : 1;
+            if (a.state != b.state) return Integer.compare(a.state, b.state);
+            return a.name.compareToIgnoreCase(b.name);
         });
+        if (tuner != null) out.add(0, tuner);
         return out;
     }
 
@@ -98,6 +126,19 @@ final class Inputs {
     static Intent screen(Context c) {
         Intent i = explicit(c, new Intent(ACTION_VIEW_INPUTS));
         return i != null ? i : FirmwareKeys.sourceMenu(c);
+    }
+
+    /** Home's extra that opens Afnon's Inputs panel. */
+    static final String EXTRA_PANEL = "inputs_panel";
+
+    /**
+     * What Source opens: the TV's own inputs screen, else Home with Afnon's panel where the TV lists sources (the
+     * Xiaomi MiTV's firmware opens the stock launcher's panel, which is gone once setup disables it); null if neither.
+     */
+    static Intent source(Context c) {
+        Intent i = screen(c);
+        if (i != null || list(c).isEmpty()) return i;
+        return new Intent(c, MainActivity.class).putExtra(EXTRA_PANEL, true);
     }
 
     /** The intent pinned to the activity that answers it now, or null if none does. */

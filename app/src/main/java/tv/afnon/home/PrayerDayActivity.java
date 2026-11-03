@@ -124,7 +124,7 @@ public class PrayerDayActivity extends Screen {
         rowName[i] = text(ui400, 32, Tokens.PLASTER_100);
         rowStatus[i] = text(ui400, 22, Tokens.PLASTER_100);
         rowStatus[i].setAlpha(0.85f);
-        rowTime[i] = text(display, 40, Tokens.PLASTER_100);
+        rowTime[i] = text(numbers, 40, Tokens.PLASTER_100);
         rowTime[i].setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
         rowTime[i].setTextDirection(rtl ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         rowTime[i].setMinWidth(Ui.ipx(120));
@@ -178,7 +178,7 @@ public class PrayerDayActivity extends Screen {
         // 260 rather than the design's 320, to make room for the room-direction button below.
         dial = new QiblaView(this);
         northLabel = text(ui400, 20, Tokens.MIST_400);
-        degrees = text(display, 64, Tokens.GOLD_400);
+        degrees = text(numbers, 64, Tokens.GOLD_400);
         degrees.setTextDirection(View.TEXT_DIRECTION_LTR);
         direction = text(ui400, 24, Tokens.PLASTER_100);
         direction.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -348,7 +348,7 @@ public class PrayerDayActivity extends Screen {
         for (int i = 0; i < ROWS; i++) {
             state[i] = i == day.nowIndex ? 1 : (i != day.nextIndex && !day.times[i].after(now) ? 0 : 2);
             rowName[i].setText(names[i]);
-            rowTime[i].setText(time(day.times[i], 0.55f));
+            rowTime[i].setText(displayTime(day.times[i], 0.55f));
             paintRow(i);
         }
 

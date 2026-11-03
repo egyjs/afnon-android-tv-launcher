@@ -37,6 +37,8 @@ public class AfnonDream extends DreamService {
     private Text t;
     private FrameLayout root, group;
     private TextView clock, date, next, left;
+    /** The clock's ص/م font where its digits are Marcellus; else null. */
+    private Typeface marker;
     private PrayerDay day;
     private long lastDrift, lastMinute = -1;
     /** The radio line under the countdown, and the screen-off step while it plays (Settings → Radio). */
@@ -70,6 +72,9 @@ public class AfnonDream extends DreamService {
 
         Typeface ui = getResources().getFont(R.font.alexandria_regular);
         Typeface display = getResources().getFont(t.ar ? R.font.amiri_regular : R.font.marcellus_regular);
+        // The clock in Marcellus also in Arabic with Western digits, its ص/م in Amiri (Screen.marcellusDigits).
+        Typeface numbers = Screen.marcellusDigits(t) ? getResources().getFont(R.font.marcellus_regular) : display;
+        marker = numbers != display ? display : null;
 
         root = new FrameLayout(this);
         root.setBackgroundColor(Tokens.SCREENSAVER_GROUND);
@@ -80,7 +85,7 @@ public class AfnonDream extends DreamService {
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setGravity(Gravity.CENTER_HORIZONTAL);
-        clock = text(display, 128, ink);
+        clock = text(numbers, 128, ink);
         clock.setTextDirection(t.ar ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         date = text(ui, 24, dim);
         View rule = new View(this);
@@ -163,7 +168,7 @@ public class AfnonDream extends DreamService {
             boolean arrived = day != null && Screen.secondsUntil(day.nextTime, now) == 0;
             day = new PrayerDay(this, arrived ? new Date(now.getTime() + 1000) : now);
             boolean h24 = Prefs.clock24(this);
-            clock.setText(Screen.clock(t, now, h24, 0.35f));
+            clock.setText(Screen.clock(t, now, h24, 0.35f, marker));
             date.setText(t.d(Screen.weekday(t, day) + t.sep() + day.hijriDay + " " + t.hijriMonths()[day.hijriMonth]));
             String[] names = t.prayerNames();
             if (day.friday) names[PrayerDay.DHUHR] = t.jumuah();

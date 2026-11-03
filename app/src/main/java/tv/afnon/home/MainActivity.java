@@ -123,6 +123,11 @@ public class MainActivity extends Screen {
      * `--es station <id>` (ids in Radio.STATIONS) picks a radio station as Settings does, before any test runs.
      */
     private void runTest(Intent i) {
+        // Source on a TV without its own inputs screen (RemoteKeys): Afnon's panel. After onNewIntent's focus post.
+        if (i != null && i.getBooleanExtra(Inputs.EXTRA_PANEL, false)) {
+            i.removeExtra(Inputs.EXTRA_PANEL);
+            root.post(() -> showInputsPanel(Inputs.list(this)));
+        }
         String station = i == null ? null : i.getStringExtra("station");
         if (station != null) {
             i.removeExtra("station");
@@ -225,7 +230,7 @@ public class MainActivity extends Screen {
         // Courtyard: clock and dates, then Radio, Wi-Fi, Inputs, night mode and Settings at the end side.
         LinearLayout when = new LinearLayout(this);
         when.setOrientation(LinearLayout.VERTICAL);
-        clock = text(display, 96, Tokens.PLASTER_100);
+        clock = text(numbers, 96, Tokens.PLASTER_100);
         clock.setIncludeFontPadding(false);
         clock.setTextDirection(rtl ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         clock.setFontFeatureSettings("tnum");
@@ -516,7 +521,7 @@ public class MainActivity extends Screen {
 
     private void renderMinute(Date now) {
         readClockFormat();
-        clock.setText(time(now, 0.4f));
+        clock.setText(displayTime(now, 0.4f));
         gdate.setText(gregorian(now));
         hdate.setText(hijri(day) + t.sep() + t.city());
 
@@ -901,7 +906,7 @@ public class MainActivity extends Screen {
         boolean known = s.connected != null, on = !known || s.connected;
         int rest = on ? Tokens.PLASTER_100 : Tokens.MIST_400;
         TextView name = text(ui500, 30, rest);
-        name.setText(s.name);
+        name.setText(s.tuner ? t.inputChannels() : s.name);
         name.setSingleLine(true);
         name.setEllipsize(TextUtils.TruncateAt.END);
         TextView status = text(ui400, 20, rest);

@@ -66,6 +66,8 @@ final class Text {
     // Inputs panel (design/Inputs.dc.html)
     String inputs() { return ar ? "مصادر الإدخال" : "Inputs"; }
     String inputSwitch() { return ar ? "تبديل" : "Switch"; }
+    /** The panel's first row: the TV's own channels, from its built-in receiver. */
+    String inputChannels() { return ar ? "قنوات التلفاز" : "TV channels"; }
     String inputOn() { return ar ? "متصل" : "Connected"; }
     String inputOff() { return ar ? "غير متصل" : "Not connected"; }
 
@@ -255,6 +257,11 @@ final class Text {
      */
     String[][] news() {
         if (ar) return new String[][] {
+            {"0.8.2",
+                "قائمة مصادر الإدخال تبدأ بقنوات التلفاز (الريسيفر المدمج)، ولم يعد فيها مصدر AV"},
+            {"0.8.1",
+                "تلفاز شاومي: زر المصادر في الريموت يفتح قائمة مصادر الإدخال",
+                "الأرقام الكبيرة بخط Marcellus مع الأرقام الغربية، والعدّ التنازلي ثابت لا يتحرك كل ثانية"},
             {"0.8",
                 "تعديل المواقيت: كل وقت حتى 30 دقيقة قبله أو بعده، لمطابقة تقويم مسجدك",
                 "التاريخ الهجري ويومه يتغيّران عند المغرب، ومعهما رمضان وتذكير سورة الكهف",
@@ -290,6 +297,11 @@ final class Text {
                 "مرجع الآية «النساء 103» بالأرقام المختارة"},
         };
         return new String[][] {
+            {"0.8.2",
+                "The Inputs list starts with TV channels (the built-in receiver), and AV is no longer in it"},
+            {"0.8.1",
+                "Xiaomi TVs: the remote's Input button opens the list of inputs",
+                "With Western digits the big numbers are in Marcellus, and the countdown no longer shifts every second"},
             {"0.8",
                 "Adjust the times: each up to 30 minutes earlier or later, to match your mosque's timetable",
                 "The Hijri date and its weekday turn at Maghrib, and Ramadan and the Al-Kahf reminder with them",

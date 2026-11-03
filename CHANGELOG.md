@@ -10,6 +10,35 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   appears each time Settings opens. Theme.Afnon sets `windowDisablePreview` and Afnon's own screens open and close
   with no transition, so the screen in front stays until the next one has drawn.
 
+## [0.8.2] - 2026-11-03
+
+### Fixed
+- Inputs panel (Home's Inputs button, and the remote's Input button on the Xiaomi MiTV): it listed only HDMI and
+  AV, so someone looking for the channels picked AV, and Live TV, which reopens on the last input, then showed
+  "No signal" with no way back from the panel. It now starts with **TV channels**, the built-in receiver (opened
+  on its channel list), and leaves AV out. HDMI ports with a device plugged in come first.
+
+## [0.8.1] - 2026-11-03
+
+### Changed
+- Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
+  is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
+  Prayer day's prayer times and the Qibla degrees. Their ص/م and every Arabic word stay in Amiri. With Eastern
+  digits, which Marcellus doesn't have, they stay in Amiri, and so they do before Android 9 (the mixed fonts
+  need its `TypefaceSpan`).
+- The arch countdown holds still. Marcellus's digits differ in width (a 0 is nearly three 1s) and it has no
+  tabular figures, so the centred countdown slid sideways every second, in English too. It now starts at a
+  fixed point, centred for average seconds and set again only when the minutes change, so a digit that isn't
+  changing never moves. The view also no longer asks for a new layout every second.
+
+### Fixed
+- The arch countdown stays on one line: a wide count (10:00:00 in Marcellus) was wider than the arch and wrapped.
+  It gets a little smaller until it fits, measured as if every digit were a 0 (the widest), so its size changes
+  only with the count's shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+- Xiaomi MiTV: the remote's Input button did nothing. It sends Source (178), and the firmware opens the stock
+  launcher's inputs panel, which setup disables. Where the TV has no inputs screen of its own, Source and TV now
+  open Afnon's Inputs panel (Home's), as the Inputs button on Home does. TCL and CVTE are unchanged.
+
 ## [0.8] - 2026-10-31
 
 ### Added
@@ -328,7 +357,9 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...v0.8.1
 [0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
 [0.7]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6...v0.6.1
