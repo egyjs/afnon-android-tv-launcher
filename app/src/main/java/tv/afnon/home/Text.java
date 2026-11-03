@@ -246,8 +246,10 @@ final class Text {
     String sectionNews() { return ar ? "ما الجديد" : "What's new"; }
     /** A release's heading on the What's new page: «أفنون 0.5» / "Afnon 0.5", in the chosen digits. */
     String newsVersion(String version) {
-        return (ar ? "أفنون " : "Afnon ") + (eastern ? d(version).replace('.', '٫') : version);
+        return (ar ? "أفنون " : "Afnon ") + version(version);
     }
+    /** A version number in the chosen digits, with the Arabic decimal mark beside Eastern digits. */
+    String version(String v) { return eastern ? d(v).replace('.', '٫') : v; }
     /**
      * Settings → What's new, newest release first: each group is a version (its heading, newsVersion), then a few
      * short lines, the same lines in the same order in both languages. Each line goes through d(), so its numbers
@@ -255,6 +257,8 @@ final class Text {
      */
     String[][] news() {
         if (ar) return new String[][] {
+            {"0.9",
+                "إعدادات الجهاز ← تحديث أفنون: يتحقّق من وجود إصدار جديد ويثبّته عند الضغط، ولا يتصل بالإنترنت وحده"},
             {"0.8.1",
                 "تلفاز شاومي: زر المصادر في الريموت يفتح قائمة مصادر الإدخال",
                 "الأرقام الكبيرة بخط Marcellus مع الأرقام الغربية، والعدّ التنازلي ثابت لا يتحرك كل ثانية"},
@@ -293,6 +297,8 @@ final class Text {
                 "مرجع الآية «النساء 103» بالأرقام المختارة"},
         };
         return new String[][] {
+            {"0.9",
+                "Device settings → Afnon updates: checks for a new version and installs it when you press OK, never online on its own"},
             {"0.8.1",
                 "Xiaomi TVs: the remote's Input button opens the list of inputs",
                 "With Western digits the big numbers are in Marcellus, and the countdown no longer shifts every second"},
@@ -391,6 +397,37 @@ final class Text {
     String networkHelp() { return ar ? "واي فاي وإيثرنت" : "Wi-Fi and Ethernet"; }
     String deviceRow() { return ar ? "إعدادات التلفاز" : "TV settings"; }
     String deviceHelp() { return ar ? "الصورة والصوت والتطبيقات والنظام" : "Picture, sound, apps and system"; }
+    // Settings → Device → Afnon updates (Updates): Afnon contacts GitHub only when OK is pressed there.
+    String updateRow() { return ar ? "تحديث أفنون" : "Afnon updates"; }
+    String updateHelp(int state, int failure, String current, String latest) {
+        String now = version(current);
+        switch (state) {
+            case Updates.LATEST: return ar ? "الإصدار " + now + " هو الأحدث" : "Version " + now + " is the latest";
+            case Updates.AVAILABLE: return ar ? "الإصدار " + now + sep() + "الإصدار " + version(latest) + " متاح"
+                : "Version " + now + sep() + version(latest) + " is out";
+            case Updates.DOWNLOADING:
+            case Updates.INSTALLING: return ar ? "يعود أفنون وحده بعد التثبيت" : "Afnon comes back by itself once installed";
+            case Updates.NOT_ALLOWED: return ar ? "شغّل إعداد أفنون مرة أخرى للسماح بالتحديث" : "Run Afnon's setup again to allow updates";
+            case Updates.FAILED:
+                if (failure == Updates.OFFLINE) return ar ? "تعذّر الوصول إلى GitHub، تحقّق من الإنترنت" : "Couldn't reach GitHub; check the internet";
+                if (failure == Updates.DOWNLOAD) return ar ? "انقطع التنزيل" : "The download stopped";
+                return ar ? "رفض التلفاز تثبيت التحديث" : "The TV refused the update";
+            default: return ar ? "الإصدار " + now + sep() + "يتصل بـ GitHub فقط عند الضغط على OK"
+                : "Version " + now + sep() + "contacts GitHub only when you press OK";
+        }
+    }
+    String updateValue(int state, int percent, String latest) {
+        switch (state) {
+            case Updates.CHECKING: return ar ? "جارٍ التحقّق…" : "Checking…";
+            case Updates.LATEST: return ar ? "محدَّث" : "Up to date";
+            case Updates.AVAILABLE: return ar ? "تحديث إلى " + version(latest) : "Update to " + version(latest);
+            case Updates.DOWNLOADING: return d((ar ? "جارٍ التنزيل " : "Downloading ") + percent) + (eastern ? "٪" : "%");
+            case Updates.INSTALLING: return ar ? "جارٍ التثبيت…" : "Installing…";
+            case Updates.FAILED:
+            case Updates.NOT_ALLOWED: return ar ? "حاول مجددًا" : "Try again";
+            default: return ar ? "تحقّق" : "Check";
+        }
+    }
     String hintMove() { return ar ? "▲▼  تنقل" : "▲▼  Move"; }
     String hintChange() { return ar ? "◀▶  تغيير القيمة" : "◀▶  Change value"; }
     String hintChoose() { return ar ? "OK  اختيار" : "OK  Choose"; }

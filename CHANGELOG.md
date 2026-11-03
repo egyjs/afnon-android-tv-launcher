@@ -4,6 +4,17 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- Settings → Device → **Afnon updates**: OK checks GitHub for the latest release, and OK again downloads and
+  installs it, with the progress on the row. Android 12+ installs it without a dialog; Android 10/11 show
+  Android's confirm. Afnon contacts GitHub only when that row is pressed, never on its own (README, Privacy).
+- Setup step "Afnon can install its updates" (`appops set tv.afnon.home REQUEST_INSTALL_PACKAGES allow`), in
+  `tools/setup-steps.txt` and the phone installer's fallback. Until it has run, the row says to run setup again.
+
+### Changed
+- Settings → Device: OK on the section now goes into its rows (TV settings, Afnon updates) instead of opening the
+  TV's settings at once.
+
 ## [0.8.1] - 2026-11-03
 
 ### Changed

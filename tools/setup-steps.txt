@@ -25,3 +25,5 @@
 ?|d=$(dumpsys package tv.afnon.home); echo "$d" | grep -q 'RECORD_AUDIO: granted=true' && echo "$d" | grep -q 'WRITE_SECURE_SETTINGS: granted=true'
 0|Wi-Fi name in Settings|اسم الواي فاي في الإعدادات|pm grant tv.afnon.home android.permission.ACCESS_FINE_LOCATION
 ?|dumpsys package tv.afnon.home | grep -q 'ACCESS_FINE_LOCATION: granted=true'
+0|Afnon can install its updates|أفنون يثبّت تحديثاته|appops set tv.afnon.home REQUEST_INSTALL_PACKAGES allow
+?|appops get tv.afnon.home REQUEST_INSTALL_PACKAGES | grep -q allow

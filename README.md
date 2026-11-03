@@ -103,7 +103,10 @@ Afnon has **no accounts, no analytics and no ads**. The radio is the only featur
 internet, and it connects only to the chosen station's stream, one at a time: `stream.radiojar.com` (Cairo),
 `quran-radio.org` (Nablus), `streaming.zaytonatube.com` (Shabab FM), `live.kwikmotion.com` (Qatar and the Saudi
 Quran stations), `jrtv-live.ercdn.net` (Jordan), `partwota.cdn.mgmlcdn.com` (Oman) or `backup.qurango.net` (the
-reciters). The list is in `Radio.STATIONS`. Afnon makes no other network requests, and its
+reciters). The list is in `Radio.STATIONS`. The only other connection is **Settings → Device → Afnon updates**:
+when you press OK there, Afnon asks `github.com` for the latest release and, if you then choose to update,
+downloads its `afnon.apk` from GitHub (`github.com`, which hands the file over from `*.githubusercontent.com`). It
+never checks on its own and sends nothing about you or the TV. Afnon makes no other network requests, and its
 [network security config](app/src/main/res/xml/network_security.xml) allows plain HTTP for the Cairo stream only.
 Your city and settings stay on the TV.
 
@@ -115,6 +118,7 @@ nothing from other sites except the station's stream when you press Play, and ke
 | `INTERNET`, `WAKE_LOCK` | The radio stream, kept playing with the screen off |
 | `RECORD_AUDIO` | Required by Android's Visualizer, to read Afnon's **own** player for the level bars. It does not use the microphone. |
 | `WRITE_SECURE_SETTINGS` | Turns the TV's sleep timer off while the radio plays, and puts it back after. Turns Afnon's own remote buttons service back on after a force-stop. On TCL, also writes the remote button mappings (see TCL notes) |
+| `REQUEST_INSTALL_PACKAGES`, `UPDATE_PACKAGES_WITHOUT_USER_ACTION` | Settings → Device → Afnon updates installs the new release you asked for (on Android 12+ without a confirm dialog). Allowed at setup (`appops`); Android only accepts an update signed with the same key |
 | `ACCESS_FINE_LOCATION` | Android 9+ hides the Wi-Fi name without it; Home shows the name. Afnon never reads the TV's location |
 | Accessibility service | Remote button mapping (see `RemoteKeys.java`) |
 

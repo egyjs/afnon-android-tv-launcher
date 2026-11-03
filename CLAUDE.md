@@ -19,7 +19,8 @@ real TV over ADB, never just in the build.
 - No blur, video or shadows; animate transform/opacity only. No new timers or background services: prayer checks
   share one 15 s timer in the accessibility service.
 - No network access except the chosen radio station's stream (hosts listed in `Radio.STATIONS` and the README's
-  Privacy section). No analytics, ads or feeds.
+  Privacy section) and Settings → Device → Afnon updates (`Updates`), which contacts GitHub only when OK is pressed
+  on it, never on its own. No analytics, ads or feeds.
 - Colours/sizes/timings from `afnon-mihrab/tokens.json` (generated into `Tokens.java`, `colors.xml` and the site's
   `tokens.css` by `cd site && npm run tokens`; never edit those by hand). Night mode's colours are
   `tokens.night.json`; colours are read when a view is built, so never copy one into a `static final`. Every string in Arabic and English in
