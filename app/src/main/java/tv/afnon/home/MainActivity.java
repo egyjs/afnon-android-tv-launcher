@@ -906,7 +906,7 @@ public class MainActivity extends Screen {
         boolean known = s.connected != null, on = !known || s.connected;
         int rest = on ? Tokens.PLASTER_100 : Tokens.MIST_400;
         TextView name = text(ui500, 30, rest);
-        name.setText(s.name);
+        name.setText(s.tuner ? t.inputChannels() : s.name);
         name.setSingleLine(true);
         name.setEllipsize(TextUtils.TruncateAt.END);
         TextView status = text(ui400, 20, rest);

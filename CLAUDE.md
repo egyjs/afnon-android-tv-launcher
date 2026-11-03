@@ -108,7 +108,9 @@ One Xiaomi MiTV-MOOQ0 (Android TV 10, MediaTek, 1.8 GB, low-RAM mode), debloated
 `examples/xiaomi-mitv-mooq0` list. Stock launcher `com.google.android.tvlauncher` (no launcherx, so setup leaves
 Google's setup app alone; on that TV it owns the saved Wi-Fi network and must stay enabled). Input sends
 `KEYCODE_TV_INPUT` (178); Xiaomi's `GlobalKeyReceiver` (MiTvSetupCustomizer) starts the disabled stock launcher's
-`InputsPanelActivity` on it, so `RemoteKeys` opens Afnon's Inputs panel instead (`Inputs.source`). Not checked there: holding Volume (the service filters keys on
+`InputsPanelActivity` on it, so `RemoteKeys` opens Afnon's Inputs panel instead (`Inputs.source`). Its channels come from the
+built-in satellite receiver (tuner `HW0`): the panel's first row opens its channel list, since Live TV reopens on
+whatever input was last used (AV or an empty HDMI shows "No signal"). Not checked there: holding Volume (the service filters keys on
 non-TCL, non-CVTE firmware), Audio Only, the remote's buttons. Live TV/HDMI is `com.mediatek.wwtv.tvcenter`.
 
 ## Web preview (`site/`)
