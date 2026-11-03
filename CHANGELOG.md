@@ -4,6 +4,10 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Added
+- `docs/tested-tvs.md`: the TVs Afnon has run on (TCL, Super General, Xiaomi, a Toptech/HiSilicon set from #35,
+  and the ones a fork reported), and what works on each. README's Xiaomi note on the Input button is brought up to date.
+
 ## [0.8.2] - 2026-11-03
 
 ### Fixed
