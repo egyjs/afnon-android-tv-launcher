@@ -4,6 +4,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Fixed
+- TCL remote buttons: Afnon emptied every entry in TCL's key remapping that it didn't map itself, including
+  TCL's own and other apps', so those buttons stopped working. It now changes only its own entries, saves a TCL
+  entry it takes over, and puts it back when it lets that button go. `tools/restore.sh` does the same instead of
+  deleting the whole list. Reported by the Awan TV project (discussion #36).
+
 ## [0.8.2] - 2026-11-03
 
 ### Fixed

@@ -32,6 +32,9 @@ import java.util.Set;
  * - Changing "CustomKey_<code>" while <code> is not in the list throws (an observer outlives the list entry). So
  *   codes are never dropped from the list, only emptied, and keys are written a moment after the list, once TCL
  *   has read it.
+ *
+ * Other entries in the list (TCL's own, another app's) are left alone. One we take over is saved under
+ * "AfnonSavedKey_<code>" and put back when the button is no longer ours; tools/restore.sh does the same.
  */
 final class TclKeys {
 
@@ -40,6 +43,8 @@ final class TclKeys {
     private static final String LIST = "CustomKeyList";
     private static final String KEY_PREFIX = "CustomKey_";
     private static final String MISSING = "tv.afnon.home.KEY_TARGET_MISSING";
+    /** Where a firmware entry we replaced waits to be put back. */
+    private static final String SAVED_PREFIX = "AfnonSavedKey_";
     /** Time for TCL's observer to reread the list before the keys change. */
     private static final long LIST_SETTLE_MS = 1000;
 
@@ -60,14 +65,28 @@ final class TclKeys {
                 Intent i = e.getValue();
                 if (i.getPackage() == null && i.getComponent() != null) i.setPackage(i.getComponent().getPackageName());
                 if (i.getPackage() == null) continue;
-                values.put(String.valueOf(e.getKey()), entry(e.getKey(), i).toString());
+                String code = String.valueOf(e.getKey());
+                values.put(code, entry(e.getKey(), i).toString());
+                String now = Settings.Global.getString(r, KEY_PREFIX + code);
+                if (now != null && !ours(now) && Settings.Global.getString(r, SAVED_PREFIX + code) == null) {
+                    Settings.Global.putString(r, SAVED_PREFIX + code, now);
+                }
             }
-            // Buttons no longer ours (their app was uninstalled) are emptied, which hands them back to the firmware.
-            for (String code : codes) if (!values.has(code)) values.put(code, "");
+            // Buttons no longer ours (their app was uninstalled) get back what they had before: the entry we
+            // replaced, else empty, which hands them to the firmware. Entries we never wrote stay as they are.
+            Set<String> restored = new HashSet<>();
+            for (String code : codes) {
+                if (values.has(code) || !ours(Settings.Global.getString(r, KEY_PREFIX + code))) continue;
+                String saved = Settings.Global.getString(r, SAVED_PREFIX + code);
+                values.put(code, saved != null ? saved : "");
+                if (saved != null) restored.add(code);
+            }
+            Set<String> all = new HashSet<>(codes);
+            for (Iterator<String> it = values.keys(); it.hasNext(); ) all.add(it.next());
             JSONArray list = new JSONArray();
-            for (Iterator<String> it = values.keys(); it.hasNext(); ) list.put(it.next());
-            if (!codes(list.toString()).equals(codes)) Settings.Global.putString(r, LIST, list.toString());
-            new Handler(Looper.getMainLooper()).postDelayed(() -> writeKeys(r, values), LIST_SETTLE_MS);
+            for (String code : all) list.put(code);
+            if (!all.equals(codes)) Settings.Global.putString(r, LIST, list.toString());
+            new Handler(Looper.getMainLooper()).postDelayed(() -> writeKeys(r, values, restored), LIST_SETTLE_MS);
             return true;
         } catch (SecurityException | JSONException e) {
             Log.w(TAG, "TCL key remapping unavailable", e);
@@ -75,18 +94,27 @@ final class TclKeys {
         }
     }
 
-    private static void writeKeys(ContentResolver r, JSONObject values) {
+    private static void writeKeys(ContentResolver r, JSONObject values, Set<String> restored) {
         for (Iterator<String> it = values.keys(); it.hasNext(); ) {
             String code = it.next();
             String value = values.optString(code);
-            if (!value.equals(Settings.Global.getString(r, KEY_PREFIX + code))) {
-                try {
+            try {
+                if (!value.equals(Settings.Global.getString(r, KEY_PREFIX + code))) {
                     Settings.Global.putString(r, KEY_PREFIX + code, value);
-                } catch (SecurityException e) {
-                    Log.w(TAG, "could not write " + KEY_PREFIX + code, e);
                 }
+                if (restored.contains(code)) Settings.Global.putString(r, SAVED_PREFIX + code, null);
+            } catch (SecurityException e) {
+                Log.w(TAG, "could not write " + KEY_PREFIX + code, e);
             }
         }
+    }
+
+    /**
+     * Whether an entry is Afnon's: it carries our appnotinstall broadcast. Empty counts too, since only Afnon
+     * empties entries (and older versions emptied other apps' as well).
+     */
+    private static boolean ours(String value) {
+        return value != null && (value.isEmpty() || value.contains(MISSING));
     }
 
     private static JSONObject entry(int code, Intent target) throws JSONException {
