@@ -4,6 +4,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-03
+
 ### Changed
 - Arabic with Western digits: the big numbers are in Marcellus, English's display font, instead of Amiri. That
   is Home's clock, the arch countdown (Home and Prayer day), the call screen's time, the screensaver clock,
@@ -341,7 +343,8 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...v0.8.1
 [0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
 [0.7]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6...v0.6.1
