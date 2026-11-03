@@ -66,6 +66,8 @@ final class Text {
     // Inputs panel (design/Inputs.dc.html)
     String inputs() { return ar ? "مصادر الإدخال" : "Inputs"; }
     String inputSwitch() { return ar ? "تبديل" : "Switch"; }
+    /** The panel's first row: the TV's own channels, from its built-in receiver. */
+    String inputChannels() { return ar ? "قنوات التلفاز" : "TV channels"; }
     String inputOn() { return ar ? "متصل" : "Connected"; }
     String inputOff() { return ar ? "غير متصل" : "Not connected"; }
 

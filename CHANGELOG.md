@@ -4,6 +4,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+### Fixed
+- Inputs panel (Home's Inputs button, and the remote's Input button on the Xiaomi MiTV): it listed only HDMI and
+  AV, so someone looking for the channels picked AV, and Live TV, which reopens on the last input, then showed
+  "No signal" with no way back from the panel. It now starts with **TV channels**, the built-in receiver (opened
+  on its channel list), and leaves AV out. HDMI ports with a device plugged in come first.
+
 ## [0.8.1] - 2026-11-03
 
 ### Changed

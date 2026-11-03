@@ -88,8 +88,8 @@ Afnon started from [cleanyourtv](https://github.com/Gathin23/cleanyourtv):
   The same service brings the call to prayer, so if a TV cleaner force-stops Afnon (which switches the
   service off), Home switches it back on. Turning it off in Settings → Accessibility is respected.
 - **Inputs.** A round button on Home, beside the night-mode button, opens the TV's input menu, as the Source button
-  does, for remotes without one. Where the TV has no menu of its own, Afnon lists the HDMI and AV
-  sources itself.
+  does, for remotes without one. Where the TV has no menu of its own, Afnon lists the sources itself:
+  TV channels (the built-in receiver) first, then the HDMI ports.
 - **Arabic and English.** RTL and LTR layouts. Language follows the TV or is set in Afnon. Digits
   are Arabic-Indic or Latin.
 - **Night mode.** Calmer, dimmer, warmer colours on every screen, from the moon button beside Home's Settings
