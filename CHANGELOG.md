@@ -15,6 +15,14 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - Settings → Device: OK on the section now goes into its rows (TV settings, Afnon updates) instead of opening the
   TV's settings at once.
 
+## [0.8.2] - 2026-11-03
+
+### Fixed
+- Inputs panel (Home's Inputs button, and the remote's Input button on the Xiaomi MiTV): it listed only HDMI and
+  AV, so someone looking for the channels picked AV, and Live TV, which reopens on the last input, then showed
+  "No signal" with no way back from the panel. It now starts with **TV channels**, the built-in receiver (opened
+  on its channel list), and leaves AV out. HDMI ports with a device plugged in come first.
+
 ## [0.8.1] - 2026-11-03
 
 ### Changed
@@ -354,7 +362,8 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...v0.8.1
 [0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
 [0.7]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.6.1...v0.7
