@@ -5,6 +5,10 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 ## [Unreleased]
 
 ### Fixed
+- No blue screen before Settings, Prayer day and All apps. Android showed a starting window in Theme.Afnon's ground
+  (day lapis, also in night mode) while the screen drew: on the TCL 55P7K a `Splash Screen tv.afnon.home` layer
+  appears each time Settings opens. Theme.Afnon sets `windowDisablePreview` and Afnon's own screens open and close
+  with no transition, so the screen in front stays until the next one has drawn.
 - TCL remote buttons: Afnon emptied every entry in TCL's key remapping that it didn't map itself, including
   TCL's own and other apps', so those buttons stopped working. It now changes only its own entries, saves a TCL
   entry it takes over, and puts it back when it lets that button go. `tools/restore.sh` does the same instead of
