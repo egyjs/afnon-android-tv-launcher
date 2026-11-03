@@ -22,7 +22,7 @@ Afnon replaces the stock launcher on an Android TV with one quiet screen. The ne
 countdown sit inside a mihrab arch. The day's six times run across the top, your favourite apps sit
 below, and the call to prayer comes to the TV by itself. Built and tested on a **TCL 55P7K (Google
 TV, Android 12)**, driven only by the remote's D-pad, and also run on a Super General (CVTE) and a Xiaomi
-Mi TV (see the notes below).
+Mi TV (see the notes below, and [Tested TVs](docs/tested-tvs.md) for every TV so far).
 
 ### How it started
 
@@ -258,8 +258,8 @@ launcher off behind its safety switch). Notes:
   it back on.
 - The firmware gives a few built-in apps a phone-style entry only (Clock, MediaTek's Netflix watcher, a
   disclaimer screen). Afnon leaves those out of its app list.
-- The remote's Input button sends `KEYCODE_MEDIA_RECORD` (130). Afnon doesn't map it yet; open Live TV from
-  the favourites for HDMI.
+- The remote's Input button sends Source (`KEYCODE_TV_INPUT`, 178) and opens Afnon's Inputs panel, which
+  starts with the TV channels.
 - Holding Volume and the Audio Only screen-off have not been checked there yet.
 - Free memory matters on this 1.8 GB set: a screen-mirroring app stuck at full CPU (AirScreen) had filled
   RAM and swap and froze other apps before Afnon was installed.
