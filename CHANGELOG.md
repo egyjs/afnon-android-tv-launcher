@@ -8,6 +8,12 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - `docs/tested-tvs.md`: the TVs Afnon has run on (TCL, Super General, Xiaomi, a Toptech/HiSilicon set from #35,
   and the ones a fork reported), and what works on each. README's Xiaomi note on the Input button is brought up to date.
 
+### Fixed
+- No blue screen before Settings, Prayer day and All apps. Android showed a starting window in Theme.Afnon's ground
+  (day lapis, also in night mode) while the screen drew: on the TCL 55P7K a `Splash Screen tv.afnon.home` layer
+  appears each time Settings opens. Theme.Afnon sets `windowDisablePreview` and Afnon's own screens open and close
+  with no transition, so the screen in front stays until the next one has drawn.
+
 ## [0.8.2] - 2026-11-03
 
 ### Fixed
