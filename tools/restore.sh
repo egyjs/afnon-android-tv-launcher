@@ -24,7 +24,7 @@ for code in $(adb shell settings get global CustomKeyList | tr -d '\r[]"' | tr '
   saved=$(adb shell settings get global "AfnonSavedKey_$code" | tr -d '\r')
   adb shell settings delete global "AfnonSavedKey_$code" >/dev/null
   case "$value" in
-    ""|*KEY_TARGET_MISSING*)
+    ""|*tv.afnon.home.KEY_TARGET_MISSING*)
       if [ "$saved" != null ]; then
         adb shell "settings put global CustomKey_$code '$saved'" >/dev/null
         keep="$keep,\"$code\""
