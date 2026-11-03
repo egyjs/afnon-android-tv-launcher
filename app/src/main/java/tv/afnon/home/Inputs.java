@@ -100,6 +100,19 @@ final class Inputs {
         return i != null ? i : FirmwareKeys.sourceMenu(c);
     }
 
+    /** Home's extra that opens Afnon's Inputs panel. */
+    static final String EXTRA_PANEL = "inputs_panel";
+
+    /**
+     * What Source opens: the TV's own inputs screen, else Home with Afnon's panel where the TV lists sources (the
+     * Xiaomi MiTV's firmware opens the stock launcher's panel, which is gone once setup disables it); null if neither.
+     */
+    static Intent source(Context c) {
+        Intent i = screen(c);
+        if (i != null || list(c).isEmpty()) return i;
+        return new Intent(c, MainActivity.class).putExtra(EXTRA_PANEL, true);
+    }
+
     /** The intent pinned to the activity that answers it now, or null if none does. */
     static Intent explicit(Context c, Intent i) {
         ResolveInfo r = c.getPackageManager().resolveActivity(i, 0);

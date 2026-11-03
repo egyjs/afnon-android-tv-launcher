@@ -19,6 +19,9 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 - The arch countdown stays on one line: a wide count (10:00:00 in Marcellus) was wider than the arch and wrapped.
   It gets a little smaller until it fits, measured as if every digit were a 0 (the widest), so its size changes
   only with the count's shape (h:mm:ss to hh:mm:ss), never from one second to the next.
+- Xiaomi MiTV: the remote's Input button did nothing. It sends Source (178), and the firmware opens the stock
+  launcher's inputs panel, which setup disables. Where the TV has no inputs screen of its own, Source and TV now
+  open Afnon's Inputs panel (Home's), as the Inputs button on Home does. TCL and CVTE are unchanged.
 
 ## [0.8] - 2026-10-31
 
