@@ -121,9 +121,10 @@ abstract class Screen extends Activity {
     // ---------------------------------------------------------------- settings
 
     /**
-     * Language and digits. "locale" is "system" (default: Arabic only when the TV's language is Arabic), "ar" or
-     * "en"; "digits" is empty (Eastern in Arabic, Western in English), "eastern" or "western". Set in Afnon
-     * Settings, or for testing: `adb shell am start -n tv.afnon.home/.MainActivity --es locale ar|en|system`.
+     * Language and digits. "locale" is "system" (default: Arabic or Indonesian only when the TV's language is),
+     * "ar", "en" or "id"; "digits" is empty (Eastern in Arabic, Western in English and Indonesian), "eastern" or
+     * "western". Set in Afnon Settings, or for testing:
+     * `adb shell am start -n tv.afnon.home/.MainActivity --es locale ar|en|id|system`.
      *
      * @return whether a setting changed since the screen was built: by the intent, or while it was away (Afnon
      *     Settings, or the phone installer through SetupProvider) and Home brought it back through onNewIntent
@@ -160,12 +161,13 @@ abstract class Screen extends Activity {
     static Text loadText(Context c) {
         SharedPreferences p = c.getSharedPreferences("afnon", MODE_PRIVATE);
         String locale = p.getString("locale", "system");
-        boolean ar = "system".equals(locale)
-            ? "ar".equals(c.getResources().getConfiguration().getLocales().get(0).getLanguage())
-            : "ar".equals(locale);
+        String tvLanguage = c.getResources().getConfiguration().getLocales().get(0).getLanguage();
+        boolean system = "system".equals(locale);
+        boolean ar = system ? "ar".equals(tvLanguage) : "ar".equals(locale);
+        boolean id = system ? "id".equals(tvLanguage) : "id".equals(locale);
         String digits = p.getString("digits", "");
         boolean eastern = digits.isEmpty() ? ar : "eastern".equals(digits);
-        Text t = new Text(ar, eastern);
+        Text t = new Text(ar, id, eastern);
         Prefs.City city = Prefs.city(c);
         t.cityName = ar ? city.ar : city.en;
         return t;
@@ -337,7 +339,7 @@ abstract class Screen extends Activity {
     }
 
     private static Locale dateLocale(Text t) {
-        return t.ar ? Locale.forLanguageTag("ar-EG-u-nu-latn") : Locale.UK;
+        return t.ar ? Locale.forLanguageTag("ar-EG-u-nu-latn") : t.id ? new Locale("id", "ID") : Locale.UK;
     }
 
     /**
