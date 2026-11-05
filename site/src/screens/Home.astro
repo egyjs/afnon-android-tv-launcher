@@ -23,6 +23,8 @@ const favs: { label: string; icon: 'tv' | 'film' | 'book' | 'globe' }[] = [
   { label: ar ? 'شاهد' : 'Shahid', icon: 'film' },
   { label: ar ? 'القرآن الكريم' : 'Quran', icon: 'book' },
   { label: ar ? 'المتصفح' : 'Browser', icon: 'globe' },
+  { label: ar ? 'نتفليكس' : 'Netflix', icon: 'film' },
+  { label: ar ? 'سبوتيفاي' : 'Spotify', icon: 'tv' },
 ];
 const more = ar ? ['يوتيوب ميوزك', 'متجر Play', 'مشغل الوسائط', 'مدير الملفات'] : ['YouTube Music', 'Play Store', 'Media Player', 'File Manager'];
 const allCount = 14;
@@ -345,7 +347,7 @@ const W = { site: ar ? 'على التلفاز يفتح هذا' : 'On the TV this
   .label { position: absolute; inset-inline-start: var(--layout-courtyard-inset-inline-start); font-size: var(--font-size-label); color: var(--color-mist-400); }
   .fav-label { top: 478px; }
   .more-label { top: 722px; }
-  .fav { top: 520px; width: var(--layout-tile-favourite-width); height: var(--layout-tile-favourite-height); padding: 22px 24px; flex-direction: column; justify-content: space-between; align-items: flex-start; font-size: var(--font-size-body-l); font-weight: 500; text-align: start; }
+  .fav { top: 520px; width: var(--layout-tile-favourite-width); height: var(--layout-tile-favourite-height); padding: 18px; flex-direction: column; justify-content: space-between; align-items: flex-start; font-size: var(--font-size-label); font-weight: 500; text-align: start; }
   .more { top: 764px; width: calc((var(--layout-courtyard-width) - 5 * var(--layout-gap-more)) / 6); height: var(--layout-tile-more-height); border-radius: var(--radius-cell); padding: 18px; align-items: flex-end; font-size: var(--font-size-label); text-align: start; }
   .all { white-space: pre-line; padding: 12px; --rest-fill: transparent; --rest-border: var(--color-line-dash); --rest-border-width: 0; border: 2px dashed var(--color-line-dash); }
   .all:focus { border-color: transparent; }

@@ -283,14 +283,15 @@ final class Hero extends View {
         return p;
     }
 
-    /** Four app tiles, one lit at a time: the favourites. */
+    /** Six app tiles, one lit at a time: the favourites. */
     private void tiles(Canvas c, float cx, float cy) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         float s = 96 * k, gap = 26 * k;
-        int lit = (int) (t * 4) % 4;
-        for (int i = 0; i < 4; i++) {
-            float l = cx - s - gap / 2 + (i % 2) * (s + gap), top = cy - s - gap / 2 + (i / 2) * (s + gap) - 20 * k;
-            r.set(l, top, l + s, top + s);
+        int lit = (int) (t * 6) % 6;
+        float left = cx - s - gap / 2, top = cy - (3 * s + 2 * gap) / 2 - 20 * k;
+        for (int i = 0; i < 6; i++) {
+            float l = left + (i % 2) * (s + gap), y = top + (i / 2) * (s + gap);
+            r.set(l, y, l + s, y + s);
             p.setColor(i == lit ? Ui.GOLD_400 : Ui.LAPIS_700);
             c.drawRoundRect(r, 20 * k, 20 * k, p);
         }

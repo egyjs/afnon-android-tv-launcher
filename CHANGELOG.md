@@ -12,10 +12,16 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
   `tools/setup-steps.txt` and the phone installer's fallback. Until it has run, the row says to run setup again.
 - `docs/tested-tvs.md`: the TVs Afnon has run on (TCL, Super General, Xiaomi, a Toptech/HiSilicon set from #35,
   and the ones a fork reported), and what works on each. README's Xiaomi note on the Input button is brought up to date.
+- Indonesian (`id`) as a third interface language, beside Arabic and English: Home, Settings, Prayer day, the
+  call screen, the screensaver and the phone installer's data. "TV" follows the TV's language, Indonesian uses
+  Western digits by default, and the Hijri date uses Indonesian month names and day names.
+- The phone installer can choose six favourites, and reads the regions from Afnon in Indonesian too.
 
 ### Changed
 - Settings → Device: OK on the section now goes into its rows (TV settings, Afnon updates) instead of opening the
   TV's settings at once.
+- Home's favourites row has six slots instead of four. The tiles are narrower so the row still fills the same
+  courtyard width, on the same baseline, and the D-pad reaches all six from the buttons above.
 
 ### Fixed
 - No blue screen before Settings, Prayer day and All apps. Android showed a starting window in Theme.Afnon's ground

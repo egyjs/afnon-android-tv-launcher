@@ -55,8 +55,8 @@ public class MainActivity extends Screen {
     // Section labels sit 10px above the design (478 / 722) so the focus ring and 1.06 scale never touch them.
     private static final int LABEL_ABOVE_FAV = 468, LABEL_ABOVE_MORE = 712;
 
-    private static final int ARCH = 0, WIFI = 1, SETTINGS = 2, F0 = 3, M0 = 7, ALL = 12, RADIO = 13, NIGHT = 14, INPUTS = 15,
-        NODES = 16;
+    private static final int ARCH = 0, WIFI = 1, SETTINGS = 2, F0 = 3, M0 = 9, ALL = 14, RADIO = 15, NIGHT = 16, INPUTS = 17,
+        NODES = 18;
 
     private final View[] nodes = new View[NODES];
     private final TextView[] cellTag = new TextView[6], cellName = new TextView[6], cellTime = new TextView[6];
@@ -291,9 +291,10 @@ public class MainActivity extends Screen {
         TextView fav = caps(text(ui400, 22, Tokens.MIST_400));
         fav.setText(t.fav());
         place(fav, Tokens.COURT_X, LABEL_ABOVE_FAV, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        float fw = (Tokens.COURT_W - 3 * 24) / 4f;
-        for (int i = 0; i < 4; i++) {
-            nodes[F0 + i] = favouriteTile(i < favApps.size() ? favApps.get(i) : null, F0 + i, Tokens.COURT_X + i * (fw + 24), 520, fw);
+        float fw = Tokens.LAYOUT_TILE_FAVOURITE_WIDTH;
+        for (int i = 0; i < 6; i++) {
+            nodes[F0 + i] = favouriteTile(i < favApps.size() ? favApps.get(i) : null, F0 + i,
+                Tokens.COURT_X + i * (fw + Tokens.LAYOUT_GAP_FAVOURITES), 520, fw);
         }
 
         TextView more = caps(text(ui400, 22, Tokens.MIST_400));
@@ -440,13 +441,13 @@ public class MainActivity extends Screen {
         FocusTile b = new FocusTile(this, Tokens.RADIUS_TILE);
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(Ui.ipx(24), Ui.ipx(22), Ui.ipx(24), Ui.ipx(22));
+        col.setPadding(Ui.ipx(18), Ui.ipx(18), Ui.ipx(18), Ui.ipx(18));
         ImageView icon = new ImageView(this);
         icon.setScaleType(ImageView.ScaleType.FIT_START);
         if (!icons.containsKey(pkg)) icons.put(pkg, Apps.icon(this, pkg));
         Apps.showIcon(icon, icons.get(pkg));
         String name = appName(pkg);
-        TextView label = text(ui500, Apps.isLatin(name) ? 28 : 30, Tokens.PLASTER_100);
+        TextView label = text(ui500, Apps.isLatin(name) ? 22 : 24, Tokens.PLASTER_100);
         label.setText(name);
         label.setSingleLine(true);
         label.setEllipsize(TextUtils.TruncateAt.END);
@@ -1136,18 +1137,20 @@ public class MainActivity extends Screen {
         int to = -1;
         switch (from) {
             case ARCH: to = right ? F0 : up ? RADIO : -1; break;
-            case RADIO: to = left ? ARCH : right ? WIFI : down ? F0 + 1 : -1; break;
-            case WIFI: to = left ? RADIO : right ? (nodes[INPUTS] != null ? INPUTS : NIGHT) : down ? F0 + 2 : -1; break;
-            case INPUTS: to = left ? WIFI : right ? NIGHT : down ? F0 + 3 : -1; break;
-            case NIGHT: to = left ? (nodes[INPUTS] != null ? INPUTS : WIFI) : right ? SETTINGS : down ? F0 + 3 : -1; break;
-            case SETTINGS: to = left ? NIGHT : down ? F0 + 3 : -1; break;
+            case RADIO: to = left ? ARCH : right ? WIFI : down ? F0 + 2 : -1; break;
+            case WIFI: to = left ? RADIO : right ? (nodes[INPUTS] != null ? INPUTS : NIGHT) : down ? F0 + 3 : -1; break;
+            case INPUTS: to = left ? WIFI : right ? NIGHT : down ? F0 + 4 : -1; break;
+            case NIGHT: to = left ? (nodes[INPUTS] != null ? INPUTS : WIFI) : right ? SETTINGS : down ? F0 + 5 : -1; break;
+            case SETTINGS: to = left ? NIGHT : down ? F0 + 5 : -1; break;
             default:
                 if (from >= F0 && from < M0) {
                     int i = from - F0;
                     if (left) to = i == 0 ? ARCH : from - 1;
-                    else if (right) to = i == 3 ? -1 : from + 1;
-                    else if (up) to = i == 3 ? SETTINGS : i == 2 ? WIFI : RADIO;
-                    else to = M0 + new int[] {0, 1, 3, 4}[i];
+                    else if (right) to = i == 5 ? -1 : from + 1;
+                    else if (up) to = i == 5 ? SETTINGS
+                        : i == 4 ? (nodes[INPUTS] != null ? INPUTS : NIGHT)
+                        : i == 3 ? WIFI : RADIO;
+                    else to = M0 + Math.min(i, 4);
                 } else {
                     int i = from - M0;
                     if (left) to = i == 0 ? ARCH : from - 1;

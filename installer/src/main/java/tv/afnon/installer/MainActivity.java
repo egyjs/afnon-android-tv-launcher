@@ -799,7 +799,7 @@ public final class MainActivity extends Activity {
                 for (int i = 0; i < steps.size() + 2; i++) timeline.set(i, Timeline.State.CHECKED);
                 if (!installedOk) timeline.set(3, Timeline.State.FAILED);
                 showDone(Arrays.asList(getString(R.string.sum_city, Ui.arabic(this) ? "القاهرة" : "Cairo"),
-                        getString(R.string.sum_favourites, "YouTube, Shahid, Claude Code TV, BrowseHere"),
+                        getString(R.string.sum_favourites, "YouTube, Shahid, Claude Code TV, BrowseHere, Netflix, Plex"),
                         getString(R.string.sum_cleaned, "14")), false);
                 break;
             }

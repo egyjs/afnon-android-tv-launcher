@@ -113,9 +113,9 @@
     <string name="city_lead">تتبع كل مدينة طريقة الحساب التي تعتمدها مساجدها.</string>
     <string name="city_search">ابحث عن مدينة أو دولة</string>
     <string name="city_none">لا توجد مدينة بهذا الاسم. جرّب اسم الدولة أو مدينة قريبة.</string>
-    <string name="fav_title">تطبيقاتك المفضلة الأربعة</string>
+    <string name="fav_title">تطبيقاتك المفضلة الستة</string>
     <string name="fav_lead">تأتي أولًا في الشاشة الرئيسية. اضغط عليها بالترتيب الذي تريده.</string>
-    <string name="fav_count">%1$d من ٤</string>
+    <string name="fav_count">%1$d من ٦</string>
     <string name="clean_title">نظّف تلفازك</string>
     <string name="clean_lead">أوقف الإعلانات والتتبّع والتطبيقات التي لا تستخدمها. لا يُحذف شيء، ويمكنك إعادة تشغيلها كلها.</string>
     <string name="clean_loading">جارٍ فحص ما على التلفاز…</string>

@@ -240,7 +240,7 @@ public class SettingsActivity extends Screen {
     private ScrollView newsPage() {
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
-        for (String[] group : t.news()) {
+        for (String[] group : t.id ? t.newsId() : t.news()) {
             TextView head = text(ui500, 26, Tokens.GOLD_400);
             head.setText(t.newsVersion(group[0]));
             LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(-1, -2);
@@ -419,7 +419,7 @@ public class SettingsActivity extends Screen {
                 });
             case DISPLAY: return Arrays.asList(
                 new Row(SEG) {
-                    final String[] values = {"system", "ar", "en"};
+                    final String[] values = {"system", "ar", "en", "id"};
                     String label() { return t.language(); }
                     String help() { return t.languageHelp(); }
                     String[] segs() { return t.languages(); }
@@ -827,7 +827,7 @@ public class SettingsActivity extends Screen {
                 if (city.countryEn.equals(en)) { countries.add(t.ar ? city.countryAr : city.countryEn); break; }
             }
         }
-        java.text.Collator order = java.text.Collator.getInstance(t.ar ? new Locale("ar") : Locale.ENGLISH);
+        java.text.Collator order = java.text.Collator.getInstance(t.ar ? new Locale("ar") : t.id ? new Locale("id", "ID") : Locale.ENGLISH);
         Collections.sort(countries, (a, b) -> order.compare(a.replaceFirst("^ال", ""), b.replaceFirst("^ال", "")));
         Prefs.City now = Prefs.city(this);
         int sel = countries.indexOf(t.ar ? now.countryAr : now.countryEn);
