@@ -136,7 +136,7 @@ on an Android phone (8 or later) on the same Wi-Fi as the TV, open it and follow
 3. **Install.** The latest `afnon.apk` from this repo's releases (skipped when the TV already has it), then the
    steps in [`tools/setup-steps.txt`](tools/setup-steps.txt) at that release's tag, the same file
    `tools/install.sh` runs.
-4. **Make it yours.** The city and prayer settings, the four favourites (with the TV's own app icons) and a
+4. **Make it yours.** The city and prayer settings, the six favourites (with the TV's own app icons) and a
    cleanup: ads, tracking and preloaded apps, turned off (never uninstalled) from
    [`tools/clean-catalog.tsv`](tools/clean-catalog.tsv), with an undo.
 

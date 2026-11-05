@@ -26,7 +26,7 @@ import java.util.Set;
 final class Apps {
     private Apps() {}
 
-    static final int FAVOURITE_SLOTS = 4;
+    static final int FAVOURITE_SLOTS = 6;
 
     private static final String[] DEFAULT_FAVOURITES = {
         "com.google.android.youtube.tv", "net.mbc.shahidTV", "dev.ctv.tv", "com.tcl.browser"};
@@ -112,7 +112,7 @@ final class Apps {
         List<String> favs = favourites(c);
         List<String> rest = new ArrayList<>();
         for (String p : all) if (!favs.contains(p)) rest.add(p);
-        Collator col = Collator.getInstance(t.ar ? new Locale("ar") : Locale.ENGLISH);
+        Collator col = Collator.getInstance(t.ar ? new Locale("ar") : t.id ? new Locale("id", "ID") : Locale.ENGLISH);
         Map<String, String> names = new HashMap<>();
         for (String p : rest) names.put(p, name(c, t, p));
         rest.sort((a, b) -> col.compare(names.get(a), names.get(b)));
@@ -152,7 +152,7 @@ final class Apps {
     }
 
     /**
-     * Four for Home: the saved favourites that are installed, topped up from the rest if some went away. Fewer on
+     * Six for Home: the saved favourites that are installed, topped up from the rest if some went away. Fewer on
      * a TV with fewer apps; Home shows the missing ones as empty tiles.
      */
     static List<String> slots(Context c, Text t) {

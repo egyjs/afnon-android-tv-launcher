@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * All apps (design/AllApps.dc.html): five columns, three rows in view, paging a row at a time. The info bar
  * names the focused app and its place in favourites. Hold OK arranges favourites: a favourite moves earlier or
- * later; any other app can take a favourite's place (Home always has four). The chip shows the next prayer and
+ * later; any other app can take a favourite's place (Home always has six). The chip shows the next prayer and
  * opens Prayer day; Back returns Home.
  */
 public class AllAppsActivity extends Screen {

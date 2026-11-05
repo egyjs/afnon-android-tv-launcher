@@ -115,9 +115,9 @@
     <string name="city_lead">Each city uses the method its mosques follow.</string>
     <string name="city_search">Search a city or country</string>
     <string name="city_none">No city by that name. Try its country, or a nearby city.</string>
-    <string name="fav_title">Your four favourites</string>
+    <string name="fav_title">Your six favourites</string>
     <string name="fav_lead">They sit first on the home screen. Tap them in the order you want.</string>
-    <string name="fav_count">%1$d of 4</string>
+    <string name="fav_count">%1$d of 6</string>
     <string name="clean_title">Clean up your TV</string>
     <string name="clean_lead">Turn off ads, tracking and apps you don’t use. Nothing is uninstalled, and you can turn it all back on.</string>
     <string name="clean_loading">Checking what’s on the TV…</string>

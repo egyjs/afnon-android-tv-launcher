@@ -158,13 +158,13 @@ final class Tokens {
     /** layout.courtyard.width */
     static final float COURT_W = 1064f;
     /** layout.gap-favourites */
-    static final float LAYOUT_GAP_FAVOURITES = 24f;
+    static final float LAYOUT_GAP_FAVOURITES = 20f;
     /** layout.gap-more */
     static final float LAYOUT_GAP_MORE = 20f;
     /** layout.gap-prayer-cells */
     static final float LAYOUT_GAP_PRAYER_CELLS = 12f;
     /** layout.tile-favourite.width */
-    static final float LAYOUT_TILE_FAVOURITE_WIDTH = 248f;
+    static final float LAYOUT_TILE_FAVOURITE_WIDTH = 160.67f;
     /** layout.tile-favourite.height */
     static final float LAYOUT_TILE_FAVOURITE_HEIGHT = 150f;
     /** layout.tile-more.height */

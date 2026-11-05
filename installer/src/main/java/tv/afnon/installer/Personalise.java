@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * "Make it yours", after the install: the city and prayer settings, the four favourites, the remote's app buttons
+ * "Make it yours", after the install: the city and prayer settings, the six favourites, the remote's app buttons
  * and the cleanup. Every choice is read from and written to Afnon on the TV (SetupProvider), so its cities and
  * settings stay the one source of truth; on an Afnon without the provider (0.5) only the cleanup runs.
  */
 final class Personalise {
+    /** Home's favourite slots; the TV app takes at most this many. */
+    static final int FAVOURITE_SLOTS = 6;
     private final MainActivity a;
     private final Tv tv;
     private final boolean ar;
@@ -263,7 +265,7 @@ final class Personalise {
         t.addView(name, Ui.wide(a, 8));
         t.setOnClickListener(v -> {
             if (favourites.contains(pkg)) favourites.remove(pkg);
-            else if (favourites.size() < 4) favourites.add(pkg);
+            else if (favourites.size() < FAVOURITE_SLOTS) favourites.add(pkg);
             paint.run();
         });
         return t;
