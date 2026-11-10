@@ -15,11 +15,30 @@ fi
 adb shell cmd package set-home-activity "$STOCK_HOME"
 adb shell settings put secure screensaver_components "$STOCK_DREAM"
 adb shell settings delete secure enabled_accessibility_services
-# Afnon's remote buttons, handed to TCL's key remapping (TclKeys.java); harmless where they were never set.
-for code in $(adb shell settings get global CustomKeyList | tr -d '[]"' | tr ',' ' '); do
-  adb shell settings delete global "CustomKey_$code" >/dev/null
+# Afnon's remote buttons, handed to TCL's key remapping (TclKeys.java); harmless where they were never set. Only
+# Afnon's entries (empty, or carrying its KEY_TARGET_MISSING mark) go: one Afnon replaced is put back, others stay.
+# Keys go before the list: TCL crashes if a key changes while its code is out of the list.
+keep=""
+for code in $(adb shell settings get global CustomKeyList | tr -d '\r[]"' | tr ',' ' '); do
+  value=$(adb shell settings get global "CustomKey_$code" | tr -d '\r')
+  saved=$(adb shell settings get global "AfnonSavedKey_$code" | tr -d '\r')
+  adb shell settings delete global "AfnonSavedKey_$code" >/dev/null
+  case "$value" in
+    ""|*tv.afnon.home.KEY_TARGET_MISSING*)
+      if [ "$saved" != null ]; then
+        adb shell "settings put global CustomKey_$code '$saved'" >/dev/null
+        keep="$keep,\"$code\""
+      else
+        adb shell settings delete global "CustomKey_$code" >/dev/null
+      fi ;;
+    *) keep="$keep,\"$code\"" ;;
+  esac
 done
-adb shell settings delete global CustomKeyList >/dev/null
+if [ -n "$keep" ]; then
+  adb shell "settings put global CustomKeyList '[${keep#,}]'" >/dev/null
+else
+  adb shell settings delete global CustomKeyList >/dev/null
+fi
 # The radio turns the sleep timer off while it plays and saves the old value; put it back if it's still off.
 if [ "$(adb shell settings get secure sleep_timeout | tr -d '\r')" = "-1" ]; then
   saved=$(adb shell "run-as tv.afnon.home cat shared_prefs/afnon.xml" 2>/dev/null | sed -n 's/.*name="sleep_saved" value="\([0-9]*\)".*/\1/p')
