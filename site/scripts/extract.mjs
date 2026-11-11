@@ -49,6 +49,36 @@ function template(expr, params) {
   return { s: parts.join(''), d };
 }
 
+// `id ? I : E`, with the Indonesian branch first, reads as E: the site preview keeps Arabic and English.
+function englishOnly(e) {
+  e = e.trim();
+  for (;;) {
+    if (!e.startsWith('(')) break;
+    let depth = 0, inStr = false, wraps = true;
+    for (let i = 0; i < e.length; i++) {
+      const c = e[i];
+      if (inStr) { if (c === '\\') i++; else if (c === '"') inStr = false; continue; }
+      if (c === '"') inStr = true;
+      else if (c === '(') depth++;
+      else if (c === ')') { depth--; if (depth === 0 && i < e.length - 1) { wraps = false; break; } }
+    }
+    if (!wraps) break;
+    e = e.slice(1, -1).trim();
+  }
+  if (!e.startsWith('id ?')) return e;
+  let depth = 0, inStr = false;
+  for (let i = 4; i < e.length; i++) {
+    const c = e[i];
+    if (inStr) { if (c === '\\') i++; else if (c === '"') inStr = false; continue; }
+    if (c === '"') inStr = true;
+    else if (c === '(' || c === '{') depth++;
+    else if (c === ')' || c === '}') depth--;
+    else if (c === '?' && depth === 0) return e;
+    else if (c === ':' && depth === 0) return englishOnly(e.slice(i + 1));
+  }
+  return e;
+}
+
 function splitTernary(body) {
   // body: `ar ? X : Y` with X, Y free of top-level ?: (string literals may contain ':').
   if (!body.startsWith('ar ?')) return null;
@@ -60,7 +90,7 @@ function splitTernary(body) {
     else if (c === '(' || c === '{') depth++;
     else if (c === ')' || c === '}') depth--;
     else if (c === '?' && depth === 0) return null;
-    else if (c === ':' && depth === 0) return [body.slice(4, i).trim(), body.slice(i + 1).trim()];
+    else if (c === ':' && depth === 0) return [body.slice(4, i).trim(), englishOnly(body.slice(i + 1).trim())];
   }
   return null;
 }

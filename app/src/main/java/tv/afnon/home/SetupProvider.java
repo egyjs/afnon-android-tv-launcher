@@ -32,12 +32,12 @@ import java.util.List;
  * <pre>
  * content query --uri content://tv.afnon.home.setup/info     {"version","api","city","locale","adhan",...}
  * content query --uri content://tv.afnon.home.setup/cities   [{"id","ar","en","countryAr","countryEn","region"}]
- * content query --uri content://tv.afnon.home.setup/regions  [{"ar","en"}]
- * content query --uri content://tv.afnon.home.setup/apps     [{"p","ar","en","fav"}]   fav: slot 0-3, or -1
+ * content query --uri content://tv.afnon.home.setup/regions  [{"ar","en","id"}]
+ * content query --uri content://tv.afnon.home.setup/apps     [{"p","ar","en","fav"}]   fav: slot 0-5, or -1
  * content query --uri content://tv.afnon.home.setup/keys     [{"key","p"}]
  * content read  --uri content://tv.afnon.home.setup/icon/&lt;package&gt;   a 96 px PNG
  * content insert --uri content://tv.afnon.home.setup/settings --bind name:s:&lt;name&gt; --bind value:s:&lt;value&gt;
- *     city (an id from cities) · locale (ar|en|system) · favourites (packages, comma-separated, at most 4) ·
+ *     city (an id from cities) · locale (ar|en|id|system) · favourites (packages, comma-separated, at most 6) ·
  *     keys (KEY=package pairs, comma-separated; KEY is a keycode name or number) · adhan · remind_voice ·
  *     announce (on|off)
  * </pre>
@@ -101,9 +101,10 @@ public final class SetupProvider extends ContentProvider {
     }
 
     private static JSONArray regions() throws JSONException {
-        String[] ar = new Text(true, false).regions(), en = new Text(false, false).regions();
+        String[] ar = new Text(true, false).regions(), en = new Text(false, false).regions(),
+            id = new Text(false, true, false).regions();
         JSONArray a = new JSONArray();
-        for (int i = 0; i < ar.length; i++) a.put(new JSONObject().put("ar", ar[i]).put("en", en[i]));
+        for (int i = 0; i < ar.length; i++) a.put(new JSONObject().put("ar", ar[i]).put("en", en[i]).put("id", id[i]));
         return a;
     }
 
@@ -136,7 +137,7 @@ public final class SetupProvider extends ContentProvider {
                 for (int i = 0; i < Prefs.CITIES.length; i++) if (Prefs.CITIES[i].id.equals(value)) Prefs.setCity(c, i);
                 break;
             case "locale":
-                if (Arrays.asList("ar", "en", "system").contains(value)) Prefs.of(c).edit().putString("locale", value).apply();
+                if (Arrays.asList("ar", "en", "id", "system").contains(value)) Prefs.of(c).edit().putString("locale", value).apply();
                 break;
             case "favourites": {
                 List<String> favs = new ArrayList<>();
