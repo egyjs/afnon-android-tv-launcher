@@ -4,6 +4,8 @@ All notable changes to Afnon. Versions match `versionName` in `app/build.gradle`
 
 ## [Unreleased]
 
+## [0.9] - 2026-11-15
+
 ### Added
 - Settings → Device → **Afnon updates**: OK checks GitHub for the latest release, and OK again downloads and
   installs it, with the progress on the row. Android 12+ installs it without a dialog; Android 10/11 show
@@ -370,7 +372,8 @@ First public release.
 - Screensaver, on-TV settings and remote button mapping.
 - Arabic (RTL) first, with English.
 
-[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.9...HEAD
+[0.9]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.2...v0.9
 [0.8.2]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.8...v0.8.1
 [0.8]: https://github.com/egyjs/afnon-android-tv-launcher/compare/v0.7...v0.8
